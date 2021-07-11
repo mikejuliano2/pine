@@ -1,0 +1,44 @@
+study("TDI - MJ", shorttitle="TDI - MJ")
+// -------------------------------------------------
+hline(50, title="Middle Line", linestyle=hline.style_dotted)
+obLevel = hline(70, title="Overbought", linestyle=hline.style_dotted)
+osLevel = hline(30, title="Oversold", linestyle=hline.style_dotted)
+// -------------------------------------------------
+charLocation = input(location.abovebar, 'Character Location', options=['AboveBar', 'BelowBar', 'Absolute', 'Top', 'Bottom'])
+// -------------------------------------------------
+// horizontal ray
+// line.new(extend=extend.right)
+// -------------------------------------------------
+slow = sma(close, 7)
+fast = sma(close, 14)
+// get value of close on second cross occurrence
+valuewhen(cross(slow, fast), close, 1)
+// -------------------------------------------------
+lineStyleChoices = [line.style_solid, line.style_dashed, line.style_dotted]
+lineWidthChoices = [1, 2, 3, 4]
+positionChoices = ['AboveBar', 'BelowBar', 'Absolute', 'Top', 'Bottom']
+labelStyleChoices = [label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle]
+plotStyleChoices = [plot.style_area, plot.style_areabr, plot.style_circles, plot.style_columns, plot.style_cross, plot.style_histogram, plot.style_line, plot.style_linebr, plot.style_stepline]
+
+
+label.style_none, 
+label.style_label_up, 
+label.style_label_upper_right, 
+label.style_label_right, 
+label.style_label_lower_right, 
+label.style_label_down, 
+label.style_label_lower_left, 
+label.style_label_left, 
+label.style_label_upper_left, 
+label.style_label_center, 
+label.style_triangleup, 
+label.style_triangledown, 
+label.style_arrowup, 
+label.style_arrowdown, 
+label.style_xcross, 
+label.style_cross, 
+label.style_flag, 
+label.style_circle, 
+
+// -------------------------------------------------
+sizeChoices = [size.auto, size.tiny, size.small, size.normal, size.large]

@@ -1,0 +1,108 @@
+//@version=4
+study(title="MJ Engulfing", overlay=true)
+
+showSslLine = input(true, "Show SSL Line")
+showEmaLine = input(true, "Show EMA Line")
+showEntryPoints = input(true, 'Show Entry Points')
+useComplexEngulfingCalculation = input(false, 'Complex Engulfing Calc')
+
+showSslCrossover = input(false, "Show SSL Crossover")
+showRsiIndicators = input(false, 'Show RSI Overbought/Oversold')
+showHighLow = input(false, title='Show High/Low')
+showTradeSignal = input(false, "Show Trade Signal")
+
+// SSL -------------------------------------------------------------------------
+
+sslLength = input(10, 'SSL Length')
+sslResolution = input('60', 'SSL Resolution', input.resolution)
+
+smaHighBase = sma(high, sslLength)
+smaHigh = security(syminfo.tickerid, sslResolution, smaHighBase, barmerge.gaps_off, barmerge.lookahead_off)
+smaLowBase = sma(low, sslLength)
+smaLow = security(syminfo.tickerid, sslResolution, smaLowBase, barmerge.gaps_off, barmerge.lookahead_off)
+
+adjustedClose = security(syminfo.tickerid, sslResolution, close, barmerge.gaps_off, barmerge.lookahead_off)
+hlv = 0
+hlv := adjustedClose > smaHigh ? 1 : adjustedClose < smaLow ? -1 : hlv[1] 
+
+
+sslRed = hlv < 0 ? smaHigh : smaLow
+sslGreen = hlv < 0 ? smaLow : smaHigh
+isUpTrend = sslGreen > sslRed
+isDownTrend = sslGreen < sslRed
+isSslCrossover = isDownTrend[1] != isDownTrend
+
+plot(showSslLine ? sslRed : na, linewidth=2, color=color.red)
+plot(showSslLine ? sslGreen : na, linewidth=2, color=color.green)
+
+plotshape(showSslCrossover and isSslCrossover and isUpTrend, title="SSL Crossover", location=location.belowbar, color=color.green, textcolor=color.green, transp=0, style=shape.triangleup, text="SSL Exit")
+plotshape(showSslCrossover and isSslCrossover and isDownTrend, title="SSL Crossover", location=location.belowbar, color=color.orange, textcolor=color.orange, transp=0, style=shape.triangleup, text="SSL Exit")
+
+// EMA -------------------------------------------------------------------------
+emaLineColor = input(color.purple, title="EMA Line Color")
+emaLength = input(50, minval=1, title="EMA Length")
+emaSource = close
+emaOffset = 0
+emaValue = ema(emaSource, emaLength)
+plot(showEmaLine ? emaValue : na, title="EMA", color=emaLineColor, offset=emaOffset)
+
+// isTouchingEmaLine = open <= emaValue and close >= emaValue and open[1] <= emaValue [1] and close[1] >= emaValue[1]
+isTouchingEmaLine = open <= emaValue and close >= emaValue
+
+// CANDLESTICK PATTERNS --------------------------------------------------------
+bullishColor = input(color.green, "Bullish Color")
+bearishColor = input(color.orange, "Bearish Color")
+
+isBullishEngComplex = open[3] > close[3] and open[2] > close[2] and open[1] > close[1] and close > open and close >= open[1] and close[1] >= open and close - open > open[1] - close[1]
+isBearishEngComplex = open[3] < close[3] and open[2] < close[2] and close[1] > open[1] and open > close and open >= close[1] and open[1] >= close and open - close > close[1] - open[1]
+isBullishEngSimple = close >= open[1] and close[1] < open[1]
+isBearishEngSimple = close <= open[1] and close[1] > open[1]
+isBullishEng = useComplexEngulfingCalculation ? isBullishEngComplex : isBullishEngSimple
+isBearishEng = useComplexEngulfingCalculation ? isBearishEngComplex : isBearishEngSimple
+
+isBuyEntryPoint = isBullishEng and isUpTrend and isTouchingEmaLine
+isShortEntryPoint = isBearishEng and isDownTrend and isTouchingEmaLine
+
+plotshape(isBuyEntryPoint and showEntryPoints, title="Bullish", location=location.abovebar, color=bullishColor, textcolor=bullishColor, transp=0, style=shape.triangledown, text="Go Long")
+plotshape(isShortEntryPoint and showEntryPoints, title="Bearish", location=location.abovebar, color=bearishColor, textcolor=bearishColor, transp=0, style=shape.triangledown, text="Go Short")
+barcolor(isBuyEntryPoint ? bullishColor : isShortEntryPoint ? bearishColor : na)
+
+// RSI --------------------------------------------------------------------------
+rsiSource = input(close, title='Rsi Source', type=input.source)
+rsiLength = input(14, title='RSI Length')
+rsiOverboughtLevel = input(70, title='RSI Overbought Level')
+rsiOversoldLevel = input(30, title='RSI Oversold Level')
+rsiValue = rsi(rsiSource, rsiLength)
+isRsiOverbought = rsiValue >= rsiOverboughtLevel
+isRsiOversold = rsiValue <= rsiOversoldLevel
+plotshape(showRsiIndicators and isRsiOverbought, title="Overbought", location=location.belowbar, color=color.red, transp=0, style=shape.triangleup, text="OB")
+plotshape(showRsiIndicators and isRsiOversold, title="Oversold", location=location.belowbar, color=color.green, transp=0, style=shape.triangleup, text="OS")
+// alertcondition(isRsiOverbought or isRsiOversold, title='RSI Signal!', message='RSI Signal Detected for {{ticker}}!')
+
+// HIGH/LOW --------------------------------------------------------------------
+lookbackPeriod = input(title='Lookback Period', type=input.integer, defval=50, minval=1)
+highestHigh = highest(high, lookbackPeriod)
+lowestLow = lowest(low, lookbackPeriod)
+plot(showHighLow ? highestHigh : na, title='Highest High')
+plot(showHighLow ? lowestLow : na)
+
+// TRADE DECISION --------------------------------------------------------------
+shouldBuy = ((isRsiOversold or isRsiOversold[1]) and isBullishEng)
+shouldSell = ((isRsiOverbought or isRsiOverbought[1]) and isBearishEng)
+plotshape(showTradeSignal and shouldSell, title="Sell", location=location.abovebar, color=color.red, transp=0, style=shape.triangledown, text="Sell")
+plotshape(showTradeSignal and shouldBuy, title="Buy", location=location.belowbar, color=color.green, transp=0, style=shape.triangleup, text="Buy")
+
+// TODOS -----------------------------------------------------------------------
+
+// TODO: determine how to set takeProfit/stopLoss
+// TODO: Use SSL crossover as an exit point
+
+
+
+
+
+
+
+
+
+

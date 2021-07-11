@@ -1,0 +1,28 @@
+//@version=4
+// This is just a simple script to plot a character when an oscillator crosses 0
+
+study(title="MCB - Cross Plot", format=format.price, overlay=true)
+
+wave = input(type=input.source, defval=hlc3, title="Wave to monitor (e.g. VWAP, MFI)")
+crossValue = input(title="Cross Value", defval=0)
+bullishColor = input(title="Bullish Color", defval=color.new(#1cd206, 0))
+bearishColor = input(title="Bearish Color", defval=color.new(#f21616, 0))
+characterToPlot = input(title="Character to plot", defval='V')
+charLocation = input(location.abovebar, 'Character Location', options=['AboveBar', 'BelowBar', 'Absolute', 'Top', 'Bottom'])
+hasBullishCross = wave > crossValue and wave[1] < crossValue
+hasBearishCross = wave < crossValue and wave[1] > crossValue
+hasAnyCross = hasBullishCross or hasBearishCross
+
+
+charColor = hasBearishCross ? bearishColor : bullishColor
+
+plotchar( 
+     series=hasAnyCross ? high : na,
+     title="Cross",
+     char=characterToPlot,
+     location=charLocation,
+     size=size.tiny,
+     color=charColor,
+     textcolor=charColor,
+     offset=-1
+     )

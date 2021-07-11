@@ -1,0 +1,25 @@
+//////////////////////////////////////////////////////////////////
+// 
+// ==== DAILY OPEN ==== 
+// 
+//////////////////////////////////////////////////////////////////
+
+groupDailyOpen = 'Daily Open'
+bool showPrev = input(false, "Print Previous Daily Open Alongside Next", group=groupDailyOpen)
+bool showMore = input(false, "Print Daily Open From Two Days Ago", group=groupDailyOpen)
+bool showAvg  = input(false, "Show Average of Current and Previous", group=groupDailyOpen)
+
+_color = input(#196ae7, "Daily Open Color", type=input.color)
+dailyOpenColor = color.new(_color, 20)
+previousDayColor = color.new(_color, 60)
+size = 3
+plotStyle = plot.style_circles
+
+daily_open(x) => 
+    trigger = na(time("D")) or change(time("D"))
+    valuewhen(trigger, open, x)
+
+plot(daily_open(0), "Daily Open", dailyOpenColor, size, plot.style_circles)
+plot(showPrev ? daily_open(1) : na, "Previous Daily Open", previousDayColor, size, plotStyle)
+plot(showMore ? daily_open(2) : na, "Previously Previous Daily Open", previousDayColor, 2, plotStyle)
+plot(showAvg ? avg(daily_open(0), daily_open(1)) : na, "Avg.", color.silver, size, plotStyle)

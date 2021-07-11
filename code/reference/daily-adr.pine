@@ -1,0 +1,110 @@
+//@version=4
+//
+// Average Daily Range (ADR) Indicator for TradingView
+// This script is based on the "Best ADR Indicator for MT4" described at https://www.fxdayjob.com/best-adr-indicator-mt4.
+//
+// -----------------------------------------------------------------------------
+// Copyright 2017 sherwind
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+// 
+// The GNU General Public License can be found here
+// <http://www.gnu.org/licenses/>.
+//
+// -----------------------------------------------------------------------------
+//
+study(title="Average Daily Range High Low", shorttitle="ADR HiLo", overlay=true)
+
+is_forex_pips = input(title="Display average range as forex pips?", type=input.bool, defval=true)
+daily_adr = input(title="How many ADR to show", type=input.integer, defval=5, minval=0)
+weekly_adr = input(title="How many AWR to show", type=input.integer, defval=0, minval=0)
+monthly_adr = input(title="How many AMR to show", type=input.integer, defval=0, minval=0)
+yearly_adr = input(title="How many AYR to show", type=input.integer, defval=0, minval=0)
+daily_adr_length = input(title="ADR Length parameter", type=input.integer, defval=5, minval=0)
+weekly_adr_length = input(title="AWR Length parameter", type=input.integer, defval=5, minval=0)
+monthly_adr_length = input(title="AMR Length parameter", type=input.integer, defval=1, minval=0)
+yearly_adr_length = input(title="AYR Length parameter", type=input.integer, defval=1, minval=0)
+daily_adr_color = input(title="ADR color", type=input.color, defval=color.rgb(0, 128, 0, 40))
+weekly_adr_color = input(title="AWR color", type=input.color, defval=color.rgb(255, 165, 0, 50))
+monthly_adr_color = input(title="AMR color", type=input.color, defval=color.rgb(255, 0, 255, 70))
+yearly_adr_color = input(title="AYR color", type=input.color, defval=color.rgb(255, 0, 0, 70))
+
+new_bar(res) =>
+    change(time(res)) != 0
+adr(length) =>
+    range = high - low
+    sma(range[1], length)
+adr_high(adr) =>
+    high - low < adr ? low + adr : close >= open ? low + adr : high
+adr_low(adr) =>
+    high - low < adr ? high - adr : close >= open ? low : high - adr
+adr_levels(length) =>
+    _adr = adr(length) 
+    [_adr, adr_high(_adr), adr_low(_adr)]
+to_pips(val) =>
+    is_forex_pips ? val/syminfo.mintick/10 : val/syminfo.mintick
+tick_format() =>
+    _s = tostring(syminfo.mintick)
+    _s := str.replace_all(_s, "25", "00")
+    _s := str.replace_all(_s, "5",  "0")
+    _s := str.replace_all(_s, "1",  "0")
+draw_adr_hilo(hi_level, lo_level, res, adr, level_color, show_count, prefix) =>
+    var line hi_line = na
+    var line lo_line = na
+    var ary_range_label = array.new_label(show_count)
+    var ary_hi_line = array.new_line(show_count)
+    var ary_lo_line = array.new_line(show_count)
+    if new_bar(res)
+        line.set_x2(hi_line, bar_index)
+        line.set_x2(lo_line, bar_index)
+        line.set_extend(hi_line, extend.none)
+        line.set_extend(lo_line, extend.none)
+        hi_line := line.new(bar_index, hi_level, bar_index, hi_level, extend=extend.right, color=level_color)
+        lo_line := line.new(bar_index, lo_level, bar_index, lo_level, extend=extend.right, color=level_color)
+        range_label = label.new(bar_index, hi_level, prefix + ": " + tostring(to_pips(adr), tick_format()) + "\n\n", color=color(na), style=label.style_label_left, textalign=text.align_left)
+        array.push(ary_hi_line, hi_line)
+        array.push(ary_lo_line, lo_line)
+        array.push(ary_range_label, range_label)
+        line.delete(array.shift(ary_hi_line))
+        line.delete(array.shift(ary_lo_line))
+        label.delete(array.shift(ary_range_label))
+    if not na(hi_line) and line.get_x2(hi_line) != bar_index
+        line.set_x2(hi_line, bar_index)
+        line.set_x2(lo_line, bar_index)
+
+
+//
+// Daily
+//
+[day_adr, day_adr_high, day_adr_low] = security(syminfo.tickerid, 'D', adr_levels(daily_adr_length), lookahead=barmerge.lookahead_on)
+if timeframe.isintraday and daily_adr > 0
+    draw_adr_hilo(day_adr_high, day_adr_low, 'D', day_adr, daily_adr_color, daily_adr, "ADR")
+
+//
+// Weekly
+//
+[week_adr, week_adr_high, week_adr_low]  = security(syminfo.tickerid, 'W', adr_levels(weekly_adr_length), lookahead=barmerge.lookahead_on)
+if (timeframe.isintraday or timeframe.isdaily) and weekly_adr > 0
+    draw_adr_hilo(week_adr_high, week_adr_low, 'W', week_adr, weekly_adr_color, weekly_adr, "AWR")
+
+//
+// Monthly
+//
+[month_adr, month_adr_high, month_adr_low]  = security(syminfo.tickerid, 'M', adr_levels(monthly_adr_length), lookahead=barmerge.lookahead_on)
+if (timeframe.isintraday or timeframe.isdaily or timeframe.isweekly) and monthly_adr > 0
+    draw_adr_hilo(month_adr_high, month_adr_low, 'M', month_adr, monthly_adr_color, monthly_adr, "AMR")
+
+//
+// Yearly
+//
+[year_adr, year_adr_high, year_adr_low]  = security(syminfo.tickerid, '12M', adr_levels(yearly_adr_length), lookahead=barmerge.lookahead_on)
+if yearly_adr > 0
+    draw_adr_hilo(month_adr_high, month_adr_low, '12M', year_adr, yearly_adr_color, yearly_adr, "AYR")

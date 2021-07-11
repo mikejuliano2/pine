@@ -1,0 +1,195 @@
+//@version=4
+// Modified by Jakub  a Babo
+
+study("MJ - TDI", shorttitle="MJ - TDI")
+
+rsiPeriod = input(21, minval = 1, title = "RSI Period")
+bandLength = input(34, minval = 1, title = "Band Length")
+lengthrsipl = input(7, minval = 0, title = "Fast MA on RSI")
+lengthtradesl = input(2, minval = 1, title = "Slow MA on RSI")
+
+bandsColor = color.new(#2962ff, 40)
+bandsLineWidth = 2
+
+marketBaseColor = color.new(#ffb74d, 50)
+marketBaseLineWidth = 2
+
+marketSignalColor = color.new(#ff5252, 20)
+marketSignalLineWidth = 2
+
+rsiColor = color.new(#006064, 0)
+rsiLineWidth = 2
+
+
+src = close                                                             // Source of Calculations (Close of Bar)
+r = rsi(src, rsiPeriod)                                                 // RSI of Close
+ma = sma(r, bandLength)                                                 // Moving Average of RSI [current]
+offs = (1.6185 * stdev(r, bandLength))                                  // Offset
+up = ma + offs                                                          // Upper Bands
+dn = ma - offs                                                          // Lower Bands
+mid = (up + dn) / 2                                                     // Average of Upper and Lower Bands
+fastMA = sma(r, lengthrsipl)                                            // Moving Average of RSI 7 bars back
+slowMA = sma(r, lengthtradesl)                                          // Moving Average of RSI 2 bars back
+osc = slowMA
+// hline(20)                                                               // ExtremelyOversold
+// hline(80)                                                               // ExtremelyOverbought
+
+upl = plot(up, "Upper Band", color=bandsColor, linewidth=bandsLineWidth)               // Upper Band
+dnl = plot(dn, "Lower Band", color=bandsColor, linewidth=bandsLineWidth)               // Lower Band
+midl = plot(mid, "Middle of Bands", color=marketBaseColor, linewidth=marketBaseLineWidth)      // Middle of Bands
+rsiLine = plot(slowMA, "Slow MA", color=rsiColor, linewidth=rsiLineWidth)                       // Plot Slow MA
+marketSignalLine = plot(fastMA, "Fast MA", color=marketSignalColor, linewidth=marketSignalLineWidth)                         // Plot Fast MA
+// -------------------------------------------------------------------------------------------------------------
+//len = input(title="RSI Period", minval=1, defval=21)
+//src1 = close
+lbR = input(title="Pivot Lookback Right", defval=5)
+lbL = input(title="Pivot Lookback Left", defval=5)
+rangeUpper = input(title="Max of Lookback Range", defval=60)
+rangeLower = input(title="Min of Lookback Range", defval=5)
+plotBull = input(title="Plot Bullish", defval=true)
+plotHiddenBull = input(title="Plot Hidden Bullish", defval=false)
+plotBear = input(title="Plot Bearish", defval=true)
+plotHiddenBear = input(title="Plot Hidden Bearish", defval=false)
+bearColor = color.new(#f21616, 0)
+bullColor = color.new(#1cd206, 0)
+hiddenBullColor = color.new(color.green, 80)
+hiddenBearColor = color.new(color.red, 80)
+textColor = color.new(color.black, 0)
+divergenceLineWidth = 4
+divergenceLineTransparency = 0
+
+
+// hline(50, title="Middle Line", linestyle=hline.style_dotted)
+// obLevel = hline(70, title="Overbought", linestyle=hline.style_dotted)
+// osLevel = hline(30, title="Oversold", linestyle=hline.style_dotted)
+// fill(obLevel, osLevel, title="Background", color=color.new(#9915FF, 2))
+
+// #############################################################################
+// DIVERGENCE
+// #############################################################################
+
+plFound = na(pivotlow(osc, lbL, lbR)) ? false : true
+phFound = na(pivothigh(osc, lbL, lbR)) ? false : true
+_inRange(cond) =>
+	bars = barssince(cond == true)
+	rangeLower <= bars and bars <= rangeUpper
+
+//-----------------------
+// Regular Bullish
+//-----------------------
+
+oscHL = osc[lbR] > valuewhen(plFound, osc[lbR], 1) and _inRange(plFound[1]) // Osc: Higher Low
+priceLL = low[lbR] < valuewhen(plFound, low[lbR], 1) // Price: Lower Low
+bullCond = plotBull and priceLL and oscHL and plFound
+
+plot(
+     plFound ? osc[lbR] : na,
+     offset=-lbR,
+     title="Regular Bullish",
+     linewidth=divergenceLineWidth,
+     color=bullCond ? color.new(bullColor, divergenceLineTransparency) : na
+     )
+
+plotshape(
+	 bullCond ? osc[lbR] : na,
+	 offset=-lbR,
+	 title="Regular Bullish Label",
+	 text="R",
+	 style=shape.labelup,
+	 location=location.absolute,
+	 color=bullCond ? color.new(bullColor, 0) : na,
+	 textcolor=textColor
+	 )
+
+//-----------------------
+// Hidden Bullish
+//-----------------------
+
+oscLL = osc[lbR] < valuewhen(plFound, osc[lbR], 1) and _inRange(plFound[1]) // Osc: Lower Low
+priceHL = low[lbR] > valuewhen(plFound, low[lbR], 1) // Price: Higher Low
+hiddenBullCond = plotHiddenBull and priceHL and oscLL and plFound
+
+plot(
+	 plFound ? osc[lbR] : na,
+	 offset=-lbR,
+	 title="Hidden Bullish",
+	 linewidth=divergenceLineWidth,
+	 color=hiddenBullCond ? color.new(hiddenBullColor, divergenceLineTransparency) : na
+	 )
+
+plotshape(
+	 hiddenBullCond ? osc[lbR] : na,
+	 offset=-lbR,
+	 title="Hidden Bullish Label",
+	 text="H",
+	 location=location.absolute,
+	 style=shape.labelup,
+	 color=color.new(bearColor, 0),
+	 textcolor=textColor
+	 )
+
+//-----------------------
+// Regular Bearish
+//-----------------------
+
+oscLH = osc[lbR] < valuewhen(phFound, osc[lbR], 1) and _inRange(phFound[1]) // Osc: Lower High
+priceHH = high[lbR] > valuewhen(phFound, high[lbR], 1) // Price: Higher High
+bearCond = plotBear and priceHH and oscLH and phFound
+
+plot(
+	 phFound ? osc[lbR] : na,
+	 offset=-lbR,
+	 title="Regular Bearish",
+	 linewidth=divergenceLineWidth,
+	 color=bearCond ? color.new(bearColor, divergenceLineTransparency) : na
+	 )
+
+plotshape(
+	 bearCond ? osc[lbR] : na,
+	 offset=-lbR,
+	 title="Regular Bearish Label",
+	 text="R",
+	 location=location.absolute,
+	 style=shape.labeldown,
+	 color=color.new(bearColor, 0),
+	 textcolor=textColor
+	 )
+
+//-----------------------
+// Hidden Bearish
+//-----------------------
+
+oscHH = osc[lbR] > valuewhen(phFound, osc[lbR], 1) and _inRange(phFound[1]) // Osc: Higher High
+priceLH = high[lbR] < valuewhen(phFound, high[lbR], 1) // Price: Lower High
+hiddenBearCond = plotHiddenBear and priceLH and oscHH and phFound
+
+plot(
+	 phFound ? osc[lbR] : na,
+	 offset=-lbR,
+	 title="Hidden Bearish",
+	 linewidth=divergenceLineWidth,
+	 color=hiddenBearCond ? color.new(hiddenBearColor, divergenceLineTransparency) : na
+	 )
+
+plotshape(
+	 hiddenBearCond ? osc[lbR] : na,
+	 offset=-lbR,
+	 title="Hidden Bearish Label",
+	 text="H",
+	 location=location.absolute,
+	 style=shape.labeldown,
+	 color=color.new(bearColor, 0),
+	 textcolor=textColor
+	 )
+	 
+// #############################################################################
+// BG COlOR (when outside bands)
+// #############################################################################
+
+coloredBgWhenOutsideBands = input(true, title='Colored BG when outside bands?', group='Background Color')
+bgColorTransparency = input(94, title='BG color transparency', group='Background Color', minval=0, maxval=100)
+
+belowLowerBand = slowMA < dn
+aboveUpperBand = slowMA > up
+bgColor = color.new(coloredBgWhenOutsideBands ? (belowLowerBand ? color.purple : aboveUpperBand ? color.blue : na) : na, bgColorTransparency)
+bgcolor(bgColor)

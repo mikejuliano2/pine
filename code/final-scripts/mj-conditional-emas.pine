@@ -1,0 +1,47 @@
+//@version=4
+
+study("MJ - Conditional EMAs", overlay=true)
+
+//////////////////////////////////////////////////////////////////
+// 
+// ==== CONDITIONAL EMAs ==== 
+// 
+//////////////////////////////////////////////////////////////////
+
+emaOneColor = input(color.new(#e65100, 15), 'EMA 1 Color')
+lineWidth = input(2, 'EMA Line Width', options=[1,2,3,4])
+labelOffsetInBars = input(35, 'Label Offset (in bars)')
+labelOpacity = input(30, 'Label Opacity')
+labelStyle = input(label.style_none, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
+labelSize = input(size.normal, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large])
+
+_getValues() => 
+    if timeframe.period == '1'
+        [ema(close, 3000)]
+    else if timeframe.period == '5'
+        [ema(close, 600)]
+    else 
+        [na]
+
+_getLabels() => 
+    if timeframe.period == '1'
+        ['3000 => 50EMA on 1h']
+    else if timeframe.period == '5'
+        ['600 => 50EMA on 1h']
+    else 
+        [na]
+
+_getFutureTimeNBarsFromNow(numBars) => time + ( ( time - time[1] ) * numBars )
+
+_drawLabel(y, text, Color, textColor) => 
+    x = _getFutureTimeNBarsFromNow(labelOffsetInBars)
+    _color = color.new(Color, labelOpacity)
+    y ? label.new(x, y, text, style=labelStyle, textcolor=textColor, color=_color, size=labelSize, xloc=xloc.bar_time) : na
+
+[valueOne] = _getValues()
+[labelOneText] = _getLabels()
+
+// EMA 1
+plot(valueOne, color=emaOneColor, linewidth=lineWidth, title='EMA 1')
+labelOneId = _drawLabel(valueOne, labelOneText, emaOneColor, color.white)
+label.delete(labelOneId[1])
