@@ -91,6 +91,8 @@ _isFirstBarForCurrentTimeframeAtResolution(Resolution) =>
 // ------------------
 groupCurrentHourRange = 'Current Hour Range'
 _defaultHourRangeColor = color.new(#fbc02d, 40)
+
+maxTimeframeToShowCurrentHourRange = input(15, 'Max timeframe to show current hour range?', maxval=60, minval=1, group=groupCurrentHourRange)
 rangeLineColor = input(_defaultHourRangeColor, 'Current Hour Range Line Color', group=groupCurrentHourRange)
 rangeLineWidth = input(1, 'Current Hour Range Line Width', options=[1,2,3,4], group=groupCurrentHourRange)
 rangeLineStyle = input(line.style_dashed, 'Current Hour Range Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupCurrentHourRange)
@@ -112,6 +114,8 @@ showOpenHighLowValueInLabel = input(false, 'Show Open/High/Low Values in Label?'
 var line hourlyHighLineId = na
 var line hourlyLowLineId = na
 var line hourlyOpenLineId = na
+
+_isValidTimeframeToShowCurrentHourRange() => timeframe.multiplier <= maxTimeframeToShowCurrentHourRange
 
 _getHighAndLow (fromIndex, toIndex) =>
     float pT = 0
@@ -162,6 +166,16 @@ _plotTheRangeOfTheCurrentHour(_color, _width, _style) =>
     
     openValueDisplay = ': ' + tostring(hourlyOpen[0])
     openLabel = 'O' + (showOpenHighLowValueInLabel ? openValueDisplay : '')
+
+    if not _isValidTimeframeToShowCurrentHourRange()
+        x1 := na
+        x2 := na
+        highLabel := na
+        lowLabel := na
+        openLabel := na
+        lowValueDisplay := na
+        openValueDisplay := na
+        highValueDisplay := na
     
     _highLineId = _drawHourlyRangeHorizontalLine(hourlyHighLineId, x1, x2, hourlyHigh, _color, _width, _style, highLabel, rangeHighLabelStyle)
     _lowLineId = _drawHourlyRangeHorizontalLine(hourlyLowLineId, x1, x2, hourlyLow, _color, _width, _style, lowLabel, rangeLowLabelStyle)

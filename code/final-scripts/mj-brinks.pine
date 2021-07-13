@@ -95,12 +95,12 @@ dailyLast15minActive = input(true, 'Last 15min of Day Active', group=groupBrinks
 brinksPlotJoined = input(false, 'Join Brinks Plot Points?', group=groupBrinks)
 // ---- dropdowns ----
 maxTimeFrameToShowBrinks = input(title='Max timeframe to show Brinks', defval=15, maxval=60, minval=1, group=groupBrinks)
-brinksLineColor = input(color.new(color.white, 30), 'Brinks Line Color', group=groupBrinks)
-brinksBgColor = input(color.new(color.white, 70), 'Brinks BG Color', group=groupBrinks)
+brinksLineColor = input(color.new(color.white, 10), 'Brinks Line Color', group=groupBrinks)
+brinksBgColor = input(color.new(color.white, 60), 'Brinks BG Color', group=groupBrinks)
 dailyLast15MinLineColor = input(color.new(color.orange, 30), 'Daily Last 15min Line Color', group=groupBrinks)
 dailyLast15MinBgColor = input(color.new(color.orange, 80), 'Daily Last 15min BG Color', group=groupBrinks)
 brinksPlotStyle = input(plot.style_linebr, 'Brinks Plot Style', group=groupBrinks, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-brinksLineWidth = input(1, 'Brinks Line Width', group=groupBrinks, options=[1,2,3,4])
+brinksLineWidth = input(2, 'Brinks Line Width', group=groupBrinks, options=[1,2,3,4])
 // ----- time ranges -----
 nyBrinksTimeRange = input('1300-1401:23456', 'New York Session Time', group=groupBrinks, type=input.session)
 londonBrinksTimeRange = input('0700-0801:23456', 'London Session Time', group=groupBrinks, type=input.session)
@@ -110,18 +110,18 @@ dailyLast15MinTimeRange = input('2345-0001:1234567', 'Last 15min Time', group=gr
 // FUNCTIONS
 // ---------------
 
-_isValdBrinksTimeframe() => timeframe.multiplier <= maxTimeFrameToShowBrinks
+_isValidBrinksTimeframe() => timeframe.multiplier <= maxTimeFrameToShowBrinks
 
 _passesBrinksDayRestriction() => onlyShowBrinksForCurrentDay ? _isCurrentDay() : true
 
 _getBrinksBgColorForTimeRange(timeRange, isActive, _color) => 
-    isGoodTimeframe = _isValdBrinksTimeframe()
+    isGoodTimeframe = _isValidBrinksTimeframe()
     passesDayRestriction = _passesBrinksDayRestriction()
     isInSession = _isInSession(timeRange)
     bgColor = isInSession and isActive and isGoodTimeframe and passesDayRestriction ? _color : na
 
 _getBrinksLabel(timeRange, isActive, text) => 
-    isGoodTimeframe = _isValdBrinksTimeframe()
+    isGoodTimeframe = _isValidBrinksTimeframe()
     isInSession = _isInSession(timeRange)
     isFirstBar = _isFirstBarForCurrentTimeframeAtResolution('30')
     labelPosition = time(timeframe.period, timeRange)
