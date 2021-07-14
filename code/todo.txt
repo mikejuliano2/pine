@@ -1,0 +1,37 @@
+//////////////////////////////////////////////////////////////////
+// 
+// ==== TODOS ==== 
+// 
+//////////////////////////////////////////////////////////////////
+
+// adjust the x2 offset for all the levels... most important levels closest to current bar
+// Session Levels - optionally fill the range for each session, but once out of session, only show the line in the future
+// optionally show price in levels labels
+// convert the pivot lines
+
+// daily open MT4 = 10pm GMT = 18:00
+
+// Plot Markers for EMA cross
+    // 5/13
+    // 5/50 cross
+    // 13/50 cross
+    // 50/200 cross
+    // 50/800 cross
+    // 200/800 cross
+// move all EMAs to conditional EMAs
+// add conditional labels
+    // 1m: 750 = 50 on 15, 250 = 50 on 5
+    // 5m: 150 = 50 on 15
+
+// Split out PVSRA
+
+// extend lines to yesterday's daily open like the M1-5 levels in TR
+// if in NY Session, lines that extend out to the end of the session
+// RDH/RDL
+// add an alert for MCB divergence on the 15 min
+// label the brinks
+// extend session lines backwards for debriefing
+// make the daily open blue
+
+
+// the 50% retracement is where you determine if the move is going to continue
