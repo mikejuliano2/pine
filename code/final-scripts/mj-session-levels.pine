@@ -75,6 +75,9 @@ _isFirstBarForCurrentTimeframeAtResolution(Resolution) =>
     currentBar = t
     not na(currentBar) and ( na(previousBar) or currentBar > previousBar)
 
+// new_bar: check if we're on a new bar within the session in a given resolution
+new_bar(res) => change(time(res)) != 0
+
 //////////////////////////////////////////////////////////////////
 // 
 // ==== SESSION LEVELS ==== 
@@ -285,13 +288,27 @@ label.delete(nyOpenLabelId[1])
 onlyShowYesterdayHighLowForCurrentDay = input(true, 'Only show yesterday H/L on current day?')
 onlyShowLastWeekHighLowForCurrentDay = input(true, 'Only show last week H/L on current day?')
 
-yesterdayHighLowLineColor = input(color.blue, 'Yesterday H/L Line Color')
-yesterdayHighLowPlotStyle = input(plot.style_linebr, 'Yesterday H/L Plot Style', options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-yesterdayHighLowLineWidth = input(1, 'Yesterday H/L Line Width', options=[1,2,3,4])
 
+dailyWeeklyHighLowLabelStyle = input(label.style_none, 'Yesterday H/L Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
+dailyWeeklyHighLowLabelVisible = input(true, 'Daily/Weekly H/L Label Visible?')
+dailyWeeklyHighLowLabelSize = input(size.normal, 'Daily/Weekly H/L Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large])
+
+// yesterdayHighLowPlotStyle = input(plot.style_linebr, 'Yesterday H/L Plot Style', options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+yesterdayHighLowLineColor = input(color.blue, 'Yesterday H/L Line Color')
+yesterdayHighLowLineWidth = input(1, 'Yesterday H/L Line Width', options=[1,2,3,4])
+yesterdayHighLowLineStyle = input(line.style_solid, 'Yesterday H/L Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted])
+yesterdayHighLowLabelColor = input(color.new(color.blue, 0), 'Yesterday H/L Label Color')
+yesterdayHighLowLabelTextColor = input(color.new(color.white, 0), 'Yesterday H/L Label Text Color')
+yesterdayHighLowLabelOffset = input(30, 'Yesterday H/L Label Offset (in bars)')
+
+
+// lastWeekHighLowPlotStyle = input(plot.style_linebr, 'Last Week H/L Plot Style', options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
 lastWeekHighLowLineColor = input(color.green, 'Last Week H/L Line Color')
-lastWeekHighLowPlotStyle = input(plot.style_linebr, 'Last Week H/L Plot Style', options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
 lastWeekHighLowLineWidth = input(1, 'Last Week H/L Line Width', options=[1,2,3,4])
+lastWeekHighLowLineStyle = input(line.style_solid, 'Last Week H/L Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted])
+lastWeekHighLowLabelColor = input(color.new(color.green, 0), 'Last Week H9/L Label Color')
+lastWeekHighLowLabelTextColor = input(color.new(color.white, 0), 'Last Week H/L Label Text Color')
+lastWeekHighLowLabelOffset = input(40, 'Last Week H/L Label Offset (in bars)')
 
 _nonRepaintSecurity(_symbol, _res, _src, _repaint) => security(_symbol, _res, _src[_repaint ? 0 : barstate.isrealtime ? 1 : 0])[_repaint ? 0 : barstate.isrealtime ? 0 : 1]
 
@@ -308,6 +325,11 @@ pivR2 = pivotPoint-pivS1+pivR1
 pivS2 = pivotPoint-pivR1+pivS1
 pivR3 = (2*pivotPoint)+(dayHigh-(2*dayLow))
 pivS3 = (2*pivotPoint)-((2*dayHigh)-dayLow)
+
+// _getLevelsStart() => 
+//     levelsStartTime = iff((timeframe.isseconds == true) or (timeframe.isminutes == true and timeframe.multiplier < 5), time('D'), time('D') - (MS_PER_DAY))
+//     levelsStartBar = barssince(levelsStartBar)
+//     [levelsStartTime, levelsStartBar]
 
 _doShowYesterdayHighLow() => 
     isValidTimeframe = timeframe.isintraday == true
@@ -332,15 +354,58 @@ _getLastWeekHighLowValues() =>
     else 
         [na, na]
 
-[yesterdayHigh, yesterdayLow] = _getYesterdayHighLowValues()
-[lastWeekHigh, lastWeekLow] = _getLastWeekHighLowValues()
+_drawRay(lineId, y, _color, _width, _style, labelText, labelStyle, labelColor, labelTextColor, labelSize, labelOffset, showLabel) => 
+    _lineId = lineId
+    
+    x1 = time[10]
+    x2 = _getFutureTimeNBarsFromNow(labelOffset)
 
-plot(yesterdayHigh, linewidth=yesterdayHighLowLineWidth, color=yesterdayHighLowLineColor, style=yesterdayHighLowPlotStyle, title='Yesterday High')
-plot(yesterdayLow, linewidth=yesterdayHighLowLineWidth, color=yesterdayHighLowLineColor, style=yesterdayHighLowPlotStyle, title = 'Yesterday Low')
-plot(lastWeekHigh, linewidth=lastWeekHighLowLineWidth, color=lastWeekHighLowLineColor, style=lastWeekHighLowPlotStyle, title='Last Week High')
-plot(lastWeekLow, linewidth=lastWeekHighLowLineWidth, color=lastWeekHighLowLineColor, style=lastWeekHighLowPlotStyle, title='Last Week Low')
+    if na(_lineId)
+        _lineId := line.new(x1, y, x2, y, xloc.bar_time, extend.none)
 
-// r_label(weekHigh,"LWeek Hi",label.style_none,color.green,validWHLTimeFrame and showWeekHighLow and showDayHighLowLabels)//ry, rtext, rstyle, rcolor, valid
-// r_label(weekLow,"LWeek Lo",label.style_none,color.green,validWHLTimeFrame and showWeekHighLow and showDayHighLowLabels)
-// r_label(dayHigh,"YH",label.style_none,color.blue,validDHLTimeFrame and showDayHighLow and showDayHighLowLabels)//ry, rtext, rstyle, rcolor, valid
-// r_label(dayLow,"YL",label.style_none,color.blue,validDHLTimeFrame and showDayHighLow and showDayHighLowLabels)
+    line.set_xy1(_lineId, x1, y)
+    line.set_xy2(_lineId, x2, y)
+    line.set_color(_lineId, _color)
+    line.set_width(_lineId, _width)
+    line.set_style(_lineId, _style)
+    line.delete(_lineId[1])
+
+    // ----------------
+    // draw the label
+    // ----------------
+
+    if showLabel
+        // labelPosition = rangeLabelRightJustified ? x2 : x1
+        labelId = label.new(x2, y, labelText, textcolor=labelTextColor, style=labelStyle, size=labelSize, xloc=xloc.bar_time, color=labelColor)
+        label.delete(labelId[1])
+
+    _lineId
+
+var line yesterdayHighLineId = na
+var line yesterdayLowLineId = na
+var line lastWeekHighLineId = na
+var line lastWeekLowLineId = na
+
+_drawDailyWeeklyHighLowRays() => 
+    [yesterdayHigh, yesterdayLow] = _getYesterdayHighLowValues()
+    [lastWeekHigh, lastWeekLow] = _getLastWeekHighLowValues()
+
+    // plot(yesterdayHigh, linewidth=yesterdayHighLowLineWidth, color=yesterdayHighLowLineColor, style=yesterdayHighLowPlotStyle, title='Yesterday High')
+    // plot(yesterdayLow, linewidth=yesterdayHighLowLineWidth, color=yesterdayHighLowLineColor, style=yesterdayHighLowPlotStyle, title = 'Yesterday Low')
+    // plot(lastWeekHigh, linewidth=lastWeekHighLowLineWidth, color=lastWeekHighLowLineColor, style=lastWeekHighLowPlotStyle, title='Last Week High')
+    // plot(lastWeekLow, linewidth=lastWeekHighLowLineWidth, color=lastWeekHighLowLineColor, style=lastWeekHighLowPlotStyle, title='Last Week Low')
+    _yesterdayHighLineId = _drawRay(yesterdayHighLineId, yesterdayHigh, yesterdayHighLowLineColor, yesterdayHighLowLineWidth, yesterdayHighLowLineStyle, 'Yesterday High', dailyWeeklyHighLowLabelStyle, yesterdayHighLowLabelColor, yesterdayHighLowLabelTextColor, dailyWeeklyHighLowLabelSize, yesterdayHighLowLabelOffset,  dailyWeeklyHighLowLabelVisible)
+    _yesterdayLowLineId = _drawRay(yesterdayLowLineId, yesterdayLow, yesterdayHighLowLineColor, yesterdayHighLowLineWidth, yesterdayHighLowLineStyle, 'Yesterday Low', dailyWeeklyHighLowLabelStyle, yesterdayHighLowLabelColor, yesterdayHighLowLabelTextColor, dailyWeeklyHighLowLabelSize, yesterdayHighLowLabelOffset,  dailyWeeklyHighLowLabelVisible)
+    _lastWeekHighLineId = _drawRay(lastWeekHighLineId, lastWeekHigh, lastWeekHighLowLineColor, lastWeekHighLowLineWidth, lastWeekHighLowLineStyle, 'Last Week High', dailyWeeklyHighLowLabelStyle, lastWeekHighLowLabelColor, lastWeekHighLowLabelTextColor, dailyWeeklyHighLowLabelSize, lastWeekHighLowLabelOffset,  dailyWeeklyHighLowLabelVisible)
+    _lastWeekLowLineId = _drawRay(lastWeekLowLineId, lastWeekLow, lastWeekHighLowLineColor, lastWeekHighLowLineWidth, lastWeekHighLowLineStyle, 'Last Week Low', dailyWeeklyHighLowLabelStyle, lastWeekHighLowLabelColor, lastWeekHighLowLabelTextColor, dailyWeeklyHighLowLabelSize, lastWeekHighLowLabelOffset,  dailyWeeklyHighLowLabelVisible)
+
+    [_yesterdayHighLineId, _yesterdayLowLineId, _lastWeekHighLineId, _lastWeekLowLineId]
+
+
+[_yesterdayHighLineId, _yesterdayLowLineId, _lastWeekHighLineId, _lastWeekLowLineId] = _drawDailyWeeklyHighLowRays()
+
+if na(_yesterdayHighLineId) or na(_yesterdayLowLineId) or na(_lastWeekHighLineId) or na(_lastWeekLowLineId)
+    yesterdayHighLineId := _yesterdayHighLineId
+    yesterdayLowLineId := _yesterdayLowLineId
+    lastWeekHighLineId := _lastWeekHighLineId
+    lastWeekLowLineId := _lastWeekLowLineId
