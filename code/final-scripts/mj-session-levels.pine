@@ -80,6 +80,40 @@ new_bar(res) => change(time(res)) != 0
 
 //////////////////////////////////////////////////////////////////
 // 
+// ==== PLOT UTILS ==== 
+// 
+//////////////////////////////////////////////////////////////////
+
+_drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText, labelStyle, labelColor, labelTextColor, labelSize, showLabel) => 
+    // x1 and x2 are in time (not bars)
+
+    _lineId = lineId
+
+    if na(_lineId)
+        _lineId := line.new(x1, y, x2, y, xloc.bar_time, _extend)
+
+
+    line.set_xy1(_lineId, x1, y)
+    line.set_xy2(_lineId, x2, y)
+    line.set_color(_lineId, _color)
+    line.set_width(_lineId, _width)
+    line.set_style(_lineId, _style)
+    line.delete(_lineId[1])
+
+    // ----------------
+    // draw the label
+    // ----------------
+
+    if showLabel
+        // labelPosition = rangeLabelRightJustified ? x2 : x1
+        labelId = label.new(x2, y, labelText, textcolor=labelTextColor, style=labelStyle, size=labelSize, xloc=xloc.bar_time, color=labelColor)
+        label.delete(labelId[1])
+
+    _lineId
+
+
+//////////////////////////////////////////////////////////////////
+// 
 // ==== SESSION LEVELS ==== 
 // 
 //////////////////////////////////////////////////////////////////
@@ -105,6 +139,7 @@ nyHighLowPlotActive = input(false, 'Plot New York HighLow?', group=groupSessionL
 // asian
 asianMasterColor = input(#00897b, 'Asian Color', input.color, group=groupSessionLevels)
 asianOpenPlotStyle = input(plot.style_cross, 'Asian Open Plot Style', group=groupSessionLevels, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+asianOpenLineStyle = input(line.style_solid, 'Asian Open Line Style', group=groupSessionLevels, options=[line.style_solid, line.style_dashed, line.style_dotted])
 asianStartHour = input(20, 'Asian Start Hour', minval=0, maxval=23, group=groupSessionLevels)
 asianEndHour = input(4, 'Asian End Hour', minval=0, maxval=23, group=groupSessionLevels)
 asianHoldTimeInHours = input(16, "Asian Holding Time", input.integer, minval=0, maxval = 23, tooltip = TT_PR, group=groupSessionLevels)
@@ -112,6 +147,7 @@ asianTimeRange = input('0000-0600:1234567', 'Asian Session Time', group=groupSes
 // london
 londonMasterColor = input(#ff851a, 'London Color', input.color, group=groupSessionLevels)
 londonOpenPlotStyle = input(plot.style_circles, 'London Open Plot Style', group=groupSessionLevels, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+londonOpenLineStyle = input(line.style_solid, 'London Open Line Style', group=groupSessionLevels, options=[line.style_solid, line.style_dashed, line.style_dotted])
 londonStartHour = input(4, 'London Start Hour', minval=0, maxval=23, group=groupSessionLevels)
 londonEndHour = input(13, 'London End Hour', minval=0, maxval=23, group=groupSessionLevels)
 londonHoldTimeInHours = input(0, "London Holding Time", input.integer, minval=0, maxval = 23, tooltip = TT_PR, group=groupSessionLevels)
@@ -119,6 +155,7 @@ londonTimeRange = input('0800-1630:1234567', 'London Session Time', group=groupS
 // new york
 nyMasterColor = input(#fff176, 'New York Color', input.color, group=groupSessionLevels)
 nyOpenPlotStyle = input(plot.style_cross, 'New York Open Plot Style', group=groupSessionLevels, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+nyOpenLineStyle = input(line.style_solid, 'New York Open Line Style', group=groupSessionLevels, options=[line.style_solid, line.style_dashed, line.style_dotted])
 nyStartHour = input(9, 'New York Start Hour', minval=0, maxval=23, group=groupSessionLevels)
 nyEndHour = input(17, 'New York End Hour', minval=0, maxval=23, group=groupSessionLevels)
 nyHoldTimeInHours = input(0, "New York Holding Time", input.integer, minval=0, maxval = 23, tooltip = TT_PR, group=groupSessionLevels)
@@ -130,9 +167,11 @@ sessionLevelsHoldingHighLowLineOpacity = input(60, 'Opacity - Hold H/L', minval=
 sessionLevelsHoldFillOpacity = input(100, 'Opacity - Hold Fill', minval=0, maxval=100, group=groupSessionLevels)
 sessionLevelsOpenLineOpacity = input(10, 'Opacity - Open Line', minval=0, maxval=100, group=groupSessionLevels)
 // line style
-sessionLevelsHighLowLineStyle = input(plot.style_linebr, 'Plot Style - H/L', group=groupSessionLevels, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+sessionLevelsHighLowPlotStyle = input(plot.style_linebr, 'Plot Style - H/L', group=groupSessionLevels, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+sessionLevelsHighLowLineStyle = input(line.style_solid, 'Line Style - H/L', group=groupSessionLevels, options=[line.style_solid, line.style_dashed, line.style_dotted])
 sessionLevelsLineWidth = input(2, 'Line Width', group=groupSessionLevels, options=[1,2,3,4])
 sessionLevelsLinesJoined = input(false, 'Join points?')
+sessionLevelsLineExtend = input(extend.none, 'Line Extend', options=[extend.none, extend.left, extend.right, extend.both])
 // labels
 sessionLabelOffsetInBars = input(25, 'Session Label Offset (bars)', group=groupSessionLevels)
 sessionLabelStyle = input(label.style_label_lower_left, 'Session Label Style', group=groupSessionLevels, options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
@@ -233,27 +272,31 @@ _getValuesToPlotSessionLevels(timeRange, startHour, endHour, holdHour, hourShift
     else 
         [na, na, na, na, na, na]
 
-// ------------------
-// Plot Lines
-// ------------------
+// ====================================
+// Session Levels using plot
+// ====================================
+
+// -------------
+// Plot + Fill
+// -------------
 
 [asianHigh, asianLow, asianOpen, asianOpenLineColor, asianHighLowLineColor, asianFillColor] = _getValuesToPlotSessionLevels(asianTimeRange, asianStartHour, asianEndHour, asianHoldTimeInHours, sessionLevelsTZShiftHours, asianMasterColor, asianOpenPlotActive, asianHighLowPlotActive)
-asianPlotHigh = plot(asianHigh, "Asian Session High", asianHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, join=sessionLevelsLinesJoined)
-asianPlotLow  = plot(asianLow,  "Asian Session Low",  asianHighLowLineColor,  sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, join=sessionLevelsLinesJoined)
-asianPlotOpen  = plot(asianOpen,  "Asian Session Low",  asianOpenLineColor,  sessionLevelsLineWidth, asianOpenPlotStyle, join=sessionLevelsLinesJoined)
-fill(asianPlotHigh, asianPlotLow, asianFillColor)
+// asianPlotHigh = plot(asianHigh, "Asian Session High", asianHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
+// asianPlotLow  = plot(asianLow,  "Asian Session Low",  asianHighLowLineColor,  sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
+// asianPlotOpen  = plot(asianOpen,  "Asian Session Low",  asianOpenLineColor,  sessionLevelsLineWidth, asianOpenPlotStyle, join=sessionLevelsLinesJoined)
+// fill(asianPlotHigh, asianPlotLow, asianFillColor)
 
 [londonHigh, londonLow, londonOpen, londonOpenLineColor, londonHighLowLineColor, londonFillColor] = _getValuesToPlotSessionLevels(londonTimeRange, londonStartHour, londonEndHour, londonHoldTimeInHours, sessionLevelsTZShiftHours, londonMasterColor, londonOpenPlotActive, londonHighLowPlotActive)
-londonPlotHigh = plot(londonHigh, "London Session High", londonHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, join=sessionLevelsLinesJoined)
-londonPlotLow  = plot(londonLow,  "London Session Low",  londonHighLowLineColor,  sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, join=sessionLevelsLinesJoined)
-londonPlotOpen  = plot(londonOpen,  "London Session Low",  londonOpenLineColor,  sessionLevelsLineWidth, londonOpenPlotStyle, join=sessionLevelsLinesJoined)
-fill(londonPlotHigh, londonPlotLow, londonFillColor)
+// londonPlotHigh = plot(londonHigh, "London Session High", londonHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
+// londonPlotLow  = plot(londonLow,  "London Session Low",  londonHighLowLineColor,  sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
+// londonPlotOpen  = plot(londonOpen,  "London Session Low",  londonOpenLineColor,  sessionLevelsLineWidth, londonOpenPlotStyle, join=sessionLevelsLinesJoined)
+// fill(londonPlotHigh, londonPlotLow, londonFillColor)
 
 [nyHigh, nyLow, nyOpen, nyOpenLineColor, nyHighLowLineColor, nyFillColor] = _getValuesToPlotSessionLevels(nyTimeRange, nyStartHour, nyEndHour, nyHoldTimeInHours, sessionLevelsTZShiftHours, nyMasterColor, nyOpenPlotActive, nyHighLowPlotActive)
-nyPlotHigh = plot(nyHigh, "New York Session High", nyHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, join=sessionLevelsLinesJoined)
-nyPlotLow  = plot(nyLow,  "New York Session Low",  nyHighLowLineColor,  sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, join=sessionLevelsLinesJoined)
-nyPlotOpen  = plot(nyOpen,  "New York Session Low",  nyOpenLineColor,  sessionLevelsLineWidth, nyOpenPlotStyle, join=sessionLevelsLinesJoined)
-fill(nyPlotHigh, nyPlotLow, nyFillColor)
+// nyPlotHigh = plot(nyHigh, "New York Session High", nyHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
+// nyPlotLow  = plot(nyLow,  "New York Session Low",  nyHighLowLineColor,  sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
+// nyPlotOpen  = plot(nyOpen,  "New York Session Low",  nyOpenLineColor,  sessionLevelsLineWidth, nyOpenPlotStyle, join=sessionLevelsLinesJoined)
+// fill(nyPlotHigh, nyPlotLow, nyFillColor)
 
 // ------------------
 // Labels
@@ -264,148 +307,88 @@ _drawSessionnLabel(x, y, text, style, size, Color, textColor) =>
 
 
 
-sessionLabelTime = _getFutureTimeNBarsFromNow(sessionLabelOffsetInBars)
+sessionLabelX2 = _getFutureTimeNBarsFromNow(sessionLabelOffsetInBars)
 
-asianHighlabelId = _drawSessionnLabel(sessionLabelTime, asianHigh, 'Asian Session High', sessionLabelStyle, size.normal, asianMasterColor, color.white)
-label.delete(asianHighlabelId[1])
+// asianHighlabelId = _drawSessionnLabel(sessionLabelX2, asianHigh, 'Asian Session High', sessionLabelStyle, size.normal, asianMasterColor, color.white)
+// label.delete(asianHighlabelId[1])
 
-asianLowlabelId = _drawSessionnLabel(sessionLabelTime, asianLow, 'Asian Session Low', sessionLabelStyle, size.normal, asianMasterColor, color.white)
-label.delete(asianLowlabelId[1])
+// asianLowlabelId = _drawSessionnLabel(sessionLabelX2, asianLow, 'Asian Session Low', sessionLabelStyle, size.normal, asianMasterColor, color.white)
+// label.delete(asianLowlabelId[1])
 
-asianOpenLabelId = _drawSessionnLabel(sessionLabelTime, asianOpen, 'Daily Open', sessionLabelStyle, size.normal, asianMasterColor, color.white)
-label.delete(asianOpenLabelId[1])
+// asianOpenLabelId = _drawSessionnLabel(sessionLabelX2, asianOpen, 'Daily Open', sessionLabelStyle, size.normal, asianMasterColor, color.white)
+// label.delete(asianOpenLabelId[1])
 
-londonOpenLabelId = _drawSessionnLabel(sessionLabelTime, londonOpen, 'London Open', sessionLabelStyle, size.normal, londonMasterColor, color.white)
-label.delete(londonOpenLabelId[1])
+// londonOpenLabelId = _drawSessionnLabel(sessionLabelX2, londonOpen, 'London Open', sessionLabelStyle, size.normal, londonMasterColor, color.white)
+// label.delete(londonOpenLabelId[1])
 
-nyOpenLabelId = _drawSessionnLabel(sessionLabelTime, nyOpen, 'New York Open', sessionLabelStyle, size.normal, nyMasterColor, color.white)
-label.delete(nyOpenLabelId[1])
+// nyOpenLabelId = _drawSessionnLabel(sessionLabelX2, nyOpen, 'New York Open', sessionLabelStyle, size.normal, nyMasterColor, color.white)
+// label.delete(nyOpenLabelId[1])
 
+// ====================================
+// Session Levels using labelled lines
+// ====================================
 
-// -----------------------------------
-// Daily/Weekly High/Low
-// -----------------------------------
-onlyShowYesterdayHighLowForCurrentDay = input(true, 'Only show yesterday H/L on current day?')
-onlyShowLastWeekHighLowForCurrentDay = input(true, 'Only show last week H/L on current day?')
+var line asianOpenLineId = na
+var line asianHighLineId = na
+var line asianLowLineId = na
+var line nyOpenLineId = na
+var line nyHighLineId = na
+var line nyLowLineId = na
+var line londonOpenLineId = na
+var line londonHighLineId = na
+var line londonLowLineId = na
 
-
-dailyWeeklyHighLowLabelStyle = input(label.style_none, 'Yesterday H/L Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
-dailyWeeklyHighLowLabelVisible = input(true, 'Daily/Weekly H/L Label Visible?')
-dailyWeeklyHighLowLabelSize = input(size.normal, 'Daily/Weekly H/L Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large])
-
-// yesterdayHighLowPlotStyle = input(plot.style_linebr, 'Yesterday H/L Plot Style', options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-yesterdayHighLowLineColor = input(color.blue, 'Yesterday H/L Line Color')
-yesterdayHighLowLineWidth = input(1, 'Yesterday H/L Line Width', options=[1,2,3,4])
-yesterdayHighLowLineStyle = input(line.style_solid, 'Yesterday H/L Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted])
-yesterdayHighLowLabelColor = input(color.new(color.blue, 0), 'Yesterday H/L Label Color')
-yesterdayHighLowLabelTextColor = input(color.new(color.white, 0), 'Yesterday H/L Label Text Color')
-yesterdayHighLowLabelOffset = input(30, 'Yesterday H/L Label Offset (in bars)')
-
-
-// lastWeekHighLowPlotStyle = input(plot.style_linebr, 'Last Week H/L Plot Style', options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-lastWeekHighLowLineColor = input(color.green, 'Last Week H/L Line Color')
-lastWeekHighLowLineWidth = input(1, 'Last Week H/L Line Width', options=[1,2,3,4])
-lastWeekHighLowLineStyle = input(line.style_solid, 'Last Week H/L Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted])
-lastWeekHighLowLabelColor = input(color.new(color.green, 0), 'Last Week H9/L Label Color')
-lastWeekHighLowLabelTextColor = input(color.new(color.white, 0), 'Last Week H/L Label Text Color')
-lastWeekHighLowLabelOffset = input(40, 'Last Week H/L Label Offset (in bars)')
-
-_nonRepaintSecurity(_symbol, _res, _src, _repaint) => security(_symbol, _res, _src[_repaint ? 0 : barstate.isrealtime ? 1 : 0])[_repaint ? 0 : barstate.isrealtime ? 0 : 1]
-
-dayHigh = _nonRepaintSecurity(syminfo.tickerid, "D",high, false)
-dayLow = _nonRepaintSecurity(syminfo.tickerid, "D",low, false)
-dayOpen  = _nonRepaintSecurity(syminfo.tickerid, "D",open, false)
-dayClose = _nonRepaintSecurity(syminfo.tickerid, "D",close, false)
-weekHigh = _nonRepaintSecurity(syminfo.tickerid, "W",high, false)
-weekLow = _nonRepaintSecurity(syminfo.tickerid, "W",low, false)
-pivotPoint = (dayHigh + dayLow + dayClose)/3
-pivR1 = (2 * pivotPoint) - dayLow
-pivS1 = (2 * pivotPoint) - dayHigh
-pivR2 = pivotPoint-pivS1+pivR1
-pivS2 = pivotPoint-pivR1+pivS1
-pivR3 = (2*pivotPoint)+(dayHigh-(2*dayLow))
-pivS3 = (2*pivotPoint)-((2*dayHigh)-dayLow)
-
-// _getLevelsStart() => 
-//     levelsStartTime = iff((timeframe.isseconds == true) or (timeframe.isminutes == true and timeframe.multiplier < 5), time('D'), time('D') - (MS_PER_DAY))
-//     levelsStartBar = barssince(levelsStartBar)
-//     [levelsStartTime, levelsStartBar]
-
-_doShowYesterdayHighLow() => 
-    isValidTimeframe = timeframe.isintraday == true
-    isValidDay = onlyShowYesterdayHighLowForCurrentDay ? _isCurrentDay() : true
-    isValidTimeframe and isValidDay
-
-_doShowLastWeekHighLow() => 
-    isValidTimeframe = timeframe.isintraday == true or timeframe.isdaily == true
-    isValidDay = onlyShowYesterdayHighLowForCurrentDay ? _isCurrentDay() : true
-    isValidTimeframe and isValidDay
-
-
-_getYesterdayHighLowValues() => 
-    if _doShowYesterdayHighLow()
-        [dayHigh, dayLow]
-    else 
-        [na, na]
-
-_getLastWeekHighLowValues() => 
-    if _doShowLastWeekHighLow()
-        [weekHigh, weekLow]
-    else 
-        [na, na]
-
-_drawRay(lineId, y, _color, _width, _style, labelText, labelStyle, labelColor, labelTextColor, labelSize, labelOffset, showLabel) => 
-    _lineId = lineId
+_drawSessionLines() =>
+    x1 = time
     
-    x1 = time[10]
-    x2 = _getFutureTimeNBarsFromNow(labelOffset)
+    asianLabelColor = color.new(asianMasterColor, sessionLabelOpacity)
+    nyLabelColor = color.new(nyMasterColor, sessionLabelOpacity)
+    londonLabelColor = color.new(londonMasterColor, sessionLabelOpacity)
+    
+    labelTextColor = color.new(color.white, 0)
+    labelSize = size.normal
+    labelVisible = true
 
-    if na(_lineId)
-        _lineId := line.new(x1, y, x2, y, xloc.bar_time, extend.none)
+    _asianOpenLineId = _drawLabelledLine(asianOpenLineId, x1, sessionLabelX2, asianOpen, asianOpenLineColor, sessionLevelsLineWidth, asianOpenLineStyle, sessionLevelsLineExtend, 'Daily Open', sessionLabelStyle, asianLabelColor, labelTextColor, labelSize, labelVisible)
+    _asianHighLineId = _drawLabelledLine(asianHighLineId, x1, sessionLabelX2, asianHigh, asianHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'Asian Session High', sessionLabelStyle, asianLabelColor, labelTextColor, labelSize, labelVisible)
+    _asianLowLineId = _drawLabelledLine(asianLowLineId, x1, sessionLabelX2, asianLow, asianHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'Asian Session Low', sessionLabelStyle, asianLabelColor, labelTextColor, labelSize, labelVisible)
+    
+    _nyOpenLineId = _drawLabelledLine(nyOpenLineId, x1, sessionLabelX2, nyOpen, nyOpenLineColor, sessionLevelsLineWidth, nyOpenLineStyle, sessionLevelsLineExtend, 'New York Open', sessionLabelStyle, nyLabelColor, labelTextColor, labelSize, labelVisible)
+    _nyHighLineId = _drawLabelledLine(nyHighLineId, x1, sessionLabelX2, nyHigh, nyHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'New York High', sessionLabelStyle, nyLabelColor, labelTextColor, labelSize, labelVisible)
+    _nyLowLineId = _drawLabelledLine(nyLowLineId, x1, sessionLabelX2, nyLow, nyHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'New York Low', sessionLabelStyle, nyLabelColor, labelTextColor, labelSize, labelVisible)
 
-    line.set_xy1(_lineId, x1, y)
-    line.set_xy2(_lineId, x2, y)
-    line.set_color(_lineId, _color)
-    line.set_width(_lineId, _width)
-    line.set_style(_lineId, _style)
-    line.delete(_lineId[1])
-
-    // ----------------
-    // draw the label
-    // ----------------
-
-    if showLabel
-        // labelPosition = rangeLabelRightJustified ? x2 : x1
-        labelId = label.new(x2, y, labelText, textcolor=labelTextColor, style=labelStyle, size=labelSize, xloc=xloc.bar_time, color=labelColor)
-        label.delete(labelId[1])
-
-    _lineId
-
-var line yesterdayHighLineId = na
-var line yesterdayLowLineId = na
-var line lastWeekHighLineId = na
-var line lastWeekLowLineId = na
-
-_drawDailyWeeklyHighLowRays() => 
-    [yesterdayHigh, yesterdayLow] = _getYesterdayHighLowValues()
-    [lastWeekHigh, lastWeekLow] = _getLastWeekHighLowValues()
-
-    // plot(yesterdayHigh, linewidth=yesterdayHighLowLineWidth, color=yesterdayHighLowLineColor, style=yesterdayHighLowPlotStyle, title='Yesterday High')
-    // plot(yesterdayLow, linewidth=yesterdayHighLowLineWidth, color=yesterdayHighLowLineColor, style=yesterdayHighLowPlotStyle, title = 'Yesterday Low')
-    // plot(lastWeekHigh, linewidth=lastWeekHighLowLineWidth, color=lastWeekHighLowLineColor, style=lastWeekHighLowPlotStyle, title='Last Week High')
-    // plot(lastWeekLow, linewidth=lastWeekHighLowLineWidth, color=lastWeekHighLowLineColor, style=lastWeekHighLowPlotStyle, title='Last Week Low')
-    _yesterdayHighLineId = _drawRay(yesterdayHighLineId, yesterdayHigh, yesterdayHighLowLineColor, yesterdayHighLowLineWidth, yesterdayHighLowLineStyle, 'Yesterday High', dailyWeeklyHighLowLabelStyle, yesterdayHighLowLabelColor, yesterdayHighLowLabelTextColor, dailyWeeklyHighLowLabelSize, yesterdayHighLowLabelOffset,  dailyWeeklyHighLowLabelVisible)
-    _yesterdayLowLineId = _drawRay(yesterdayLowLineId, yesterdayLow, yesterdayHighLowLineColor, yesterdayHighLowLineWidth, yesterdayHighLowLineStyle, 'Yesterday Low', dailyWeeklyHighLowLabelStyle, yesterdayHighLowLabelColor, yesterdayHighLowLabelTextColor, dailyWeeklyHighLowLabelSize, yesterdayHighLowLabelOffset,  dailyWeeklyHighLowLabelVisible)
-    _lastWeekHighLineId = _drawRay(lastWeekHighLineId, lastWeekHigh, lastWeekHighLowLineColor, lastWeekHighLowLineWidth, lastWeekHighLowLineStyle, 'Last Week High', dailyWeeklyHighLowLabelStyle, lastWeekHighLowLabelColor, lastWeekHighLowLabelTextColor, dailyWeeklyHighLowLabelSize, lastWeekHighLowLabelOffset,  dailyWeeklyHighLowLabelVisible)
-    _lastWeekLowLineId = _drawRay(lastWeekLowLineId, lastWeekLow, lastWeekHighLowLineColor, lastWeekHighLowLineWidth, lastWeekHighLowLineStyle, 'Last Week Low', dailyWeeklyHighLowLabelStyle, lastWeekHighLowLabelColor, lastWeekHighLowLabelTextColor, dailyWeeklyHighLowLabelSize, lastWeekHighLowLabelOffset,  dailyWeeklyHighLowLabelVisible)
-
-    [_yesterdayHighLineId, _yesterdayLowLineId, _lastWeekHighLineId, _lastWeekLowLineId]
+    _londonOpenLineId = _drawLabelledLine(londonOpenLineId, x1, sessionLabelX2, londonOpen, londonOpenLineColor, sessionLevelsLineWidth, londonOpenLineStyle, sessionLevelsLineExtend, 'London Open', sessionLabelStyle, londonLabelColor, labelTextColor, labelSize, labelVisible)
+    _londonHighLineId = _drawLabelledLine(londonHighLineId, x1, sessionLabelX2, londonHigh, londonHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'London York High', sessionLabelStyle, londonLabelColor, labelTextColor, labelSize, labelVisible)
+    _londonLowLineId = _drawLabelledLine(londonLowLineId, x1, sessionLabelX2, londonLow, londonHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'London Low', sessionLabelStyle, londonLabelColor, labelTextColor, labelSize, labelVisible)
+    
+    [_asianOpenLineId, _asianHighLineId, _asianLowLineId, _nyOpenLineId, _nyHighLineId, _nyLowLineId, _londonOpenLineId, _londonHighLineId, _londonLowLineId]
 
 
-[_yesterdayHighLineId, _yesterdayLowLineId, _lastWeekHighLineId, _lastWeekLowLineId] = _drawDailyWeeklyHighLowRays()
+[_asianOpenLineId, _asianHighLineId, _asianLowLineId, _nyOpenLineId, _nyHighLineId, _nyLowLineId, _londonOpenLineId, _londonHighLineId, _londonLowLineId] = _drawSessionLines()
 
-if na(_yesterdayHighLineId) or na(_yesterdayLowLineId) or na(_lastWeekHighLineId) or na(_lastWeekLowLineId)
-    yesterdayHighLineId := _yesterdayHighLineId
-    yesterdayLowLineId := _yesterdayLowLineId
-    lastWeekHighLineId := _lastWeekHighLineId
-    lastWeekLowLineId := _lastWeekLowLineId
+if na(_asianOpenLineId) 
+    asianOpenLineId := _asianOpenLineId
+
+if na(_asianHighLineId)
+    asianHighLineId := _asianHighLineId
+
+if na(_asianLowLineId)
+    asianLowLineId := _asianLowLineId
+
+if na(_nyOpenLineId)
+    nyOpenLineId := _nyOpenLineId
+
+if na(_nyHighLineId)
+    nyHighLineId := _nyHighLineId
+
+if na(_nyLowLineId)
+    nyLowLineId := _nyLowLineId
+
+if na(_londonOpenLineId)
+    londonOpenLineId := _londonOpenLineId
+
+if na(_londonHighLineId)
+    londonHighLineId := _londonHighLineId
+
+if na(_londonLowLineId)
+    londonLowLineId := _londonLowLineId

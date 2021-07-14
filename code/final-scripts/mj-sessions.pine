@@ -523,6 +523,10 @@ plot(dailyOpenActive and showAvg ? avg(daily_open(0), daily_open(1)) : na, "Avg.
 // 
 //////////////////////////////////////////////////////////////////
 
+// Session Levels - optionally fill the range
+
+// daily open MT4 = 10pm GMT = 18:00
+
 // 13/50 cross
 // 50/200 cross
 // 50/800 cross
@@ -532,10 +536,7 @@ plot(dailyOpenActive and showAvg ? avg(daily_open(0), daily_open(1)) : na, "Avg.
     // 1m: 750 = 50 on 15, 250 = 50 on 5
     // 5m: 150 = 50 on 15
 
-// Yesterday High/Low - optionally only show current day
-// Last Week High/Low - optionally only show current day
 // Split out PVSRA
-// code the MT4 daily open
 
 // extend lines to yesterday's daily open like the M1-5 levels in TR
 // if in NY Session, lines that extend out to the end of the session

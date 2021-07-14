@@ -1,0 +1,221 @@
+//@version=4
+
+study("MJ - Daily/Weekly High/Low Lines", overlay=true)
+
+//////////////////////////////////////////////////////////////////
+// 
+// ==== DATE UTILS ==== 
+// 
+//////////////////////////////////////////////////////////////////
+
+int MS_PER_MINUTE = 1000 * 60
+int MS_PER_HOUR = MS_PER_MINUTE * 60
+int MS_PER_DAY = MS_PER_HOUR * 24
+
+_getFutureTimeNBarsFromNow(numBars) => time + ( ( time - time[1] ) * numBars )
+
+_getPastTimeNBarsBackFromNow(numBars) => time - ( ( time - time[1] ) * numBars )
+
+_currentBarTime() => time(timeframe.period)
+
+_calcBarsPerHour() =>
+    int barLengthInMinutes = (time - time[1]) / MS_PER_MINUTE
+    int barsElapsedThisHour = minute / barLengthInMinutes 
+    int barsPerHour = 60 / barLengthInMinutes
+
+_calcBarsPerDay() => _calcBarsPerHour() * 24
+
+_timeElapsedTodayInMs() => (MS_PER_HOUR * hour) - (MS_PER_MINUTE * minute) - (1000 * second)
+_timeElapsedThisHourInMs() => (MS_PER_MINUTE * minute) + (1000 * second)
+
+_getTimeAtBeginningOfToday() => timenow - _timeElapsedTodayInMs()
+    
+_getTimeAtStartOfHourNHoursAgo(numHours) => 
+    timeElapsedSinceStartInMs = _timeElapsedThisHourInMs() + (numHours * MS_PER_HOUR)
+    timenow - timeElapsedSinceStartInMs
+
+
+// *** TOOD ***
+// _getBarIndexAtTime() => 
+// _getBarIndexForTimestamp(_timestamp) => 
+
+_getBarsElapsedAndRemainingForCurrentHour() =>
+    int barLengthInMinutes = (time - time[1]) / MS_PER_MINUTE
+    int barsElapsedThisHour = minute / barLengthInMinutes 
+    int barsPerHour = 60 / barLengthInMinutes
+    int barsRemainingThisHour = barsPerHour - barsElapsedThisHour
+    [barsElapsedThisHour, barsRemainingThisHour]
+
+_getStartTimeNDaysBack(numDays) => 
+    // int barsPerDay = _calcBarsPerDay()
+    // int numBarsElapsedToday = 0
+    // int barsElapsedSinceCutoff = numBarsElapsedToday + (barsPerDay * numDays)
+    // _getPastTimeNBarsBackFromNow(barsElapsedSinceCutoff)
+    _getTimeAtBeginningOfToday() - (numDays * MS_PER_DAY)    
+
+_isCurrentDay() => 
+    currentBarTime = time(timeframe.period)
+    currentBarTime > (timenow - MS_PER_DAY)   
+
+_isInSession(timeRange) =>
+    not na(time(timeframe.period, timeRange))
+
+_isFirstOrLastFiveMinOfAnyHour() => 
+    _isInSession('2355-0005') or _isInSession('0055-0105') or _isInSession('0155-0205') or _isInSession('0255-0305') or _isInSession('0355-0405') or _isInSession('0455-0505') or _isInSession('0555-0605') or _isInSession('0655-0705') or _isInSession('0755-0805') or _isInSession('0855-0905') or _isInSession('0955-1005') or _isInSession('1055-1105') or _isInSession('1155-1205') or _isInSession('1255-1305') or _isInSession('1355-1405') or _isInSession('1455-1505') or _isInSession('1555-1605') or _isInSession('1655-1705') or _isInSession('1755-1805') or _isInSession('1855-1905') or _isInSession('1955-2005') or _isInSession('2055-2105') or _isInSession('2155-2205') or _isInSession('2255-2305')    
+
+_isLastBarForCurrentTimeframeAtResolution(Resolution) =>
+    t = time(Resolution, session.regular) // e.g. "1440" = Daily Resolution
+    not na(t[1]) and na(t) or t[1] < t
+
+_isFirstBarForCurrentTimeframeAtResolution(Resolution) =>
+    // e.g. current timeframe: 1min, resolution: '60' => return true for the first minute of the hour
+    // e.g. current timeframe: 5min, resolution: '60' => return true for the first 5 minutes of the hour
+    t = time(Resolution)
+    previousBar = t[1]
+    currentBar = t
+    not na(currentBar) and ( na(previousBar) or currentBar > previousBar)
+
+// new_bar: check if we're on a new bar within the session in a given resolution
+new_bar(res) => change(time(res)) != 0
+
+//////////////////////////////////////////////////////////////////
+// 
+// ==== PLOT UTILS ==== 
+// 
+//////////////////////////////////////////////////////////////////
+
+_drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText, labelStyle, labelColor, labelTextColor, labelSize, showLabel) => 
+    // x1 and x2 are in time (not bars)
+
+    _lineId = lineId
+
+    if na(_lineId)
+        _lineId := line.new(x1, y, x2, y, xloc.bar_time, _extend)
+
+
+    line.set_xy1(_lineId, x1, y)
+    line.set_xy2(_lineId, x2, y)
+    line.set_color(_lineId, _color)
+    line.set_width(_lineId, _width)
+    line.set_style(_lineId, _style)
+    line.delete(_lineId[1])
+
+    // ----------------
+    // draw the label
+    // ----------------
+
+    if showLabel
+        // labelPosition = rangeLabelRightJustified ? x2 : x1
+        labelId = label.new(x2, y, labelText, textcolor=labelTextColor, style=labelStyle, size=labelSize, xloc=xloc.bar_time, color=labelColor)
+        label.delete(labelId[1])
+
+    _lineId
+
+//////////////////////////////////////////////////////////////////
+// 
+// ==== DAILY/WEEKLY HIGH/LOW LINES ==== 
+// 
+//////////////////////////////////////////////////////////////////
+
+onlyShowYesterdayHighLowForCurrentDay = input(true, 'Only show yesterday H/L on current day?')
+onlyShowLastWeekHighLowForCurrentDay = input(true, 'Only show last week H/L on current day?')
+
+
+// *** `dwhl` stands for dailyWeeklyHighLow ***
+dwhlLabelStyle = input(label.style_none, 'Yesterday H/L Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
+dwhlLabelVisible = input(true, 'Daily/Weekly H/L Label Visible?')
+dwhlLabelSize = input(size.normal, 'Daily/Weekly H/L Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large])
+dwhlLineExtend = input(extend.none, 'Daily/Weekly H/L Line Extend', options=[extend.none, extend.left, extend.right, extend.both])
+
+// *** `yhl` stands for yesterdayHighLow ***
+yhlLineColor = input(color.blue, 'Yesterday H/L Line Color')
+yhlLineWidth = input(1, 'Yesterday H/L Line Width', options=[1,2,3,4])
+yhlLineStyle = input(line.style_solid, 'Yesterday H/L Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted])
+yhlLabelColor = input(color.new(color.blue, 0), 'Yesterday H/L Label Color')
+yhlLabelTextColor = input(color.new(color.white, 0), 'Yesterday H/L Label Text Color')
+yhlLabelOffset = input(30, 'Yesterday H/L Label Offset (in bars)')
+
+// *** `lwhl` stands for lastWeekHighLow ***
+lwhlLineColor = input(color.green, 'Last Week H/L Line Color')
+lwhlLineWidth = input(1, 'Last Week H/L Line Width', options=[1,2,3,4])
+lwhlLineStyle = input(line.style_solid, 'Last Week H/L Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted])
+lwhlLabelColor = input(color.new(color.green, 0), 'Last Week H9/L Label Color')
+lwhlLabelTextColor = input(color.new(color.white, 0), 'Last Week H/L Label Text Color')
+lwhlLabelOffset = input(40, 'Last Week H/L Label Offset (in bars)')
+
+_nonRepaintSecurity(_symbol, _res, _src, _repaint) => security(_symbol, _res, _src[_repaint ? 0 : barstate.isrealtime ? 1 : 0])[_repaint ? 0 : barstate.isrealtime ? 0 : 1]
+
+dayHigh = _nonRepaintSecurity(syminfo.tickerid, "D",high, false)
+dayLow = _nonRepaintSecurity(syminfo.tickerid, "D",low, false)
+dayOpen  = _nonRepaintSecurity(syminfo.tickerid, "D",open, false)
+dayClose = _nonRepaintSecurity(syminfo.tickerid, "D",close, false)
+weekHigh = _nonRepaintSecurity(syminfo.tickerid, "W",high, false)
+weekLow = _nonRepaintSecurity(syminfo.tickerid, "W",low, false)
+pivotPoint = (dayHigh + dayLow + dayClose)/3
+pivR1 = (2 * pivotPoint) - dayLow
+pivS1 = (2 * pivotPoint) - dayHigh
+pivR2 = pivotPoint-pivS1+pivR1
+pivS2 = pivotPoint-pivR1+pivS1
+pivR3 = (2*pivotPoint)+(dayHigh-(2*dayLow))
+pivS3 = (2*pivotPoint)-((2*dayHigh)-dayLow)
+
+// _getLevelsStart() => 
+//     levelsStartTime = iff((timeframe.isseconds == true) or (timeframe.isminutes == true and timeframe.multiplier < 5), time('D'), time('D') - (MS_PER_DAY))
+//     levelsStartBar = barssince(levelsStartBar)
+//     [levelsStartTime, levelsStartBar]
+
+_doShowYesterdayHighLow() => 
+    isValidTimeframe = timeframe.isintraday == true
+    isValidDay = onlyShowYesterdayHighLowForCurrentDay ? _isCurrentDay() : true
+    isValidTimeframe and isValidDay
+
+_doShowLastWeekHighLow() => 
+    isValidTimeframe = timeframe.isintraday == true or timeframe.isdaily == true
+    isValidDay = onlyShowYesterdayHighLowForCurrentDay ? _isCurrentDay() : true
+    isValidTimeframe and isValidDay
+
+
+_getYesterdayHighLowValues() => 
+    if _doShowYesterdayHighLow()
+        [dayHigh, dayLow]
+    else 
+        [na, na]
+
+_getLastWeekHighLowValues() => 
+    if _doShowLastWeekHighLow()
+        [weekHigh, weekLow]
+    else 
+        [na, na]
+
+var line yesterdayHighLineId = na
+var line yesterdayLowLineId = na
+var line lastWeekHighLineId = na
+var line lastWeekLowLineId = na
+
+_drawDailyWeeklyHighLowRays() => 
+    [yesterdayHigh, yesterdayLow] = _getYesterdayHighLowValues()
+    [lastWeekHigh, lastWeekLow] = _getLastWeekHighLowValues()
+
+    // plot(yesterdayHigh, linewidth=yhlLineWidth, color=yhlLineColor, style=yesterdayHighLowPlotStyle, title='Yesterday High')
+    // plot(yesterdayLow, linewidth=yhlLineWidth, color=yhlLineColor, style=yesterdayHighLowPlotStyle, title = 'Yesterday Low')
+    // plot(lastWeekHigh, linewidth=lwhlLineWidth, color=lwhlLineColor, style=lastWeekHighLowPlotStyle, title='Last Week High')
+    // plot(lastWeekLow, linewidth=lwhlLineWidth, color=lwhlLineColor, style=lastWeekHighLowPlotStyle, title='Last Week Low')
+
+    dailyWeeklyHighLowX1 = time[10]
+    dailyWeeklyHighLowX2 = _getFutureTimeNBarsFromNow(yhlLabelOffset)
+
+    _yesterdayHighLineId = _drawLabelledLine(yesterdayHighLineId, dailyWeeklyHighLowX1, dailyWeeklyHighLowX2, yesterdayHigh, yhlLineColor, yhlLineWidth, yhlLineStyle, dwhlLineExtend, 'Yesterday High', dwhlLabelStyle, yhlLabelColor, yhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible)
+    _yesterdayLowLineId = _drawLabelledLine(yesterdayLowLineId, dailyWeeklyHighLowX1, dailyWeeklyHighLowX2, yesterdayLow, yhlLineColor, yhlLineWidth, yhlLineStyle, dwhlLineExtend, 'Yesterday Low', dwhlLabelStyle, yhlLabelColor, yhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible)
+    _lastWeekHighLineId = _drawLabelledLine(lastWeekHighLineId, dailyWeeklyHighLowX1, dailyWeeklyHighLowX2, lastWeekHigh, lwhlLineColor, lwhlLineWidth, lwhlLineStyle, dwhlLineExtend, 'Last Week High', dwhlLabelStyle, lwhlLabelColor, lwhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible)
+    _lastWeekLowLineId = _drawLabelledLine(lastWeekLowLineId, dailyWeeklyHighLowX1, dailyWeeklyHighLowX2, lastWeekLow, lwhlLineColor, lwhlLineWidth, lwhlLineStyle, dwhlLineExtend, 'Last Week Low', dwhlLabelStyle, lwhlLabelColor, lwhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible)
+
+    [_yesterdayHighLineId, _yesterdayLowLineId, _lastWeekHighLineId, _lastWeekLowLineId]
+
+
+[_yesterdayHighLineId, _yesterdayLowLineId, _lastWeekHighLineId, _lastWeekLowLineId] = _drawDailyWeeklyHighLowRays()
+
+if na(_yesterdayHighLineId) or na(_yesterdayLowLineId) or na(_lastWeekHighLineId) or na(_lastWeekLowLineId)
+    yesterdayHighLineId := _yesterdayHighLineId
+    yesterdayLowLineId := _yesterdayLowLineId
+    lastWeekHighLineId := _lastWeekHighLineId
+    lastWeekLowLineId := _lastWeekLowLineId

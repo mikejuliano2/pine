@@ -1,0 +1,36 @@
+//////////////////////////////////////////////////////////////////
+// 
+// ==== PLOT UTILS ==== 
+// 
+//////////////////////////////////////////////////////////////////
+
+_drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText, labelStyle, labelColor, labelTextColor, labelSize, showLabel) => 
+    // x1 and x2 are in time (not bars)
+
+    _lineId = lineId
+
+    if na(_lineId)
+        _lineId := line.new(x1, y, x2, y, xloc.bar_time, _extend)
+
+
+    line.set_xy1(_lineId, x1, y)
+    line.set_xy2(_lineId, x2, y)
+    line.set_color(_lineId, _color)
+    line.set_width(_lineId, _width)
+    line.set_style(_lineId, _style)
+    line.delete(_lineId[1])
+
+    // ----------------
+    // draw the label
+    // ----------------
+
+    if showLabel
+        // labelPosition = rangeLabelRightJustified ? x2 : x1
+        labelId = label.new(x2, y, labelText, textcolor=labelTextColor, style=labelStyle, size=labelSize, xloc=xloc.bar_time, color=labelColor)
+        label.delete(labelId[1])
+
+    _lineId
+
+
+
+// _drawLabelledLineByOffset(lineId, offsetLeft, offsetRight, y, _color, _width, _style, _extend, labelText, labelStyle, labelColor, labelTextColor, labelSize, showLabel)
