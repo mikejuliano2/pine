@@ -523,8 +523,6 @@ plot(dailyOpenActive and showAvg ? avg(daily_open(0), daily_open(1)) : na, "Avg.
 // 
 //////////////////////////////////////////////////////////////////
 
-// hide the current hour range on 15m+
-
 // 13/50 cross
 // 50/200 cross
 // 50/800 cross

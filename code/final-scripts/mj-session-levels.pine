@@ -277,3 +277,70 @@ label.delete(londonOpenLabelId[1])
 
 nyOpenLabelId = _drawSessionnLabel(sessionLabelTime, nyOpen, 'New York Open', sessionLabelStyle, size.normal, nyMasterColor, color.white)
 label.delete(nyOpenLabelId[1])
+
+
+// -----------------------------------
+// Daily/Weekly High/Low
+// -----------------------------------
+onlyShowYesterdayHighLowForCurrentDay = input(true, 'Only show yesterday H/L on current day?')
+onlyShowLastWeekHighLowForCurrentDay = input(true, 'Only show last week H/L on current day?')
+
+yesterdayHighLowLineColor = input(color.blue, 'Yesterday H/L Line Color')
+yesterdayHighLowPlotStyle = input(plot.style_linebr, 'Yesterday H/L Plot Style', options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+yesterdayHighLowLineWidth = input(1, 'Yesterday H/L Line Width', options=[1,2,3,4])
+
+lastWeekHighLowLineColor = input(color.green, 'Last Week H/L Line Color')
+lastWeekHighLowPlotStyle = input(plot.style_linebr, 'Last Week H/L Plot Style', options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+lastWeekHighLowLineWidth = input(1, 'Last Week H/L Line Width', options=[1,2,3,4])
+
+_nonRepaintSecurity(_symbol, _res, _src, _repaint) => security(_symbol, _res, _src[_repaint ? 0 : barstate.isrealtime ? 1 : 0])[_repaint ? 0 : barstate.isrealtime ? 0 : 1]
+
+dayHigh = _nonRepaintSecurity(syminfo.tickerid, "D",high, false)
+dayLow = _nonRepaintSecurity(syminfo.tickerid, "D",low, false)
+dayOpen  = _nonRepaintSecurity(syminfo.tickerid, "D",open, false)
+dayClose = _nonRepaintSecurity(syminfo.tickerid, "D",close, false)
+weekHigh = _nonRepaintSecurity(syminfo.tickerid, "W",high, false)
+weekLow = _nonRepaintSecurity(syminfo.tickerid, "W",low, false)
+pivotPoint = (dayHigh + dayLow + dayClose)/3
+pivR1 = (2 * pivotPoint) - dayLow
+pivS1 = (2 * pivotPoint) - dayHigh
+pivR2 = pivotPoint-pivS1+pivR1
+pivS2 = pivotPoint-pivR1+pivS1
+pivR3 = (2*pivotPoint)+(dayHigh-(2*dayLow))
+pivS3 = (2*pivotPoint)-((2*dayHigh)-dayLow)
+
+_doShowYesterdayHighLow() => 
+    isValidTimeframe = timeframe.isintraday == true
+    isValidDay = onlyShowYesterdayHighLowForCurrentDay ? _isCurrentDay() : true
+    isValidTimeframe and isValidDay
+
+_doShowLastWeekHighLow() => 
+    isValidTimeframe = timeframe.isintraday == true or timeframe.isdaily == true
+    isValidDay = onlyShowYesterdayHighLowForCurrentDay ? _isCurrentDay() : true
+    isValidTimeframe and isValidDay
+
+
+_getYesterdayHighLowValues() => 
+    if _doShowYesterdayHighLow()
+        [dayHigh, dayLow]
+    else 
+        [na, na]
+
+_getLastWeekHighLowValues() => 
+    if _doShowLastWeekHighLow()
+        [weekHigh, weekLow]
+    else 
+        [na, na]
+
+[yesterdayHigh, yesterdayLow] = _getYesterdayHighLowValues()
+[lastWeekHigh, lastWeekLow] = _getLastWeekHighLowValues()
+
+plot(yesterdayHigh, linewidth=yesterdayHighLowLineWidth, color=yesterdayHighLowLineColor, style=yesterdayHighLowPlotStyle, title='Yesterday High')
+plot(yesterdayLow, linewidth=yesterdayHighLowLineWidth, color=yesterdayHighLowLineColor, style=yesterdayHighLowPlotStyle, title = 'Yesterday Low')
+plot(lastWeekHigh, linewidth=lastWeekHighLowLineWidth, color=lastWeekHighLowLineColor, style=lastWeekHighLowPlotStyle, title='Last Week High')
+plot(lastWeekLow, linewidth=lastWeekHighLowLineWidth, color=lastWeekHighLowLineColor, style=lastWeekHighLowPlotStyle, title='Last Week Low')
+
+// r_label(weekHigh,"LWeek Hi",label.style_none,color.green,validWHLTimeFrame and showWeekHighLow and showDayHighLowLabels)//ry, rtext, rstyle, rcolor, valid
+// r_label(weekLow,"LWeek Lo",label.style_none,color.green,validWHLTimeFrame and showWeekHighLow and showDayHighLowLabels)
+// r_label(dayHigh,"YH",label.style_none,color.blue,validDHLTimeFrame and showDayHighLow and showDayHighLowLabels)//ry, rtext, rstyle, rcolor, valid
+// r_label(dayLow,"YL",label.style_none,color.blue,validDHLTimeFrame and showDayHighLow and showDayHighLowLabels)
