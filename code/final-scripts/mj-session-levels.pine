@@ -119,10 +119,11 @@ _drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText,
 //////////////////////////////////////////////////////////////////
 
 // -----------------------
-// dependencies: dateUtils
+// dependencies: dateUtils, plotUtils
 // -----------------------
 
 groupSessionLevels = 'Session Levels'
+groupOffset = 'Offset'
 
 // ----------------------------------------------------------------------------------
 // tooltips
@@ -173,7 +174,7 @@ sessionLevelsLineWidth = input(2, 'Line Width', group=groupSessionLevels, option
 sessionLevelsLinesJoined = input(false, 'Join points?')
 sessionLevelsLineExtend = input(extend.none, 'Line Extend', options=[extend.none, extend.left, extend.right, extend.both])
 // labels
-sessionLabelOffsetInBars = input(25, 'Session Label Offset (bars)', group=groupSessionLevels)
+sessionLabelOffsetInBars = input(25, 'Session Label Offset (bars)', group=groupOffset)
 sessionLabelStyle = input(label.style_label_left, 'Session Label Style', group=groupSessionLevels, options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
 sessionLabelOpacity = input(70, 'Label Opacity', group=groupSessionLevels, minval=0, maxval=100)
 sessionLabelSize = input(size.normal, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupSessionLevels)
@@ -368,6 +369,8 @@ _drawSessionLines() =>
 
 
 [_asianOpenLineId, _asianHighLineId, _asianLowLineId, _nyOpenLineId, _nyHighLineId, _nyLowLineId, _londonOpenLineId, _londonHighLineId, _londonLowLineId] = _drawSessionLines()
+
+// Pine Script won't let these IDs be set in the method, so have to do it here.  Stupid.
 
 if na(_asianOpenLineId) 
     asianOpenLineId := _asianOpenLineId

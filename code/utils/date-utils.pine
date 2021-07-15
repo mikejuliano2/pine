@@ -73,3 +73,5 @@ _isFirstBarForCurrentTimeframeAtResolution(Resolution) =>
 
 // new_bar: check if we're on a new bar within the session in a given resolution
 new_bar(res) => change(time(res)) != 0
+
+_nonRepaintSecurity(_symbol, _res, _src, _repaint) => security(_symbol, _res, _src[_repaint ? 0 : barstate.isrealtime ? 1 : 0])[_repaint ? 0 : barstate.isrealtime ? 0 : 1]

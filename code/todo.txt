@@ -4,14 +4,15 @@
 // 
 //////////////////////////////////////////////////////////////////
 
+// convert the pivot lines
 // adjust the x2 offset for all the levels... most important levels closest to current bar
+// fix brinks timeframe constraint
 // Session Levels - optionally fill the range for each session, but once out of session, only show the line in the future
 // optionally show price in levels labels
-// convert the pivot lines
 
 // daily open MT4 = 10pm GMT = 18:00
 
-// Plot Markers for EMA cross
+// Plot Markers for EMA cross (possibly in new pane?)
     // 5/13
     // 5/50 cross
     // 13/50 cross
@@ -29,9 +30,20 @@
 // if in NY Session, lines that extend out to the end of the session
 // RDH/RDL
 // add an alert for MCB divergence on the 15 min
-// label the brinks
+// brinks label
 // extend session lines backwards for debriefing
-// make the daily open blue
+// plot lines at whole/half/quarter
 
+
+
+
+
+
+
+
+
+/////////////////////////
+// NOTES
+/////////////////////////
 
 // the 50% retracement is where you determine if the move is going to continue

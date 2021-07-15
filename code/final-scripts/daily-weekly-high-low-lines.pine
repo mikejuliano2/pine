@@ -16,6 +16,8 @@ _getFutureTimeNBarsFromNow(numBars) => time + ( ( time - time[1] ) * numBars )
 
 _getPastTimeNBarsBackFromNow(numBars) => time - ( ( time - time[1] ) * numBars )
 
+_getPastOrFutureTimeNBarsFromNow(numBars) => numBars > 0 ? _getFutureTimeNBarsFromNow(numBars) : _getPastTimeNBarsBackFromNow(numBars * -1)
+
 _currentBarTime() => time(timeframe.period)
 
 _calcBarsPerHour() =>
@@ -78,6 +80,8 @@ _isFirstBarForCurrentTimeframeAtResolution(Resolution) =>
 // new_bar: check if we're on a new bar within the session in a given resolution
 new_bar(res) => change(time(res)) != 0
 
+_nonRepaintSecurity(_symbol, _res, _src, _repaint) => security(_symbol, _res, _src[_repaint ? 0 : barstate.isrealtime ? 1 : 0])[_repaint ? 0 : barstate.isrealtime ? 0 : 1]
+
 //////////////////////////////////////////////////////////////////
 // 
 // ==== PLOT UTILS ==== 
@@ -113,37 +117,9 @@ _drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText,
 
 //////////////////////////////////////////////////////////////////
 // 
-// ==== DAILY/WEEKLY HIGH/LOW LINES ==== 
+// ==== CALCULATIONS ==== 
 // 
 //////////////////////////////////////////////////////////////////
-
-onlyShowYesterdayHighLowForCurrentDay = input(true, 'Only show yesterday H/L on current day?')
-onlyShowLastWeekHighLowForCurrentDay = input(true, 'Only show last week H/L on current day?')
-
-
-// *** `dwhl` stands for dailyWeeklyHighLow ***
-dwhlLabelStyle = input(label.style_none, 'Yesterday H/L Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
-dwhlLabelVisible = input(true, 'Daily/Weekly H/L Label Visible?')
-dwhlLabelSize = input(size.normal, 'Daily/Weekly H/L Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large])
-dwhlLineExtend = input(extend.none, 'Daily/Weekly H/L Line Extend', options=[extend.none, extend.left, extend.right, extend.both])
-
-// *** `yhl` stands for yesterdayHighLow ***
-yhlLineColor = input(color.blue, 'Yesterday H/L Line Color')
-yhlLineWidth = input(1, 'Yesterday H/L Line Width', options=[1,2,3,4])
-yhlLineStyle = input(line.style_solid, 'Yesterday H/L Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted])
-yhlLabelColor = input(color.new(color.blue, 0), 'Yesterday H/L Label Color')
-yhlLabelTextColor = input(color.new(color.white, 0), 'Yesterday H/L Label Text Color')
-yhlLabelOffset = input(30, 'Yesterday H/L Label Offset (in bars)')
-
-// *** `lwhl` stands for lastWeekHighLow ***
-lwhlLineColor = input(color.green, 'Last Week H/L Line Color')
-lwhlLineWidth = input(1, 'Last Week H/L Line Width', options=[1,2,3,4])
-lwhlLineStyle = input(line.style_solid, 'Last Week H/L Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted])
-lwhlLabelColor = input(color.new(color.green, 0), 'Last Week H9/L Label Color')
-lwhlLabelTextColor = input(color.new(color.white, 0), 'Last Week H/L Label Text Color')
-lwhlLabelOffset = input(40, 'Last Week H/L Label Offset (in bars)')
-
-_nonRepaintSecurity(_symbol, _res, _src, _repaint) => security(_symbol, _res, _src[_repaint ? 0 : barstate.isrealtime ? 1 : 0])[_repaint ? 0 : barstate.isrealtime ? 0 : 1]
 
 dayHigh = _nonRepaintSecurity(syminfo.tickerid, "D",high, false)
 dayLow = _nonRepaintSecurity(syminfo.tickerid, "D",low, false)
@@ -158,6 +134,158 @@ pivR2 = pivotPoint-pivS1+pivR1
 pivS2 = pivotPoint-pivR1+pivS1
 pivR3 = (2*pivotPoint)+(dayHigh-(2*dayLow))
 pivS3 = (2*pivotPoint)-((2*dayHigh)-dayLow)
+m0C = (pivS2+pivS3)/2
+m1C = (pivS1+pivS2)/2
+m2C = (pivotPoint+pivS1)/2
+m3C = (pivotPoint+pivR1)/2
+m4C = (pivR1+pivR2)/2
+m5C = (pivR2+pivR3)/2
+
+//////////////////////////////////////////////////////////////////
+// 
+// ==== PIVOTS ==== 
+// 
+//////////////////////////////////////////////////////////////////
+
+pivotLineLeftOffsetInBars = input(0, 'Pivot Offset Left (in bars)', tooltip='How many bars away from current price to shift x1')
+pivotLineLengthInBars = input(10, 'Pivot Line Length (in bars)', minval=0)
+pivotLineStyle = input(line.style_dashed, 'M Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted])
+pivotLineWidth = input(1, 'M Line Width', options=[1,2,3,4])
+pivotLineExtend = input(extend.none, 'M Line Extend', options=[extend.none, extend.left, extend.right, extend.both])
+pivotLabelStyle = input(label.style_none, 'M Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
+pivotLabelVisible = input(true, 'Pivot Labels Visible')
+pivotLabelSize = input(size.normal, 'M Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large])
+
+mColor = input(color.white, 'M Color')
+sColor = input(color.red, 'S Color')
+rColor = input(color.green, 'R Color')
+ppColor = input(color.yellow, 'PP Color')
+
+mLineColor = color.new(mColor, 50)
+mLabelColor = color.new(mColor, 0)
+mLabelTextColor = color.new(mColor, 0)
+
+sLineColor = color.new(sColor, 10)
+sLabelColor = color.new(sColor, 50)
+sLabelTextColor = color.new(sColor, 0)
+
+rLineColor = color.new(rColor, 10)
+rLabelColor = color.new(rColor, 50)
+rLabelTextColor = color.new(rColor, 0)
+
+ppLineColor = color.new(ppColor, 10)
+ppLabelColor = color.new(ppColor, 50)
+ppLabelTextColor = color.new(ppColor, 0)
+
+var line m0LineId = na
+var line m1LineId = na
+var line m2LineId = na
+var line m3LineId = na
+var line m4LineId = na
+var line m5LineId = na
+var line r1LineId = na
+var line r2LineId = na
+var line r3LineId = na
+var line s1LineId = na
+var line s2LineId = na
+var line s3LineId = na
+var line ppLineId = na
+
+_drawMPivotLine(lineId, x1, x2, y, labelText) =>
+    _drawLabelledLine(lineId, x1, x2, y, mLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, labelText, pivotLabelStyle, mLabelColor, mLabelTextColor, pivotLabelSize, pivotLabelVisible)
+
+_drawPivots() => 
+    x1 = _getPastOrFutureTimeNBarsFromNow(pivotLineLeftOffsetInBars)
+    x2 = _getFutureTimeNBarsFromNow(pivotLineLeftOffsetInBars + pivotLineLengthInBars)
+
+    _m0LineId = _drawMPivotLine(m0LineId, x1, x2, m0C, 'M0')
+    _m1LineId = _drawMPivotLine(m1LineId, x1, x2, m1C, 'M1')
+    _m2LineId = _drawMPivotLine(m2LineId, x1, x2, m2C, 'M2')
+    _m3LineId = _drawMPivotLine(m3LineId, x1, x2, m3C, 'M3')
+    _m4LineId = _drawMPivotLine(m4LineId, x1, x2, m4C, 'M4')
+    _m5LineId = _drawMPivotLine(m5LineId, x1, x2, m5C, 'M5')
+    _s1LineId = _drawLabelledLine(s1LineId, x1, x2, pivS1, sLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'S1', pivotLabelStyle, sLabelColor, sLabelTextColor, pivotLabelSize, pivotLabelVisible)
+    _s2LineId = _drawLabelledLine(s2LineId, x1, x2, pivS2, sLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'S2', pivotLabelStyle, sLabelColor, sLabelTextColor, pivotLabelSize, pivotLabelVisible)
+    _s3LineId = _drawLabelledLine(s3LineId, x1, x2, pivS3, sLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'S3', pivotLabelStyle, sLabelColor, sLabelTextColor, pivotLabelSize, pivotLabelVisible)
+    _r1LineId = _drawLabelledLine(r1LineId, x1, x2, pivR1, rLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'R1', pivotLabelStyle, rLabelColor, rLabelTextColor, pivotLabelSize, pivotLabelVisible)
+    _r2LineId = _drawLabelledLine(r2LineId, x1, x2, pivR2, rLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'R2', pivotLabelStyle, rLabelColor, rLabelTextColor, pivotLabelSize, pivotLabelVisible)
+    _r3LineId = _drawLabelledLine(r3LineId, x1, x2, pivR3, rLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'R3', pivotLabelStyle, rLabelColor, rLabelTextColor, pivotLabelSize, pivotLabelVisible)
+    _ppLineId = _drawLabelledLine(ppLineId, x1, x2, pivotPoint, ppLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'PP', pivotLabelStyle, ppLabelColor, ppLabelTextColor, pivotLabelSize, pivotLabelVisible)
+
+    [_m0LineId, _m1LineId, _m2LineId, _m3LineId, _m4LineId, _m5LineId, _s1LineId, _s2LineId, _s3LineId, _r1LineId, _r2LineId, _r3LineId, _ppLineId]
+
+[_m0LineId, _m1LineId, _m2LineId, _m3LineId, _m4LineId, _m5LineId, _s1LineId, _s2LineId, _s3LineId, _r1LineId, _r2LineId, _r3LineId, _ppLineId] = _drawPivots()
+
+if na(m0LineId)
+    m0LineId := _m0LineId
+
+if na(m1LineId)
+    m1LineId := _m1LineId
+
+if na(m2LineId)
+    m2LineId := _m2LineId
+
+if na(m3LineId)
+    m3LineId := _m3LineId
+
+if na(m4LineId)
+    m4LineId := _m4LineId
+
+if na(m5LineId)
+    m5LineId := _m5LineId
+
+if na(s1LineId)
+    s1LineId := _s1LineId
+
+if na(s2LineId)
+    s2LineId := _s2LineId
+
+if na(s3LineId)
+    s3LineId := _s3LineId
+
+if na(r1LineId)
+    r1LineId := _r1LineId
+
+if na(r2LineId)
+    r2LineId := _r2LineId
+
+if na(r3LineId)
+    r3LineId := _r3LineId
+
+if na(ppLineId)
+    ppLineId := _ppLineId
+
+//////////////////////////////////////////////////////////////////
+// 
+// ==== DAILY/WEEKLY HIGH/LOW LINES ==== 
+// 
+//////////////////////////////////////////////////////////////////
+
+onlyShowYesterdayHighLowForCurrentDay = input(true, 'Only show yesterday H/L on current day?')
+onlyShowLastWeekHighLowForCurrentDay = input(true, 'Only show last week H/L on current day?')
+
+
+// *** `dwhl` stands for dailyWeeklyHighLow ***
+dwhlLabelStyle = input(label.style_label_left, 'Yesterday H/L Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
+dwhlLabelVisible = input(true, 'Daily/Weekly H/L Label Visible?')
+dwhlLabelSize = input(size.normal, 'Daily/Weekly H/L Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large])
+dwhlLineExtend = input(extend.none, 'Daily/Weekly H/L Line Extend', options=[extend.none, extend.left, extend.right, extend.both])
+
+// *** `yhl` stands for yesterdayHighLow ***
+yhlLineColor = input(color.blue, 'Yesterday H/L Line Color')
+yhlLineWidth = input(1, 'Yesterday H/L Line Width', options=[1,2,3,4])
+yhlLineStyle = input(line.style_solid, 'Yesterday H/L Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted])
+yhlLabelColor = input(color.new(color.blue, 0), 'Yesterday H/L Label Color')
+yhlLabelTextColor = input(color.new(color.white, 0), 'Yesterday H/L Label Text Color')
+yhlLabelOffset = input(10, 'Yesterday H/L Label Offset (in bars)')
+
+// *** `lwhl` stands for lastWeekHighLow ***
+lwhlLineColor = input(color.green, 'Last Week H/L Line Color')
+lwhlLineWidth = input(1, 'Last Week H/L Line Width', options=[1,2,3,4])
+lwhlLineStyle = input(line.style_solid, 'Last Week H/L Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted])
+lwhlLabelColor = input(color.new(color.green, 0), 'Last Week H9/L Label Color')
+lwhlLabelTextColor = input(color.new(color.white, 0), 'Last Week H/L Label Text Color')
+lwhlLabelOffset = input(20, 'Last Week H/L Label Offset (in bars)')
 
 // _getLevelsStart() => 
 //     levelsStartTime = iff((timeframe.isseconds == true) or (timeframe.isminutes == true and timeframe.multiplier < 5), time('D'), time('D') - (MS_PER_DAY))
@@ -192,7 +320,7 @@ var line yesterdayLowLineId = na
 var line lastWeekHighLineId = na
 var line lastWeekLowLineId = na
 
-_drawDailyWeeklyHighLowRays() => 
+_drawDailyWeeklyHighLowLines() => 
     [yesterdayHigh, yesterdayLow] = _getYesterdayHighLowValues()
     [lastWeekHigh, lastWeekLow] = _getLastWeekHighLowValues()
 
@@ -201,18 +329,19 @@ _drawDailyWeeklyHighLowRays() =>
     // plot(lastWeekHigh, linewidth=lwhlLineWidth, color=lwhlLineColor, style=lastWeekHighLowPlotStyle, title='Last Week High')
     // plot(lastWeekLow, linewidth=lwhlLineWidth, color=lwhlLineColor, style=lastWeekHighLowPlotStyle, title='Last Week Low')
 
-    dailyWeeklyHighLowX1 = time[10]
-    dailyWeeklyHighLowX2 = _getFutureTimeNBarsFromNow(yhlLabelOffset)
+    dailyWeeklyHighLowX1 = time[0]
+    dailyHighLowX2 = _getFutureTimeNBarsFromNow(yhlLabelOffset)
+    weeklyHighLowX2 = _getFutureTimeNBarsFromNow(lwhlLabelOffset)
 
-    _yesterdayHighLineId = _drawLabelledLine(yesterdayHighLineId, dailyWeeklyHighLowX1, dailyWeeklyHighLowX2, yesterdayHigh, yhlLineColor, yhlLineWidth, yhlLineStyle, dwhlLineExtend, 'Yesterday High', dwhlLabelStyle, yhlLabelColor, yhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible)
-    _yesterdayLowLineId = _drawLabelledLine(yesterdayLowLineId, dailyWeeklyHighLowX1, dailyWeeklyHighLowX2, yesterdayLow, yhlLineColor, yhlLineWidth, yhlLineStyle, dwhlLineExtend, 'Yesterday Low', dwhlLabelStyle, yhlLabelColor, yhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible)
-    _lastWeekHighLineId = _drawLabelledLine(lastWeekHighLineId, dailyWeeklyHighLowX1, dailyWeeklyHighLowX2, lastWeekHigh, lwhlLineColor, lwhlLineWidth, lwhlLineStyle, dwhlLineExtend, 'Last Week High', dwhlLabelStyle, lwhlLabelColor, lwhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible)
-    _lastWeekLowLineId = _drawLabelledLine(lastWeekLowLineId, dailyWeeklyHighLowX1, dailyWeeklyHighLowX2, lastWeekLow, lwhlLineColor, lwhlLineWidth, lwhlLineStyle, dwhlLineExtend, 'Last Week Low', dwhlLabelStyle, lwhlLabelColor, lwhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible)
+    _yesterdayHighLineId = _drawLabelledLine(yesterdayHighLineId, dailyWeeklyHighLowX1, dailyHighLowX2, yesterdayHigh, yhlLineColor, yhlLineWidth, yhlLineStyle, dwhlLineExtend, 'Yesterday High', dwhlLabelStyle, yhlLabelColor, yhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible)
+    _yesterdayLowLineId = _drawLabelledLine(yesterdayLowLineId, dailyWeeklyHighLowX1, dailyHighLowX2, yesterdayLow, yhlLineColor, yhlLineWidth, yhlLineStyle, dwhlLineExtend, 'Yesterday Low', dwhlLabelStyle, yhlLabelColor, yhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible)
+    _lastWeekHighLineId = _drawLabelledLine(lastWeekHighLineId, dailyWeeklyHighLowX1, weeklyHighLowX2, lastWeekHigh, lwhlLineColor, lwhlLineWidth, lwhlLineStyle, dwhlLineExtend, 'Last Week High', dwhlLabelStyle, lwhlLabelColor, lwhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible)
+    _lastWeekLowLineId = _drawLabelledLine(lastWeekLowLineId, dailyWeeklyHighLowX1, weeklyHighLowX2, lastWeekLow, lwhlLineColor, lwhlLineWidth, lwhlLineStyle, dwhlLineExtend, 'Last Week Low', dwhlLabelStyle, lwhlLabelColor, lwhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible)
 
     [_yesterdayHighLineId, _yesterdayLowLineId, _lastWeekHighLineId, _lastWeekLowLineId]
 
 
-[_yesterdayHighLineId, _yesterdayLowLineId, _lastWeekHighLineId, _lastWeekLowLineId] = _drawDailyWeeklyHighLowRays()
+[_yesterdayHighLineId, _yesterdayLowLineId, _lastWeekHighLineId, _lastWeekLowLineId] = _drawDailyWeeklyHighLowLines()
 
 if na(_yesterdayHighLineId) or na(_yesterdayLowLineId) or na(_lastWeekHighLineId) or na(_lastWeekLowLineId)
     yesterdayHighLineId := _yesterdayHighLineId
