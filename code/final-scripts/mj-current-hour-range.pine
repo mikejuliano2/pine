@@ -16,6 +16,8 @@ _getFutureTimeNBarsFromNow(numBars) => time + ( ( time - time[1] ) * numBars )
 
 _getPastTimeNBarsBackFromNow(numBars) => time - ( ( time - time[1] ) * numBars )
 
+_getTimeNBarsFromNow(numBars) => numBars > 0 ? _getFutureTimeNBarsFromNow(numBars) : _getPastTimeNBarsBackFromNow(numBars * -1)
+
 _currentBarTime() => time(timeframe.period)
 
 _calcBarsPerHour() =>

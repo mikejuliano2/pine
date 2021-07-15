@@ -16,6 +16,8 @@ _getFutureTimeNBarsFromNow(numBars) => time + ( ( time - time[1] ) * numBars )
 
 _getPastTimeNBarsBackFromNow(numBars) => time - ( ( time - time[1] ) * numBars )
 
+_getTimeNBarsFromNow(numBars) => numBars > 0 ? _getFutureTimeNBarsFromNow(numBars) : _getPastTimeNBarsBackFromNow(numBars * -1)
+
 _currentBarTime() => time(timeframe.period)
 
 _calcBarsPerHour() =>
@@ -84,7 +86,7 @@ new_bar(res) => change(time(res)) != 0
 // 
 //////////////////////////////////////////////////////////////////
 
-_drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText, labelStyle, labelColor, labelTextColor, labelSize, showLabel) => 
+_drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText, labelStyle, labelColor, labelTextColor, labelSize, showLabel, labelOffsetInBars) => 
     // x1 and x2 are in time (not bars)
 
     _lineId = lineId
@@ -106,7 +108,9 @@ _drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText,
 
     if showLabel
         // labelPosition = rangeLabelRightJustified ? x2 : x1
-        labelId = label.new(x2, y, labelText, textcolor=labelTextColor, style=labelStyle, size=labelSize, xloc=xloc.bar_time, color=labelColor)
+        timePerBar = time[0] - time[1]
+        labelTime = x2 + (labelOffsetInBars * timePerBar)
+        labelId = label.new(labelTime, y, labelText, textcolor=labelTextColor, style=labelStyle, size=labelSize, xloc=xloc.bar_time, color=labelColor)
         label.delete(labelId[1])
 
     _lineId
@@ -135,7 +139,7 @@ asianOpenPlotActive = input(true, 'Plot Asian Open?', group=groupSessionLevels)
 asianHighLowPlotActive = input(true, 'Plot Asian HighLow?', group=groupSessionLevels)
 londonHighLowPlotActive = input(false, 'Plot London HighLow?', group=groupSessionLevels)
 londonOpenPlotActive = input(true, 'Plot London Open?', group=groupSessionLevels)
-nyOpenPlotActive = input(true, 'Plot New York Open?', group=groupSessionLevels)
+nyOpenPlotActive = input(true, 'Plot NY Open?', group=groupSessionLevels)
 nyHighLowPlotActive = input(false, 'Plot New York HighLow?', group=groupSessionLevels)
 // asian
 asianMasterColor = input(#00897b, 'Asian Color', input.color, group=groupSessionLevels)
@@ -155,8 +159,8 @@ londonHoldTimeInHours = input(0, "London Holding Time", input.integer, minval=0,
 londonTimeRange = input('0800-1630:1234567', 'London Session Time', group=groupSessionLevels, type=input.session)
 // new york
 nyMasterColor = input(#fff176, 'New York Color', input.color, group=groupSessionLevels)
-nyOpenPlotStyle = input(plot.style_cross, 'New York Open Plot Style', group=groupSessionLevels, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-nyOpenLineStyle = input(line.style_solid, 'New York Open Line Style', group=groupSessionLevels, options=[line.style_solid, line.style_dashed, line.style_dotted])
+nyOpenPlotStyle = input(plot.style_cross, 'NY Open Plot Style', group=groupSessionLevels, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+nyOpenLineStyle = input(line.style_solid, 'NY Open Line Style', group=groupSessionLevels, options=[line.style_solid, line.style_dashed, line.style_dotted])
 nyStartHour = input(9, 'New York Start Hour', minval=0, maxval=23, group=groupSessionLevels)
 nyEndHour = input(17, 'New York End Hour', minval=0, maxval=23, group=groupSessionLevels)
 nyHoldTimeInHours = input(0, "New York Holding Time", input.integer, minval=0, maxval = 23, tooltip = TT_PR, group=groupSessionLevels)
@@ -171,11 +175,13 @@ sessionLevelsOpenLineOpacity = input(10, 'Opacity - Open Line', minval=0, maxval
 sessionLevelsHighLowPlotStyle = input(plot.style_linebr, 'Plot Style - H/L', group=groupSessionLevels, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
 sessionLevelsHighLowLineStyle = input(line.style_solid, 'Line Style - H/L', group=groupSessionLevels, options=[line.style_solid, line.style_dashed, line.style_dotted])
 sessionLevelsLineWidth = input(2, 'Line Width', group=groupSessionLevels, options=[1,2,3,4])
-sessionLevelsLinesJoined = input(false, 'Join points?')
-sessionLevelsLineExtend = input(extend.none, 'Line Extend', options=[extend.none, extend.left, extend.right, extend.both])
+sessionLevelsLinesJoined = input(false, 'Join points?', group=groupSessionLevels)
+sessionLevelsLineExtend = input(extend.none, 'Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupSessionLevels)
+sessionLevelsLineLengthInBars = input(20, 'Line Length (in bars)', group=groupSessionLevels)
+sessionLevelsLineOffsetInBars = input(0, 'Line Offset (in bars)', group=groupSessionLevels)
 // labels
-sessionLabelOffsetInBars = input(25, 'Session Label Offset (bars)', group=groupOffset)
-sessionLabelStyle = input(label.style_label_left, 'Session Label Style', group=groupSessionLevels, options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
+sessionLabelOffsetInBars = input(-3, 'Label Offset (in bars)', group=groupSessionLevels)
+sessionLabelStyle = input(label.style_none, 'Session Label Style', group=groupSessionLevels, options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
 sessionLabelOpacity = input(70, 'Label Opacity', group=groupSessionLevels, minval=0, maxval=100)
 sessionLabelSize = input(size.normal, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupSessionLevels)
 // days
@@ -283,15 +289,15 @@ _getValuesToPlotSessionLevels(timeRange, startHour, endHour, holdHour, hourShift
 // -------------
 
 [asianHigh, asianLow, asianOpen, asianOpenLineColor, asianHighLowLineColor, asianFillColor] = _getValuesToPlotSessionLevels(asianTimeRange, asianStartHour, asianEndHour, asianHoldTimeInHours, sessionLevelsTZShiftHours, asianMasterColor, asianOpenPlotActive, asianHighLowPlotActive)
-// asianPlotHigh = plot(asianHigh, "Asian Session High", asianHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
-// asianPlotLow  = plot(asianLow,  "Asian Session Low",  asianHighLowLineColor,  sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
-// asianPlotOpen  = plot(asianOpen,  "Asian Session Low",  asianOpenLineColor,  sessionLevelsLineWidth, asianOpenPlotStyle, join=sessionLevelsLinesJoined)
+// asianPlotHigh = plot(asianHigh, "Asia High", asianHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
+// asianPlotLow  = plot(asianLow,  "Asia Low",  asianHighLowLineColor,  sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
+// asianPlotOpen  = plot(asianOpen,  "Asia Low",  asianOpenLineColor,  sessionLevelsLineWidth, asianOpenPlotStyle, join=sessionLevelsLinesJoined)
 // fill(asianPlotHigh, asianPlotLow, asianFillColor)
 
 [londonHigh, londonLow, londonOpen, londonOpenLineColor, londonHighLowLineColor, londonFillColor] = _getValuesToPlotSessionLevels(londonTimeRange, londonStartHour, londonEndHour, londonHoldTimeInHours, sessionLevelsTZShiftHours, londonMasterColor, londonOpenPlotActive, londonHighLowPlotActive)
 // londonPlotHigh = plot(londonHigh, "London Session High", londonHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
-// londonPlotLow  = plot(londonLow,  "London Session Low",  londonHighLowLineColor,  sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
-// londonPlotOpen  = plot(londonOpen,  "London Session Low",  londonOpenLineColor,  sessionLevelsLineWidth, londonOpenPlotStyle, join=sessionLevelsLinesJoined)
+// londonPlotLow  = plot(londonLow,  "London Low",  londonHighLowLineColor,  sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
+// londonPlotOpen  = plot(londonOpen,  "London Low",  londonOpenLineColor,  sessionLevelsLineWidth, londonOpenPlotStyle, join=sessionLevelsLinesJoined)
 // fill(londonPlotHigh, londonPlotLow, londonFillColor)
 
 [nyHigh, nyLow, nyOpen, nyOpenLineColor, nyHighLowLineColor, nyFillColor] = _getValuesToPlotSessionLevels(nyTimeRange, nyStartHour, nyEndHour, nyHoldTimeInHours, sessionLevelsTZShiftHours, nyMasterColor, nyOpenPlotActive, nyHighLowPlotActive)
@@ -309,12 +315,12 @@ _drawSessionnLabel(x, y, text, style, size, Color, textColor) =>
 
 
 
-sessionLabelX2 = _getFutureTimeNBarsFromNow(sessionLabelOffsetInBars)
+sessionLabelX2 = _getTimeNBarsFromNow(sessionLabelOffsetInBars)
 
-// asianHighlabelId = _drawSessionnLabel(sessionLabelX2, asianHigh, 'Asian Session High', sessionLabelStyle, size.normal, asianMasterColor, color.white)
+// asianHighlabelId = _drawSessionnLabel(sessionLabelX2, asianHigh, 'Asia High', sessionLabelStyle, size.normal, asianMasterColor, color.white)
 // label.delete(asianHighlabelId[1])
 
-// asianLowlabelId = _drawSessionnLabel(sessionLabelX2, asianLow, 'Asian Session Low', sessionLabelStyle, size.normal, asianMasterColor, color.white)
+// asianLowlabelId = _drawSessionnLabel(sessionLabelX2, asianLow, 'Asia Low', sessionLabelStyle, size.normal, asianMasterColor, color.white)
 // label.delete(asianLowlabelId[1])
 
 // asianOpenLabelId = _drawSessionnLabel(sessionLabelX2, asianOpen, 'Daily Open', sessionLabelStyle, size.normal, asianMasterColor, color.white)
@@ -323,7 +329,7 @@ sessionLabelX2 = _getFutureTimeNBarsFromNow(sessionLabelOffsetInBars)
 // londonOpenLabelId = _drawSessionnLabel(sessionLabelX2, londonOpen, 'London Open', sessionLabelStyle, size.normal, londonMasterColor, color.white)
 // label.delete(londonOpenLabelId[1])
 
-// nyOpenLabelId = _drawSessionnLabel(sessionLabelX2, nyOpen, 'New York Open', sessionLabelStyle, size.normal, nyMasterColor, color.white)
+// nyOpenLabelId = _drawSessionnLabel(sessionLabelX2, nyOpen, 'NY Open', sessionLabelStyle, size.normal, nyMasterColor, color.white)
 // label.delete(nyOpenLabelId[1])
 
 // ====================================
@@ -341,7 +347,8 @@ var line londonHighLineId = na
 var line londonLowLineId = na
 
 _drawSessionLines() =>
-    x1 = time
+    x1 = _getTimeNBarsFromNow(sessionLevelsLineOffsetInBars)
+    x2 = _getTimeNBarsFromNow(sessionLevelsLineOffsetInBars + sessionLevelsLineLengthInBars)
     
     asianLabelColor = color.new(asianMasterColor, sessionLabelOpacity)
     nyLabelColor = color.new(nyMasterColor, sessionLabelOpacity)
@@ -353,17 +360,17 @@ _drawSessionLines() =>
     labelSize = sessionLabelSize
     labelVisible = true
 
-    _asianOpenLineId = _drawLabelledLine(asianOpenLineId, x1, sessionLabelX2, asianOpen, asianOpenLineColor, sessionLevelsLineWidth, asianOpenLineStyle, sessionLevelsLineExtend, 'Daily Open', sessionLabelStyle, asianLabelColor, labelTextColor, labelSize, labelVisible)
-    _asianHighLineId = _drawLabelledLine(asianHighLineId, x1, sessionLabelX2, asianHigh, asianHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'Asian Session High', sessionLabelStyle, asianLabelColor, labelTextColor, labelSize, labelVisible)
-    _asianLowLineId = _drawLabelledLine(asianLowLineId, x1, sessionLabelX2, asianLow, asianHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'Asian Session Low', sessionLabelStyle, asianLabelColor, labelTextColor, labelSize, labelVisible)
+    _asianOpenLineId = _drawLabelledLine(asianOpenLineId, x1, x2, asianOpen, asianOpenLineColor, sessionLevelsLineWidth, asianOpenLineStyle, sessionLevelsLineExtend, 'Daily Open', sessionLabelStyle, asianLabelColor, labelTextColor, labelSize, labelVisible, sessionLabelOffsetInBars)
+    _asianHighLineId = _drawLabelledLine(asianHighLineId, x1, x2, asianHigh, asianHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'Asia High', sessionLabelStyle, asianLabelColor, labelTextColor, labelSize, labelVisible, sessionLabelOffsetInBars)
+    _asianLowLineId = _drawLabelledLine(asianLowLineId, x1, x2, asianLow, asianHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'Asia Low', sessionLabelStyle, asianLabelColor, labelTextColor, labelSize, labelVisible, sessionLabelOffsetInBars)
     
-    _nyOpenLineId = _drawLabelledLine(nyOpenLineId, x1, sessionLabelX2, nyOpen, nyOpenLineColor, sessionLevelsLineWidth, nyOpenLineStyle, sessionLevelsLineExtend, 'New York Open', sessionLabelStyle, nyLabelColor, labelTextColor, labelSize, labelVisible)
-    _nyHighLineId = _drawLabelledLine(nyHighLineId, x1, sessionLabelX2, nyHigh, nyHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'New York High', sessionLabelStyle, nyLabelColor, labelTextColor, labelSize, nyHighLowLabelVisible)
-    _nyLowLineId = _drawLabelledLine(nyLowLineId, x1, sessionLabelX2, nyLow, nyHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'New York Low', sessionLabelStyle, nyLabelColor, labelTextColor, labelSize, nyHighLowLabelVisible)
+    _nyOpenLineId = _drawLabelledLine(nyOpenLineId, x1, x2, nyOpen, nyOpenLineColor, sessionLevelsLineWidth, nyOpenLineStyle, sessionLevelsLineExtend, 'NY Open', sessionLabelStyle, nyLabelColor, labelTextColor, labelSize, labelVisible, sessionLabelOffsetInBars)
+    _nyHighLineId = _drawLabelledLine(nyHighLineId, x1, x2, nyHigh, nyHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'NY High', sessionLabelStyle, nyLabelColor, labelTextColor, labelSize, nyHighLowLabelVisible, sessionLabelOffsetInBars)
+    _nyLowLineId = _drawLabelledLine(nyLowLineId, x1, x2, nyLow, nyHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'NY Low', sessionLabelStyle, nyLabelColor, labelTextColor, labelSize, nyHighLowLabelVisible, sessionLabelOffsetInBars)
 
-    _londonOpenLineId = _drawLabelledLine(londonOpenLineId, x1, sessionLabelX2, londonOpen, londonOpenLineColor, sessionLevelsLineWidth, londonOpenLineStyle, sessionLevelsLineExtend, 'London Open', sessionLabelStyle, londonLabelColor, labelTextColor, labelSize, labelVisible)
-    _londonHighLineId = _drawLabelledLine(londonHighLineId, x1, sessionLabelX2, londonHigh, londonHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'London York High', sessionLabelStyle, londonLabelColor, labelTextColor, labelSize, londonHighLowLabelVisible)
-    _londonLowLineId = _drawLabelledLine(londonLowLineId, x1, sessionLabelX2, londonLow, londonHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'London Low', sessionLabelStyle, londonLabelColor, labelTextColor, labelSize, londonHighLowLabelVisible)
+    _londonOpenLineId = _drawLabelledLine(londonOpenLineId, x1, x2, londonOpen, londonOpenLineColor, sessionLevelsLineWidth, londonOpenLineStyle, sessionLevelsLineExtend, 'London Open', sessionLabelStyle, londonLabelColor, labelTextColor, labelSize, labelVisible, sessionLabelOffsetInBars)
+    _londonHighLineId = _drawLabelledLine(londonHighLineId, x1, x2, londonHigh, londonHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'London York High', sessionLabelStyle, londonLabelColor, labelTextColor, labelSize, londonHighLowLabelVisible, sessionLabelOffsetInBars)
+    _londonLowLineId = _drawLabelledLine(londonLowLineId, x1, x2, londonLow, londonHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'London Low', sessionLabelStyle, londonLabelColor, labelTextColor, labelSize, londonHighLowLabelVisible, sessionLabelOffsetInBars)
     
     [_asianOpenLineId, _asianHighLineId, _asianLowLineId, _nyOpenLineId, _nyHighLineId, _nyLowLineId, _londonOpenLineId, _londonHighLineId, _londonLowLineId]
 

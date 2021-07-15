@@ -4,7 +4,9 @@
 // 
 //////////////////////////////////////////////////////////////////
 
-// convert the pivot lines
+// label offset for all levels
+// groups for yesterday/last week/shared
+// line up yesterday and last week labels
 // adjust the x2 offset for all the levels... most important levels closest to current bar
 // fix brinks timeframe constraint
 // Session Levels - optionally fill the range for each session, but once out of session, only show the line in the future
