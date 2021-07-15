@@ -14,7 +14,7 @@
 
 // daily open MT4 = 10pm GMT = 18:00
 
-// Plot Markers for EMA cross (possibly in new pane?)
+// Plot Markers for EMA cross (possibly in new pane?)  use valuewhen
     // 5/13
     // 5/50 cross
     // 13/50 cross
