@@ -406,7 +406,7 @@ _drawSessionLines() =>
     labelSize = sessionLabelSize
     labelVisible = true
 
-    _asianOpenLineId = _drawLabelledLine(asianOpenLineId, x1, x2, asianOpen, asianOpenLineColor, sessionLevelsLineWidth, asianOpenLineStyle, sessionLevelsLineExtend, 'Daily Open', sessionLabelStyle, asianLabelColor, labelTextColor, labelSize, labelVisible, sessionLabelOffsetInBars)
+    _asianOpenLineId = _drawLabelledLine(asianOpenLineId, x1, x2, asianOpen, mt4DailyOpenColor, sessionLevelsLineWidth, asianOpenLineStyle, sessionLevelsLineExtend, 'Daily Open', sessionLabelStyle, asianLabelColor, labelTextColor, labelSize, labelVisible, sessionLabelOffsetInBars)
     _asianHighLineId = _drawLabelledLine(asianHighLineId, x1, x2, asianHigh, asianHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'Asia High', sessionLabelStyle, asianLabelColor, labelTextColor, labelSize, labelVisible, sessionLabelOffsetInBars)
     _asianLowLineId = _drawLabelledLine(asianLowLineId, x1, x2, asianLow, asianHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'Asia Low', sessionLabelStyle, asianLabelColor, labelTextColor, labelSize, labelVisible, sessionLabelOffsetInBars)
     

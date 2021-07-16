@@ -160,17 +160,15 @@ dwhlLineLengthInBars = input(20, 'Line Length (in bars)', group=groupDailyWeekly
 dwhlLabelOffsetInBars = input(-3, 'Daily/Weekly Label Offset (in bars)', group=groupDailyWeeklyShared)
 
 // *** `yhl` stands for yesterdayHighLow ***
-yhlLineColor = input(color.blue, 'Yesterday H/L Line Color', group=groupYesterday)
+yhlColor = input(color.new(#f44336, 0), 'Yesterday H/L Color', group=groupYesterday)
 yhlLineWidth = input(1, 'Yesterday H/L Line Width', options=[1,2,3,4], group=groupYesterday)
 yhlLineStyle = input(line.style_solid, 'Yesterday H/L Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupYesterday)
-yhlLabelColor = input(color.new(color.blue, 0), 'Yesterday H/L Label Color', group=groupYesterday)
 yhlLabelTextColor = input(color.new(color.white, 0), 'Yesterday H/L Label Text Color', group=groupYesterday)
 
 // *** `lwhl` stands for lastWeekHighLow ***
-lwhlLineColor = input(color.green, 'Last Week H/L Line Color', group=groupLastWeek)
+lwhlColor = input(color.new(#9c27b0, 0), 'Last Week H/L Color', group=groupLastWeek)
 lwhlLineWidth = input(1, 'Last Week H/L Line Width', options=[1,2,3,4], group=groupLastWeek)
 lwhlLineStyle = input(line.style_solid, 'Last Week H/L Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLastWeek)
-lwhlLabelColor = input(color.new(color.green, 0), 'Last Week H9/L Label Color', group=groupLastWeek)
 lwhlLabelTextColor = input(color.new(color.white, 0), 'Last Week H/L Label Text Color', group=groupLastWeek)
 
 // _getLevelsStart() => 
@@ -210,18 +208,18 @@ _drawDailyWeeklyHighLowLines() =>
     [yesterdayHigh, yesterdayLow] = _getYesterdayHighLowValues()
     [lastWeekHigh, lastWeekLow] = _getLastWeekHighLowValues()
 
-    // plot(yesterdayHigh, linewidth=yhlLineWidth, color=yhlLineColor, style=yesterdayHighLowPlotStyle, title='Yesterday High')
-    // plot(yesterdayLow, linewidth=yhlLineWidth, color=yhlLineColor, style=yesterdayHighLowPlotStyle, title = 'Yesterday Low')
-    // plot(lastWeekHigh, linewidth=lwhlLineWidth, color=lwhlLineColor, style=lastWeekHighLowPlotStyle, title='Last Week High')
-    // plot(lastWeekLow, linewidth=lwhlLineWidth, color=lwhlLineColor, style=lastWeekHighLowPlotStyle, title='Last Week Low')
+    // plot(yesterdayHigh, linewidth=yhlLineWidth, color=yhlColor, style=yesterdayHighLowPlotStyle, title='Yesterday High')
+    // plot(yesterdayLow, linewidth=yhlLineWidth, color=yhlColor, style=yesterdayHighLowPlotStyle, title = 'Yesterday Low')
+    // plot(lastWeekHigh, linewidth=lwhlLineWidth, color=lwhlColor, style=lastWeekHighLowPlotStyle, title='Last Week High')
+    // plot(lastWeekLow, linewidth=lwhlLineWidth, color=lwhlColor, style=lastWeekHighLowPlotStyle, title='Last Week Low')
 
     x1 = _getTimeNBarsFromNow(dwhlLineOffsetInBars)
     x2 = _getTimeNBarsFromNow(dwhlLineOffsetInBars + dwhlLineLengthInBars)
 
-    _yesterdayHighLineId = _drawLabelledLine(yesterdayHighLineId, x1, x2, yesterdayHigh, yhlLineColor, yhlLineWidth, yhlLineStyle, dwhlLineExtend, 'Yesterday High', dwhlLabelStyle, yhlLabelColor, yhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible, dwhlLabelOffsetInBars)
-    _yesterdayLowLineId = _drawLabelledLine(yesterdayLowLineId, x1, x2, yesterdayLow, yhlLineColor, yhlLineWidth, yhlLineStyle, dwhlLineExtend, 'Yesterday Low', dwhlLabelStyle, yhlLabelColor, yhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible, dwhlLabelOffsetInBars)
-    _lastWeekHighLineId = _drawLabelledLine(lastWeekHighLineId, x1, x2, lastWeekHigh, lwhlLineColor, lwhlLineWidth, lwhlLineStyle, dwhlLineExtend, 'Last Week High', dwhlLabelStyle, lwhlLabelColor, lwhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible, dwhlLabelOffsetInBars)
-    _lastWeekLowLineId = _drawLabelledLine(lastWeekLowLineId, x1, x2, lastWeekLow, lwhlLineColor, lwhlLineWidth, lwhlLineStyle, dwhlLineExtend, 'Last Week Low', dwhlLabelStyle, lwhlLabelColor, lwhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible, dwhlLabelOffsetInBars)
+    _yesterdayHighLineId = _drawLabelledLine(yesterdayHighLineId, x1, x2, yesterdayHigh, yhlColor, yhlLineWidth, yhlLineStyle, dwhlLineExtend, 'Yesterday High', dwhlLabelStyle, yhlColor, yhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible, dwhlLabelOffsetInBars)
+    _yesterdayLowLineId = _drawLabelledLine(yesterdayLowLineId, x1, x2, yesterdayLow, yhlColor, yhlLineWidth, yhlLineStyle, dwhlLineExtend, 'Yesterday Low', dwhlLabelStyle, yhlColor, yhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible, dwhlLabelOffsetInBars)
+    _lastWeekHighLineId = _drawLabelledLine(lastWeekHighLineId, x1, x2, lastWeekHigh, lwhlColor, lwhlLineWidth, lwhlLineStyle, dwhlLineExtend, 'Last Week High', dwhlLabelStyle, lwhlColor, lwhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible, dwhlLabelOffsetInBars)
+    _lastWeekLowLineId = _drawLabelledLine(lastWeekLowLineId, x1, x2, lastWeekLow, lwhlColor, lwhlLineWidth, lwhlLineStyle, dwhlLineExtend, 'Last Week Low', dwhlLabelStyle, lwhlColor, lwhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible, dwhlLabelOffsetInBars)
 
     [_yesterdayHighLineId, _yesterdayLowLineId, _lastWeekHighLineId, _lastWeekLowLineId]
 
