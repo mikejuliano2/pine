@@ -80,7 +80,7 @@ _isFirstBarForCurrentTimeframeAtResolution(Resolution) =>
 // new_bar: check if we're on a new bar within the session in a given resolution
 new_bar(res) => change(time(res)) != 0
 
-_nonRepaintSecurity(_symbol, _res, _src, _repaint) => security(_symbol, _res, _src[_repaint ? 0 : barstate.isrealtime ? 1 : 0])[_repaint ? 0 : barstate.isrealtime ? 0 : 1]
+_securityRepaint(_symbol, _res, _src, _repaint) => security(_symbol, _res, _src[_repaint ? 0 : barstate.isrealtime ? 1 : 0])[_repaint ? 0 : barstate.isrealtime ? 0 : 1]
 
 //////////////////////////////////////////////////////////////////
 // 
@@ -96,13 +96,14 @@ _drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText,
     if na(_lineId)
         _lineId := line.new(x1, y, x2, y, xloc.bar_time, _extend)
 
-
     line.set_xy1(_lineId, x1, y)
     line.set_xy2(_lineId, x2, y)
     line.set_color(_lineId, _color)
     line.set_width(_lineId, _width)
     line.set_style(_lineId, _style)
-    line.delete(_lineId[1])
+
+    if not na(_lineId[1])
+        line.delete(_lineId[1])
 
     // ----------------
     // draw the label
@@ -123,12 +124,18 @@ _drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText,
 // 
 //////////////////////////////////////////////////////////////////
 
-dayHigh = _nonRepaintSecurity(syminfo.tickerid, "D",high, false)
-dayLow = _nonRepaintSecurity(syminfo.tickerid, "D",low, false)
-dayOpen  = _nonRepaintSecurity(syminfo.tickerid, "D",open, false)
-dayClose = _nonRepaintSecurity(syminfo.tickerid, "D",close, false)
-weekHigh = _nonRepaintSecurity(syminfo.tickerid, "W",high, false)
-weekLow = _nonRepaintSecurity(syminfo.tickerid, "W",low, false)
+// dayHigh = _securityRepaint(syminfo.tickerid, "D",high, false)
+// dayLow = _securityRepaint(syminfo.tickerid, "D",low, false)
+// dayOpen  = _securityRepaint(syminfo.tickerid, "D",open, false)
+// dayClose = _securityRepaint(syminfo.tickerid, "D",close, false)
+// weekHigh = _securityRepaint(syminfo.tickerid, "W",high, false)
+// weekLow = _securityRepaint(syminfo.tickerid, "W",low, false)
+dayHigh = security(syminfo.tickerid, 'D', high[1], lookahead=true)
+dayLow = security(syminfo.tickerid, 'D', low[1], lookahead=true)
+dayOpen = security(syminfo.tickerid, 'D', open[1], lookahead=true)
+dayClose = security(syminfo.tickerid, 'D', close[1], lookahead=true)
+weekHigh = security(syminfo.tickerid, 'W', high[1], lookahead=true)
+weekLow = security(syminfo.tickerid, 'W', low[1], lookahead=true)
 
 //////////////////////////////////////////////////////////////////
 // 

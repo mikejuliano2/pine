@@ -12,13 +12,14 @@ _drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText,
     if na(_lineId)
         _lineId := line.new(x1, y, x2, y, xloc.bar_time, _extend)
 
-
     line.set_xy1(_lineId, x1, y)
     line.set_xy2(_lineId, x2, y)
     line.set_color(_lineId, _color)
     line.set_width(_lineId, _width)
     line.set_style(_lineId, _style)
-    line.delete(_lineId[1])
+
+    if not na(_lineId[1])
+        line.delete(_lineId[1])
 
     // ----------------
     // draw the label
