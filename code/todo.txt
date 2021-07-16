@@ -4,16 +4,17 @@
 // 
 //////////////////////////////////////////////////////////////////
 
-// fix the security issue
-
-// groups for yesterday/last week/shared
-// line up yesterday and last week labels
-// adjust the x2 offset for all the levels... most important levels closest to current bar
-// fix brinks timeframe constraint
-// Session Levels - optionally fill the range for each session, but once out of session, only show the line in the future
-// optionally show price in levels labels
 
 // daily open MT4 = 10pm GMT = 18:00
+// convert ADR 
+// convert PVSRA
+
+
+// line up yesterday and last week labels
+// Session Levels - optionally fill the range for each session, but once out of session, only show the line in the future
+// if in NY Session, lines that extend out to the end of the session
+// optionally show price in levels labels
+
 
 // Plot Markers for EMA cross (possibly in new pane?)  use valuewhen
     // 5/13
@@ -27,14 +28,10 @@
     // 1m: 750 = 50 on 15, 250 = 50 on 5
     // 5m: 150 = 50 on 15
 
-// Split out PVSRA
 
-// extend lines to yesterday's daily open like the M1-5 levels in TR
-// if in NY Session, lines that extend out to the end of the session
 // RDH/RDL
 // add an alert for MCB divergence on the 15 min
 // brinks label
-// extend session lines backwards for debriefing
 // plot lines at whole/half/quarter
 
 
