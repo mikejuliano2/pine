@@ -68,4 +68,5 @@ COLOR_RED = #f21616
 COLOR_LIGHT_BLUE = #3179f5
 COLOR_MAGENTA = #d612f8
 // -------------------------------------------------
+// when you declare an array using var, it doesn't rebuild on every iteration
 // -------------------------------------------------

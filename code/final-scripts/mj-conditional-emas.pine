@@ -156,11 +156,11 @@ _getEmaCrossMarkerVisibility(emaOne, emaTwo, markerActive) =>
 // MARKERS USING PLOTSHAPE
 // =====================================
 
-markerCrossUpPlotStyle = input(shape.arrowup, 'Shape Style Up', options=[shape.xcross, shape.cross, shape.triangleup, shape.triangledown, shape.flag, shape.circle, shape.arrowup, shape.arrowdown, shape.labelup, shape.labeldown, shape.square, shape.diamond], group=groupMarkers)
-markerCrossDownPlotStyle = input(shape.arrowdown, 'Shape Style Down', options=[shape.xcross, shape.cross, shape.triangleup, shape.triangledown, shape.flag, shape.circle, shape.arrowup, shape.arrowdown, shape.labelup, shape.labeldown, shape.square, shape.diamond], group=groupMarkers)
+markerCrossUpPlotStyle = input(shape.triangleup, 'Shape Style Up', options=[shape.xcross, shape.cross, shape.triangleup, shape.triangledown, shape.flag, shape.circle, shape.arrowup, shape.arrowdown, shape.labelup, shape.labeldown, shape.square, shape.diamond], group=groupMarkers)
+markerCrossDownPlotStyle = input(shape.triangledown, 'Shape Style Down', options=[shape.xcross, shape.cross, shape.triangleup, shape.triangledown, shape.flag, shape.circle, shape.arrowup, shape.arrowdown, shape.labelup, shape.labeldown, shape.square, shape.diamond], group=groupMarkers)
 markerCrossUpPlotLocation = input(location.bottom, 'Shape Location Up', options=[location.abovebar, location.belowbar, location.top, location.bottom, location.absolute], group=groupMarkers)
 markerCrossDownPlotLocation = input(location.top, 'Shape Location Down', options=[location.abovebar, location.belowbar, location.top, location.bottom, location.absolute], group=groupMarkers)
-markerShapeSize = size.normal
+markerShapeSize = size.small
 
 [isVisible5x13Up, isVisible5x13Down] = _getEmaCrossMarkerVisibility(ema5, ema13, marker5x13Active)
 [isVisible5x50Up, isVisible5x50Down] = _getEmaCrossMarkerVisibility(ema5, ema50, marker5x50Active)

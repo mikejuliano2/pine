@@ -33,18 +33,5 @@
 /////////////////////////
 
 - review trade journal
-- conditional EMA labels
 - organize inputs in each script
-- optional price levels in each label.  consider making it a separate label that floats
 
-
-
-
-
-
-
-/////////////////////////
-// NOTES
-/////////////////////////
-
-// the 50% retracement is where you determine if the move is going to continue

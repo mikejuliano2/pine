@@ -88,7 +88,7 @@ _securityRepaint(_symbol, _res, _src, _repaint) => security(_symbol, _res, _src[
 // 
 //////////////////////////////////////////////////////////////////
 
-_drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText, labelStyle, labelColor, labelTextColor, labelSize, showLabel, labelOffsetInBars) => 
+_drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText, labelStyle, labelColor, labelTextColor, labelSize, showLabel, labelOffsetInBars, showPrice) => 
     // x1 and x2 are in time (not bars)
 
     _lineId = lineId
@@ -110,10 +110,10 @@ _drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText,
     // ----------------
 
     if showLabel
-        // labelPosition = rangeLabelRightJustified ? x2 : x1
+        _labelText = showPrice ? labelText + ' (' + tostring(y) + ')' : labelText
         timePerBar = time[0] - time[1]
         labelTime = x2 + (labelOffsetInBars * timePerBar)
-        labelId = label.new(labelTime, y, labelText, textcolor=labelTextColor, style=labelStyle, size=labelSize, xloc=xloc.bar_time, color=labelColor)
+        labelId = label.new(labelTime, y, _labelText, textcolor=labelTextColor, style=labelStyle, size=labelSize, xloc=xloc.bar_time, color=labelColor)
         label.delete(labelId[1])
 
     _lineId
@@ -155,6 +155,7 @@ dwhlLabelStyle = input(label.style_none, 'Yesterday H/L Label Style', options=[l
 dwhlLabelVisible = input(true, 'Daily/Weekly H/L Label Visible?', group=groupDailyWeeklyShared)
 dwhlLabelSize = input(size.normal, 'Daily/Weekly H/L Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupDailyWeeklyShared)
 dwhlLineExtend = input(extend.none, 'Daily/Weekly H/L Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupDailyWeeklyShared)
+dwhlLabelShowPrice = input(false, 'Daily/Weekly H/L Show Price in Label?', group=groupDailyWeeklyShared)
 
 onlyShowYesterdayHighLowForCurrentDay = input(true, 'Only show yesterday H/L on current day?', group=groupDailyWeeklyShared)
 onlyShowLastWeekHighLowForCurrentDay = input(true, 'Only show last week H/L on current day?', group=groupDailyWeeklyShared)
@@ -216,10 +217,10 @@ _drawDailyWeeklyHighLowLines() =>
     x1 = _getTimeNBarsFromNow(dwhlLineOffsetInBars)
     x2 = _getTimeNBarsFromNow(dwhlLineOffsetInBars + dwhlLineLengthInBars)
 
-    _yesterdayHighLineId = _drawLabelledLine(yesterdayHighLineId, x1, x2, yesterdayHigh, yhlColor, yhlLineWidth, yhlLineStyle, dwhlLineExtend, 'Yesterday High', dwhlLabelStyle, yhlColor, yhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible, dwhlLabelOffsetInBars)
-    _yesterdayLowLineId = _drawLabelledLine(yesterdayLowLineId, x1, x2, yesterdayLow, yhlColor, yhlLineWidth, yhlLineStyle, dwhlLineExtend, 'Yesterday Low', dwhlLabelStyle, yhlColor, yhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible, dwhlLabelOffsetInBars)
-    _lastWeekHighLineId = _drawLabelledLine(lastWeekHighLineId, x1, x2, lastWeekHigh, lwhlColor, lwhlLineWidth, lwhlLineStyle, dwhlLineExtend, 'Last Week High', dwhlLabelStyle, lwhlColor, lwhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible, dwhlLabelOffsetInBars)
-    _lastWeekLowLineId = _drawLabelledLine(lastWeekLowLineId, x1, x2, lastWeekLow, lwhlColor, lwhlLineWidth, lwhlLineStyle, dwhlLineExtend, 'Last Week Low', dwhlLabelStyle, lwhlColor, lwhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible, dwhlLabelOffsetInBars)
+    _yesterdayHighLineId = _drawLabelledLine(yesterdayHighLineId, x1, x2, yesterdayHigh, yhlColor, yhlLineWidth, yhlLineStyle, dwhlLineExtend, 'Yesterday High', dwhlLabelStyle, yhlColor, yhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible, dwhlLabelOffsetInBars, dwhlLabelShowPrice)
+    _yesterdayLowLineId = _drawLabelledLine(yesterdayLowLineId, x1, x2, yesterdayLow, yhlColor, yhlLineWidth, yhlLineStyle, dwhlLineExtend, 'Yesterday Low', dwhlLabelStyle, yhlColor, yhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible, dwhlLabelOffsetInBars, dwhlLabelShowPrice)
+    _lastWeekHighLineId = _drawLabelledLine(lastWeekHighLineId, x1, x2, lastWeekHigh, lwhlColor, lwhlLineWidth, lwhlLineStyle, dwhlLineExtend, 'Last Week High', dwhlLabelStyle, lwhlColor, lwhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible, dwhlLabelOffsetInBars, dwhlLabelShowPrice)
+    _lastWeekLowLineId = _drawLabelledLine(lastWeekLowLineId, x1, x2, lastWeekLow, lwhlColor, lwhlLineWidth, lwhlLineStyle, dwhlLineExtend, 'Last Week Low', dwhlLabelStyle, lwhlColor, lwhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible, dwhlLabelOffsetInBars, dwhlLabelShowPrice)
 
     [_yesterdayHighLineId, _yesterdayLowLineId, _lastWeekHighLineId, _lastWeekLowLineId]
 
