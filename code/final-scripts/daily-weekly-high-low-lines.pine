@@ -147,17 +147,17 @@ groupDailyWeeklyShared = 'Daily/Weekly Shared'
 groupYesterday = 'Yesterday'
 groupLastWeek = 'Last Week'
 
-onlyShowYesterdayHighLowForCurrentDay = input(true, 'Only show yesterday H/L on current day?', group=groupDailyWeeklyShared)
-onlyShowLastWeekHighLowForCurrentDay = input(true, 'Only show last week H/L on current day?', group=groupDailyWeeklyShared)
-
 // *** `dwhl` stands for dailyWeeklyHighLow ***
+dwhlLineOffsetInBars = input(5, 'Line Offset (in bars)', group=groupDailyWeeklyShared)
+dwhlLineLengthInBars = input(25, 'Line Length (in bars)', group=groupDailyWeeklyShared)
+dwhlLabelOffsetInBars = input(-7, 'Daily/Weekly Label Offset (in bars)', group=groupDailyWeeklyShared)
 dwhlLabelStyle = input(label.style_none, 'Yesterday H/L Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle], group=groupDailyWeeklyShared)
 dwhlLabelVisible = input(true, 'Daily/Weekly H/L Label Visible?', group=groupDailyWeeklyShared)
 dwhlLabelSize = input(size.normal, 'Daily/Weekly H/L Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupDailyWeeklyShared)
 dwhlLineExtend = input(extend.none, 'Daily/Weekly H/L Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupDailyWeeklyShared)
-dwhlLineOffsetInBars = input(0, 'Line Offset (in bars)', group=groupDailyWeeklyShared)
-dwhlLineLengthInBars = input(20, 'Line Length (in bars)', group=groupDailyWeeklyShared)
-dwhlLabelOffsetInBars = input(-3, 'Daily/Weekly Label Offset (in bars)', group=groupDailyWeeklyShared)
+
+onlyShowYesterdayHighLowForCurrentDay = input(true, 'Only show yesterday H/L on current day?', group=groupDailyWeeklyShared)
+onlyShowLastWeekHighLowForCurrentDay = input(true, 'Only show last week H/L on current day?', group=groupDailyWeeklyShared)
 
 // *** `yhl` stands for yesterdayHighLow ***
 yhlColor = input(color.new(#f44336, 0), 'Yesterday H/L Color', group=groupYesterday)

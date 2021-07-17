@@ -5,36 +5,38 @@
 //////////////////////////////////////////////////////////////////
 
 
-// daily open MT4 = 10pm GMT = 18:00
 // convert ADR 
 // convert PVSRA
+// RDH/RDL
 
 
-// line up yesterday and last week labels
+
 // Session Levels - optionally fill the range for each session, but once out of session, only show the line in the future
 // if in NY Session, lines that extend out to the end of the session
 // optionally show price in levels labels
 
 
 // Plot Markers for EMA cross (possibly in new pane?)  use valuewhen
-    // 5/13
-    // 5/50 cross
-    // 13/50 cross
-    // 50/200 cross
-    // 50/800 cross
-    // 200/800 cross
 // move all EMAs to conditional EMAs
 // add conditional labels
     // 1m: 750 = 50 on 15, 250 = 50 on 5
     // 5m: 150 = 50 on 15
 
 
-// RDH/RDL
 // add an alert for MCB divergence on the 15 min
 // brinks label
 // plot lines at whole/half/quarter
 
 
+/////////////////////////
+// WEEKEND TASKS
+/////////////////////////
+
+- review trade journal
+- conditional EMA labels
+- plot EMA cross 5/13, 5/50, 13/50, 50/200, 50/800, 200/800
+- organize inputs in each script
+- optional price levels in each label.  consider making it a separate label that floats
 
 
 

@@ -136,6 +136,16 @@ string TT_PR = "Final time to which the High and Low of the session will be held
 string TT_TZ = "Offsets all time inputs together to help align to preferred timezone"
 string TT_LB = "The number of days back to plot the session levels"
 
+// line style
+sessionLevelsLineExtend = input(extend.none, 'Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupSessionLevels)
+sessionLevelsLineLengthInBars = input(25, 'Line Length (in bars)', group=groupSessionLevels)
+sessionLevelsLineOffsetInBars = input(5, 'Line Offset (in bars)', group=groupSessionLevels)
+
+sessionLevelsHighLowPlotStyle = input(plot.style_linebr, 'Plot Style - H/L', group=groupSessionLevels, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+sessionLevelsHighLowLineStyle = input(line.style_solid, 'Line Style - H/L', group=groupSessionLevels, options=[line.style_solid, line.style_dashed, line.style_dotted])
+sessionLevelsLineWidth = input(2, 'Line Width', group=groupSessionLevels, options=[1,2,3,4])
+sessionLevelsLinesJoined = input(false, 'Join points?', group=groupSessionLevels)
+
 // switches
 asianOpenPlotActive = input(true, 'Plot Asian Open?', group=groupSessionLevels)
 asianHighLowPlotActive = input(true, 'Plot Asian HighLow?', group=groupSessionLevels)
@@ -149,14 +159,7 @@ asianMasterColor = input(#00897b, 'Asian Color', input.color, group=groupSession
 londonMasterColor = input(#ff851a, 'London Color', input.color, group=groupSessionLevels)
 nyMasterColor = input(#fff176, 'New York Color', input.color, group=groupSessionLevels)
 mt4DailyOpenColor = input(#2962ff, 'MT4 Daily Open Color', input.color, group=groupSessionLevels)
-// line style
-sessionLevelsHighLowPlotStyle = input(plot.style_linebr, 'Plot Style - H/L', group=groupSessionLevels, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-sessionLevelsHighLowLineStyle = input(line.style_solid, 'Line Style - H/L', group=groupSessionLevels, options=[line.style_solid, line.style_dashed, line.style_dotted])
-sessionLevelsLineWidth = input(2, 'Line Width', group=groupSessionLevels, options=[1,2,3,4])
-sessionLevelsLinesJoined = input(false, 'Join points?', group=groupSessionLevels)
-sessionLevelsLineExtend = input(extend.none, 'Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupSessionLevels)
-sessionLevelsLineLengthInBars = input(20, 'Line Length (in bars)', group=groupSessionLevels)
-sessionLevelsLineOffsetInBars = input(0, 'Line Offset (in bars)', group=groupSessionLevels)
+
 // labels
 sessionLabelOffsetInBars = input(-3, 'Label Offset (in bars)', group=groupSessionLevels)
 sessionLabelStyle = input(label.style_none, 'Session Label Style', group=groupSessionLevels, options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])

@@ -14,14 +14,56 @@ fast = sma(close, 14)
 // get value of close on second cross occurrence
 valuewhen(cross(slow, fast), close, 1)
 // -------------------------------------------------
+displayChoices = [display.none, display.all]
+extendChoices = [extend.none, extend.left, extend.right, extend.both]
+inputTypes = [input.bool, input.integer, input.float, input.string, input.symbol, input.resolution, input.session, input.source, input.color, input.time]
+labelStyleChoices = [label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle]
 lineStyleChoices = [line.style_solid, line.style_dashed, line.style_dotted]
 lineWidthChoices = [1, 2, 3, 4]
-positionChoices = ['AboveBar', 'BelowBar', 'Absolute', 'Top', 'Bottom']
-labelStyleChoices = [label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle]
+locationChoices = [location.abovebar, location.belowbar, location.top, location.bottom, location.absolute]
 plotStyleChoices = [plot.style_area, plot.style_areabr, plot.style_circles, plot.style_columns, plot.style_cross, plot.style_histogram, plot.style_line, plot.style_linebr, plot.style_stepline]
-extendChoices = [extend.none, extend.left, extend.right, extend.both]
-sizeChoices = [size.auto, size.tiny, size.small, size.normal, size.large]
+positionChoices = ['AboveBar', 'BelowBar', 'Absolute', 'Top', 'Bottom']
+shapeStyleChoices = [shape.xcross, shape.cross, shape.triangleup, shape.triangledown, shape.flag, shape.circle, shape.arrowup, shape.arrowdown, shape.labelup, shape.labeldown, shape.square, shape.diamond]
+sizeChoices = [size.auto, size.tiny, size.small, size.normal, size.large, size.huge]
+textAlignChoices = [text.align_left, text.align_center, text.align_right]
+xlocChoices=[xloc.bar_index, xloc.bar_time]
+ylocChoices=[yloc.price, yloc.abovebar, yloc.belowbar]
 // -------------------------------------------------
+// use yloc for placing markers
+label.new(bar_index[10], na, text="Label", yloc=yloc.abovebar)
+// -------------------------------------------------
+slow = sma(close, 7)
+fast = sma(close, 14)
+// get value of close on second cross occurrence
+valuewhen(cross(slow, fast), close, 1)
+// -------------------------------------------------
+bar_index
 timeframe.period
 syminfo.ticker
 barstate.isrealtime
+// -------------------------------------------------
+// DRAWINGS
+// https://www.tradingview.com/pine-script-docs/en/v4/essential/Drawings.html#calculation-of-drawings-on-bar-updates
+// -------------------------------------------------
+plotchar( 
+     series=hasAnyCross ? high : na,
+     title="Cross",
+     char=characterToPlot,
+     location=charLocation,
+     size=size.tiny,
+     color=charColor,
+     textcolor=charColor,
+     offset=-1
+     )
+
+// DOWNSIDE TO PLOTSHAPE: can't be called in function
+// DOWNSIDE TO LABELS: only has abovebar, belowbar, price locations
+
+// -------------------------------------------------
+// COLORS
+COLOR_LIME = #1cd206
+COLOR_VOLT = #affd00
+COLOR_PINK = #e63a97
+COLOR_RED = #f21616
+// -------------------------------------------------
+// -------------------------------------------------
