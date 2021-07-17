@@ -6,6 +6,8 @@ COLOR_LIME = #1cd206
 COLOR_VOLT = #affd00
 COLOR_PINK = #e63a97
 COLOR_RED = #f21616
+COLOR_LIGHT_BLUE = #3179f5
+COLOR_MAGENTA = #d612f8
 
 //////////////////////////////////////////////////////////////////
 // 
@@ -122,8 +124,8 @@ marker200x800Active = input(true, 'Plot 200/800 Cross?', group=groupMarkers)
 // Color
 markerTextColorSameAsMarker = input(false, 'Text Color Same as Marker?', group=groupMarkers)
 markerTextColorDefault = input(color.new(color.white, 0), 'Text Color Default', group=groupMarkers)
-markerCrossUpColor = input(color.new(COLOR_LIME, 0), 'Cross Up Color', group=groupMarkers)
-markerCrossDownColor = input(color.new(COLOR_RED, 0), 'Cross Down Color', group=groupMarkers)
+markerCrossUpColor = input(color.new(COLOR_LIGHT_BLUE, 0), 'Cross Up Color', group=groupMarkers)
+markerCrossDownColor = input(color.new(COLOR_MAGENTA, 0), 'Cross Down Color', group=groupMarkers)
 // Opacity
 shapeOpacity5x13 = input(70, 'Shape Opacity 5x13', minval=0, maxval=100, group=groupMarkers)
 shapeOpacity5x50 = input(70, 'Shape Opacity 5x50', minval=0, maxval=100, group=groupMarkers)

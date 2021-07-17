@@ -34,7 +34,6 @@
 
 - review trade journal
 - conditional EMA labels
-- plot EMA cross 5/13, 5/50, 13/50, 50/200, 50/800, 200/800
 - organize inputs in each script
 - optional price levels in each label.  consider making it a separate label that floats
 
