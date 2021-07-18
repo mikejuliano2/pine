@@ -8,6 +8,8 @@ COLOR_PINK = #e63a97
 COLOR_RED = #f21616
 COLOR_LIGHT_BLUE = #3179f5
 COLOR_MAGENTA = #d612f8
+COLOR_ORANGE = #f57f17
+COLOR_GOLD = #ffb74d
 
 //////////////////////////////////////////////////////////////////
 // 
@@ -16,48 +18,64 @@ COLOR_MAGENTA = #d612f8
 //////////////////////////////////////////////////////////////////
 groupMarkers = 'EMA Cross Markers'
 
-
-
 ema5Color = input(color.new(#ffeb3b, 20), '5 EMA Color')
 ema13Color = input(color.new(#b71c1c, 20), '13 EMA Color')
 ema50Color = input(color.new(#00bcd4, 20), '50 EMA Color')
 ema200Color = input(color.new(#ffffff, 20), '200 EMA Color')
 ema800Color = input(color.new(#1848cc, 20), '800 EMA Color')
 ema50CloudColor = input(color.new(#26c6da, 85), '50 EMA Cloud Color')
-emaSixColor = input(color.new(#e65100, 15), 'EMA 6 Color')
+emaConditional1hColor = input(color.new(COLOR_ORANGE, 15), 'EMA Conditional 1h Color')
+emaConditional15mColor = input(color.new(COLOR_MAGENTA, 40), 'EMA Conditional 15m Color')
+showConditionalEma1hLine = input(false, 'Show Conditional 1h line?')
+showConditionalEma15mLine = input(false, 'Show Conditional 15m line?')
+showConditionalEma1hLabel = input(true, 'Show Conditional 1h label?')
+showConditionalEma15mLabel = input(true, 'Show Conditional 15m label?')
 
 lineWidth = input(2, 'EMA Line Width', options=[1,2,3,4])
 labelOffsetStandard = input(3, 'Standard EMA Label Offset (in bars)')
-labelOffsetConditional = input(8, 'Conditional EMA Label Offset (in bars)')
+labelOffsetConditional = input(
+     defval=16, 
+     title='Conditional EMA Label Offset (in bars)', 
+     tooltip='Only applicable when showLabelText is true.  If showLabelText is false, this will be set to labelOffsetStandard.')
 labelOpacity = input(30, 'Label Opacity')
-labelStyle = input(label.style_none, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
-labelSize = input(size.normal, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large])
+labelStyle = input(label.style_circle, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
+labelSize = input(size.auto, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large])
+showLabelText = input(false, 'Show Label Text?')
 
 _getConditionalValues() => 
     if timeframe.period == '1'
-        [ema(close, 3000)]
+        [ema(close, 3000), ema(close, 750)]
     else if timeframe.period == '5'
-        [ema(close, 600)]
+        [ema(close, 600), ema(close, 150)]
     else 
-        [na]
+        [na, na]
 
 _getConditionalLabels() => 
     if timeframe.period == '1'
-        ['3000 => 50EMA on 1h']
+        ['3000 => 50EMA on 1h', '750 => 50 EMA on 15m']
     else if timeframe.period == '5'
-        ['600 => 50EMA on 1h']
+        ['600 => 50EMA on 1h', '150 => 50 EMA on 15m']
     else 
-        [na]
+        [na, na]
 
 _getFutureTimeNBarsFromNow(numBars) => time + ( ( time - time[1] ) * numBars )
 
 _drawLabel(y, text, Color, textColor, offset) => 
     x = _getFutureTimeNBarsFromNow(offset)
 
-    if barstate.isrealtime
+    if barstate.islast
         _color = color.new(Color, labelOpacity)
         _textColor = labelStyle == label.style_none ? color.new(Color, 0) : textColor // If no label style, use the same color as the line
-        y ? label.new(x, y, text, style=labelStyle, textcolor=_textColor, color=_color, size=labelSize, xloc=xloc.bar_time) : na
+        _text = showLabelText ? text : na
+        y ? label.new(
+             x=x, 
+             y=y, 
+             text=_text, 
+             style=labelStyle, 
+             textcolor=_textColor, 
+             color=_color, 
+             size=labelSize, 
+             xloc=xloc.bar_time) : na
 
 // -----------------
 // Get Values
@@ -68,46 +86,80 @@ ema13 = ema(close, 13)
 ema50 = ema(close, 50)
 ema200 = ema(close, 200)
 ema800 = ema(close, 800)
-[emaSix] = _getConditionalValues()
-[emaSixLabelText] = _getConditionalLabels()
+[emaConditional1h, emaConditional15m] = _getConditionalValues()
+[emaConditional1hText, emaConditional15mText] = _getConditionalLabels()
 
 // -----------------
 // Plot EMAs
 // -----------------
+
+// standard EMAs
 
 plot(ema5, color=ema5Color, linewidth=lineWidth, title="EMA 5")
 plot(ema13, color=ema13Color, linewidth=lineWidth, title="EMA 13")
 plot(ema50, color=ema50Color, linewidth=lineWidth, title="EMA 50")
 plot(ema200, color=ema200Color, linewidth=lineWidth, title="EMA 200")
 plot(ema800, color=ema800Color, linewidth=lineWidth, title="EMA 800")
-plot(emaSix, color=emaSixColor, linewidth=lineWidth, title='EMA 6')
 
-// -----------------
+// conditional EMAs
+
+plot(
+     showConditionalEma1hLine ? emaConditional1h : na, 
+     color=emaConditional1hColor, 
+     linewidth=lineWidth, 
+     title='EMA Conditional 1h')
+
+plot(showConditionalEma15mLine ? emaConditional15m : na, 
+     color=emaConditional15mColor, 
+     linewidth=lineWidth, 
+     title='EMA Conditional 15m')
+
+// ----------------------------
 // Plot 50 EMA Cloud
-// -----------------
+// ----------------------------
 
 cloudSize = stdev(close, 50 * 2) / 4 // 50 because it's for the 50 EMA
 cloudPlotUpper = plot(ema50 + cloudSize, '50 EMA Upper Cloud', color=ema50CloudColor, offset=0)
 cloudPlotLower = plot(ema50 - cloudSize, '50 EMA Lower Cloud', color=ema50CloudColor, offset=0)
 fill(cloudPlotUpper, cloudPlotLower, title='50 EMA Cloud', color=ema50CloudColor)
 
-// -----------------
+// ---------------------------
 // Draw Labels
-// -----------------
+// ---------------------------
+
+// standard
 
 label5 = _drawLabel(ema5, '5', ema5Color, color.white, labelOffsetStandard)
 label13 = _drawLabel(ema13, '13', ema13Color, color.white, labelOffsetStandard)
 label50 = _drawLabel(ema50, '50', ema50Color, color.white, labelOffsetStandard)
 label200 = _drawLabel(ema200, '200', ema200Color, color.white, labelOffsetStandard)
 label800 = _drawLabel(ema800, '800', ema800Color, color.white, labelOffsetStandard)
-labelSix = _drawLabel(emaSix, emaSixLabelText, emaSixColor, color.white, labelOffsetConditional)
+
+// conditional
+
+_conditionalLabelOffset = showLabelText ? labelOffsetConditional : labelOffsetStandard
+
+labelConditional1h = _drawLabel(
+     showConditionalEma1hLabel ? emaConditional1h : na, 
+     emaConditional1hText, 
+     emaConditional1hColor, 
+     color.white, 
+     _conditionalLabelOffset)
+
+labelConditional15m = _drawLabel(
+     showConditionalEma15mLabel ? emaConditional15m : na, 
+     emaConditional15mText, 
+     emaConditional15mColor, 
+     color.white, 
+     _conditionalLabelOffset)
 
 label.delete(label5[1])
 label.delete(label13[1])
 label.delete(label50[1])
 label.delete(label200[1])
 label.delete(label800[1])
-label.delete(labelSix[1])
+label.delete(labelConditional1h[1])
+label.delete(labelConditional15m[1])
 
 // -----------------
 // Cross Markers
