@@ -9,7 +9,7 @@
 // convert PVSRA
 // RDH/RDL
 
-
+- organize inputs in each script
 
 // Session Levels - optionally fill the range for each session, but once out of session, only show the line in the future
 // if in NY Session, lines that extend out to the end of the session
@@ -25,7 +25,6 @@
 
 // add an alert for MCB divergence on the 15 min
 // brinks label
-// plot lines at whole/half/quarter
 
 
 /////////////////////////
@@ -33,5 +32,4 @@
 /////////////////////////
 
 - review trade journal
-- organize inputs in each script
 

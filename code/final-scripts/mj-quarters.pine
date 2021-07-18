@@ -130,8 +130,8 @@ showQuarter = input(true, 'Show Quarter')
 plotRangeInMultiplesOfWhole = input(2, 'Plot Range (in multiples of the whole)', tooltip='Example:  plotRange=2.  open = 31,795.  This would plot a line at each whole level between 34k (32+2) and 30k (32-2).', minval=0)
 wholeLevelOverride = input(0, 'Whole Level Override', minval=0, tooltip='Only active if greater than 0')
 
-lineOffset = input(5, 'Line Offset (in bars)')
-lineLength = input(100, 'Line Length (in bars)')
+lineOffset = input(40, 'Line Offset (in bars)')
+lineLength = input(20, 'Line Length (in bars)')
 labelOffset = input(-3, 'Label Offset (in bars)')
 
 lineWidth = input(2, 'Line Width', options=[1,2,3,4])
