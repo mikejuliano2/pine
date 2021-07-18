@@ -40,7 +40,9 @@ valuewhen(cross(slow, fast), close, 1)
 bar_index
 timeframe.period
 syminfo.ticker
+syminfo.mintick
 barstate.isrealtime
+barstate.islast
 // -------------------------------------------------
 // DRAWINGS
 // https://www.tradingview.com/pine-script-docs/en/v4/essential/Drawings.html#calculation-of-drawings-on-bar-updates
@@ -67,6 +69,7 @@ COLOR_PINK = #e63a97
 COLOR_RED = #f21616
 COLOR_LIGHT_BLUE = #3179f5
 COLOR_MAGENTA = #d612f8
+COLOR_PEACH = #e57373
 // -------------------------------------------------
 // when you declare an array using var, it doesn't rebuild on every iteration
 // -------------------------------------------------

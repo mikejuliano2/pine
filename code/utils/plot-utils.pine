@@ -4,7 +4,7 @@
 // 
 //////////////////////////////////////////////////////////////////
 
-_drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText, labelStyle, labelColor, labelTextColor, labelSize, showLabel, labelOffsetInBars, showPrice) => 
+_drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText, labelStyle, labelColor, labelTextColor, labelSize, showLabel, labelOffsetInBars) => 
     // x1 and x2 are in time (not bars)
 
     _lineId = lineId
@@ -26,10 +26,10 @@ _drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText,
     // ----------------
 
     if showLabel
-        _labelText = showPrice ? labelText + ' (' + tostring(y) + ')' : labelText
+        // labelPosition = rangeLabelRightJustified ? x2 : x1
         timePerBar = time[0] - time[1]
         labelTime = x2 + (labelOffsetInBars * timePerBar)
-        labelId = label.new(labelTime, y, _labelText, textcolor=labelTextColor, style=labelStyle, size=labelSize, xloc=xloc.bar_time, color=labelColor)
+        labelId = label.new(labelTime, y, labelText, textcolor=labelTextColor, style=labelStyle, size=labelSize, xloc=xloc.bar_time, color=labelColor)
         label.delete(labelId[1])
 
     _lineId

@@ -1,6 +1,6 @@
 //@version=4
 
-study("MJ - Daily/Weekly High/Low Lines", overlay=true)
+study("MJ - Yesterday/Last Week High/Low Lines", overlay=true)
 
 //////////////////////////////////////////////////////////////////
 // 
