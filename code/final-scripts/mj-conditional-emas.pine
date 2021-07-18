@@ -75,6 +75,7 @@ _drawLabel(y, text, Color, textColor, offset) =>
              textcolor=_textColor, 
              color=_color, 
              size=labelSize, 
+             tooltip=text,
              xloc=xloc.bar_time) : na
 
 // -----------------
