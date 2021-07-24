@@ -5,7 +5,6 @@
 //////////////////////////////////////////////////////////////////
 
 
-- optionally extend the daily open line
 - get rid of hold time inputs
 - vertical hour lines - add labels, optionally just show labels and not lines
 - add the 50 on 30m to conditional emas

@@ -137,7 +137,8 @@ string TT_TZ = "Offsets all time inputs together to help align to preferred time
 string TT_LB = "The number of days back to plot the session levels"
 
 // line style
-sessionLevelsLineExtend = input(extend.none, 'Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupSessionLevels)
+dailyOpenLineExtend = input(extend.left, 'Daily Open Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupSessionLevels)
+sessionLevelsLineExtend = input(extend.none, 'Session Levels Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupSessionLevels)
 sessionLevelsLineLengthInBars = input(25, 'Line Length (in bars)', group=groupSessionLevels)
 sessionLevelsLineOffsetInBars = input(5, 'Line Offset (in bars)', group=groupSessionLevels)
 
@@ -446,7 +447,7 @@ _drawSessionLines() =>
          mt4DailyOpenColor, 
          sessionLevelsLineWidth, 
          asianOpenLineStyle, 
-         sessionLevelsLineExtend, 
+         dailyOpenLineExtend, 
          'Daily Open', 
          sessionLabelStyle, 
          asianLabelColor, 
@@ -616,7 +617,7 @@ _drawSessionLines() =>
          mt4DailyOpenColor, 
          sessionLevelsLineWidth, 
          mt4DailyOpenLineStyle, 
-         sessionLevelsLineExtend, 
+         dailyOpenLineExtend, 
          'MT4 Daily Open', 
          sessionLabelStyle, 
          londonLabelColor, 
