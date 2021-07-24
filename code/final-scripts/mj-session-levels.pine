@@ -129,6 +129,12 @@ _drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText,
 
 groupSessionLevels = 'Session Levels'
 groupOffset = 'Offset'
+groupFill = 'Fill'
+groupSwitches = 'Switches'
+groupColors = 'Colors'
+groupTimeRanges = 'Time Ranges'
+groupLineStyle = 'Line Style'
+groupLabels = 'Labels'
 
 // ----------------------------------------------------------------------------------
 // tooltips
@@ -137,83 +143,71 @@ string TT_TZ = "Offsets all time inputs together to help align to preferred time
 string TT_LB = "The number of days back to plot the session levels"
 
 // line style
-dailyOpenLineExtend = input(extend.left, 'Daily Open Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupSessionLevels)
-sessionLevelsLineExtend = input(extend.none, 'Session Levels Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupSessionLevels)
-sessionLevelsLineLengthInBars = input(25, 'Line Length (in bars)', group=groupSessionLevels)
-sessionLevelsLineOffsetInBars = input(5, 'Line Offset (in bars)', group=groupSessionLevels)
 
-sessionLevelsHighLowPlotStyle = input(plot.style_linebr, 'Plot Style - H/L', group=groupSessionLevels, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-sessionLevelsHighLowLineStyle = input(line.style_solid, 'Line Style - H/L', group=groupSessionLevels, options=[line.style_solid, line.style_dashed, line.style_dotted])
-sessionLevelsLineWidth = input(2, 'Line Width', group=groupSessionLevels, options=[1,2,3,4])
-sessionLevelsLinesJoined = input(false, 'Join points?', group=groupSessionLevels)
+dailyOpenLineExtend = input(extend.none, 'Daily Open Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupLineStyle)
+sessionLevelsLineExtend = input(extend.none, 'Session Levels Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupLineStyle)
+sessionLevelsLineLengthInBars = input(25, 'Line Length (in bars)', group=groupLineStyle)
+sessionLevelsLineOffsetInBars = input(5, 'Line Offset (in bars)', group=groupLineStyle)
+
+sessionLevelsHighLowLineStyle = input(line.style_solid, 'Line Style - H/L', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+sessionLevelsLineWidth = input(2, 'Line Width', group=groupLineStyle, options=[1,2,3,4])
+sessionLevelsLinesJoined = input(false, 'Join points?', group=groupLineStyle)
+
+asianOpenLineStyle = input(line.style_solid, 'Asian Open Line Style', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+londonOpenLineStyle = input(line.style_solid, 'London Open Line Style', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+nyOpenLineStyle = input(line.style_solid, 'NY Open Line Style', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+mt4DailyOpenLineStyle = input(line.style_solid, 'MT4 Daily Open Line Style', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
 // switches
-asianOpenPlotActive = input(true, 'Plot Asian Open?', group=groupSessionLevels)
-asianHighLowPlotActive = input(true, 'Plot Asian HighLow?', group=groupSessionLevels)
-londonHighLowPlotActive = input(false, 'Plot London HighLow?', group=groupSessionLevels)
-londonOpenPlotActive = input(true, 'Plot London Open?', group=groupSessionLevels)
-nyOpenPlotActive = input(true, 'Plot NY Open?', group=groupSessionLevels)
-nyHighLowPlotActive = input(false, 'Plot New York HighLow?', group=groupSessionLevels)
-mt4DailyOpenPlotActive = input(true, 'Plot MT4 Daily Open?', group=groupSessionLevels)
+
+asianOpenPlotActive = input(true, 'Plot Asian Open?', group=groupSwitches)
+asianHighLowPlotActive = input(true, 'Plot Asian HighLow?', group=groupSwitches)
+londonOpenPlotActive = input(true, 'Plot London Open?', group=groupSwitches)
+londonHighLowPlotActive = input(true, 'Plot London HighLow?', group=groupSwitches)
+nyOpenPlotActive = input(true, 'Plot NY Open?', group=groupSwitches)
+nyHighLowPlotActive = input(true, 'Plot New York HighLow?', group=groupSwitches)
+mt4DailyOpenLineActive = input(true, 'MT4 Daily Open Line Active', group=groupSwitches)
+fillAsianSession = input(true, 'Fill Asian Session?', group=groupSwitches)
+fillLondonSession = input(true, 'Fill London Session?', group=groupSwitches)
+fillNYSession = input(true, 'Fill NY Session?', group=groupSwitches)
+
+nyHighLowLineActive = input(false, 'NY HL Line Active', group=groupSwitches)
+londonHighLowLineActive = input(false, 'London HL Line Active', group=groupSwitches)
+
 // colors
+
 asianMasterColor = input(#00897b, 'Asian Color', input.color, group=groupSessionLevels)
 londonMasterColor = input(#ff851a, 'London Color', input.color, group=groupSessionLevels)
 nyMasterColor = input(#fff176, 'New York Color', input.color, group=groupSessionLevels)
 mt4DailyOpenColor = input(#2962ff, 'MT4 Daily Open Color', input.color, group=groupSessionLevels)
 
 // labels
-sessionLabelOffsetInBars = input(-3, 'Label Offset (in bars)', group=groupSessionLevels)
-sessionLabelStyle = input(label.style_none, 'Session Label Style', group=groupSessionLevels, options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
-sessionLabelOpacity = input(70, 'Label Opacity', group=groupSessionLevels, minval=0, maxval=100)
-sessionLabelSize = input(size.normal, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupSessionLevels)
-sessionLabelShowPrice = input(false, 'Show Price in Label?', group=groupSessionLevels)
+
+sessionLabelOffsetInBars = input(-3, 'Label Offset (in bars)', group=groupLabels)
+sessionLabelStyle = input(label.style_none, 'Session Label Style', group=groupLabels, options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
+sessionLabelOpacity = input(70, 'Label Opacity', group=groupLabels, minval=0, maxval=100)
+sessionLabelSize = input(size.normal, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupLabels)
+sessionLabelShowPrice = input(false, 'Show Price in Label?', group=groupLabels)
+
 // time ranges
-asianTimeRange = input('0000-0600:1234567', 'Asian Session Time', group=groupSessionLevels, type=input.session)
-londonTimeRange = input('0800-1630:1234567', 'London Session Time', group=groupSessionLevels, type=input.session)
-nyTimeRange = input('1330-2000:1234567', 'New York Session Time', group=groupSessionLevels, type=input.session)
-mt4DailyOpenTimeRange = input('2200-2201:1234567', 'MT4 Daily Open', group=groupSessionLevels, type=input.session)
 
-// asian
-asianOpenPlotStyle = input(plot.style_cross, 'Asian Open Plot Style', group=groupSessionLevels, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-asianOpenLineStyle = input(line.style_solid, 'Asian Open Line Style', group=groupSessionLevels, options=[line.style_solid, line.style_dashed, line.style_dotted])
-asianStartHour = input(20, 'Asian Start Hour', minval=0, maxval=23, group=groupSessionLevels)
-asianEndHour = input(4, 'Asian End Hour', minval=0, maxval=23, group=groupSessionLevels)
-asianHoldTimeInHours = input(16, "Asian Holding Time", input.integer, minval=0, maxval = 23, tooltip = TT_PR, group=groupSessionLevels)
-// london
-londonOpenPlotStyle = input(plot.style_circles, 'London Open Plot Style', group=groupSessionLevels, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-londonOpenLineStyle = input(line.style_solid, 'London Open Line Style', group=groupSessionLevels, options=[line.style_solid, line.style_dashed, line.style_dotted])
-londonStartHour = input(4, 'London Start Hour', minval=0, maxval=23, group=groupSessionLevels)
-londonEndHour = input(13, 'London End Hour', minval=0, maxval=23, group=groupSessionLevels)
-londonHoldTimeInHours = input(0, "London Holding Time", input.integer, minval=0, maxval = 23, tooltip = TT_PR, group=groupSessionLevels)
-// new york
-nyOpenPlotStyle = input(plot.style_cross, 'NY Open Plot Style', group=groupSessionLevels, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-nyOpenLineStyle = input(line.style_solid, 'NY Open Line Style', group=groupSessionLevels, options=[line.style_solid, line.style_dashed, line.style_dotted])
-nyStartHour = input(9, 'New York Start Hour', minval=0, maxval=23, group=groupSessionLevels)
-nyEndHour = input(17, 'New York End Hour', minval=0, maxval=23, group=groupSessionLevels)
-nyHoldTimeInHours = input(0, "New York Holding Time", input.integer, minval=0, maxval = 23, tooltip = TT_PR, group=groupSessionLevels)
-// mt4 daily open
-mt4DailyOpenLineStyle = input(line.style_solid, 'MT4 Daily Open Line Style', group=groupSessionLevels, options=[line.style_solid, line.style_dashed, line.style_dotted])
+asianTimeRange = input('0000-0600:1234567', 'Asian Session Time', group=groupTimeRanges, type=input.session)
+londonTimeRange = input('0800-1630:1234567', 'London Session Time', group=groupTimeRanges, type=input.session)
+nyTimeRange = input('1330-2000:1234567', 'New York Session Time', group=groupTimeRanges, type=input.session)
+mt4DailyOpenTimeRange = input('2200-2201:1234567', 'MT4 Daily Open', group=groupTimeRanges, type=input.session)
 
+// fill
+asianOpenPlotStyle = input(plot.style_cross, 'Asian Open Plot Style', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+londonOpenPlotStyle = input(plot.style_circles, 'London Open Plot Style', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+nyOpenPlotStyle = input(plot.style_cross, 'NY Open Plot Style', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
 
-// opacity
-sessionLevelsSessionHighLowLineOpacity = input(30, 'Opacity - Session H/L', minval=0, maxval=100, group=groupSessionLevels)
-sessionLevelsSessionFillOpacity = input(97, 'Opacity - Session Fill', minval=0, maxval=100, group=groupSessionLevels)
-sessionLevelsHoldingHighLowLineOpacity = input(60, 'Opacity - Hold H/L', minval=0, maxval=100, group=groupSessionLevels)
-sessionLevelsHoldFillOpacity = input(100, 'Opacity - Hold Fill', minval=0, maxval=100, group=groupSessionLevels)
-sessionLevelsOpenLineOpacity = input(10, 'Opacity - Open Line', minval=0, maxval=100, group=groupSessionLevels)
+sessionLevelsHighLowPlotStyle = input(plot.style_stepline, 'Plot Style - H/L', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+sessionHighLowLineOpacity = input(30, 'Opacity - Session H/L', minval=0, maxval=100, group=groupFill)
+sessionFillOpacity = input(97, 'Opacity - Session Fill', minval=0, maxval=100, group=groupFill)
+sessionLevelsOpenLineOpacity = input(10, 'Opacity - Open Line', minval=0, maxval=100, group=groupFill)
+sessionLevelsLookbackHours = input(180, 'Lookback Hours', input.integer, minval=0, maxval=24, tooltip=TT_LB, group=groupFill)
 
-// days
-sessionLevelsLookbackHours = input(6, 'Lookback Hours', input.integer, minval=0, maxval=24, tooltip=TT_LB, group=groupSessionLevels)
-sessionLevelsTZShiftHours  = input( 4, "Timezone Adjust (in hours)", input.integer, minval = -12, maxval = 14, tooltip = TT_TZ, group=groupSessionLevels)
-
-f_timeShift24( _input, _offset ) =>
-    int _shift = _input + _offset
-    _return = _shift > 23 ? _shift - 24 :
-              _shift < 0  ? 24 + _shift : _shift
-
-f_isTime( _input ) => int( hour ) == _input
-
-_captureSesionLevels(timeRange) => 
+_captureSessionLevels(timeRange) => 
     _inSession = _isInSession(timeRange)
     _inHolding = not _inSession
 
@@ -242,32 +236,6 @@ _captureSesionLevels(timeRange) =>
 
     [_sessionHigh, _sessionLow, _sessionOpen]
 
-f_captureSessionHL(_inSession,_inHolding) =>
-    var float _sessionHigh = na
-    var float _sessionLow = na
-    var float _sessionOpen = na
-
-    if _inSession //  if we are in session...
-        if not _inSession[1] //  if it just started, set the initial values
-            _sessionHigh := high
-            _sessionLow  := low
-            _sessionOpen := open
-        else //  otherwise we are checking for higher highs and lower lows to update with and remembering the new levels
-            _sessionHigh := high > _sessionHigh ? high : _sessionHigh
-            _sessionLow  := low  < _sessionLow  ? low  : _sessionLow
-    
-    else if _inHolding //  else if we're in holding state... just reference self to maintain the same levels
-        _sessionHigh := _sessionHigh
-        _sessionLow  := _sessionLow
-        _sessionOpen := _sessionOpen
-    
-    else //  not in session or holding, so we can reset.
-        _sessionHigh := na
-        _sessionLow  := na
-        _sessionOpen := na
-
-    [_sessionHigh, _sessionLow, _sessionOpen]
-    
 _isWithinSessionLevelsLookbackPeriod() => 
     // the session start time must be after the lookback time
     lookbackTimeInMs = MS_PER_HOUR * sessionLevelsLookbackHours
@@ -278,47 +246,23 @@ _isWithinSessionLevelsLookbackPeriod() =>
     // timeAtBeginningOfLookbackDay = _getStartTimeNDaysBack(sessionLevelsLookbackDays)
     // timeAtBeginningOfLookbackDay < timeOfSessionBeginning
 
-_calcInSessionAndInHold(isSessionStart, isSessionEnd, isSessionHold, timeRange) =>
-    var bool inSession = false
-    var bool inHolding = false
-
-    inSession  := isSessionStart and not isSessionStart[1] ? true  :
-              isSessionEnd[1] and not isSessionEnd     ? false : inSession
-    
-    inHolding := isSessionEnd[1] and not isSessionEnd     ? true  :
-              isSessionHold[1] and not isSessionHold   ? false : inHolding
-    
-    [inSession, inHolding]
-
-_getLevelsColors(masterColor, inSession, inHolding, openPlotActive, highLowPlotActive) => 
-    openLineColor = openPlotActive and (inSession or inHolding) ? color.new(masterColor, sessionLevelsOpenLineOpacity) : na
+_getLevelsColors(masterColor, inSession, openPlotActive, highLowPlotActive) => 
+    openLineColor = openPlotActive and inSession ? color.new(masterColor, sessionLevelsOpenLineOpacity) : na
     
     highLowLineColor = not highLowPlotActive ? na : 
-              inSession ? color.new(masterColor, sessionLevelsSessionHighLowLineOpacity ) :
-              inHolding ? color.new(masterColor, sessionLevelsHoldingHighLowLineOpacity) : na
+              inSession ? color.new(masterColor, sessionHighLowLineOpacity ) : na
             
     fillColor = not highLowPlotActive ? na : 
-              inSession ? color.new(masterColor, sessionLevelsSessionFillOpacity ) :
-              inHolding ? color.new(masterColor, sessionLevelsHoldFillOpacity) : na
+              inSession ? color.new(masterColor, sessionFillOpacity ) : na
 
-    [openLineColor, highLowLineColor, fillColor]
+    [openLineColor, highLowLineColor, fillColor]    
 
-
-_getValuesToPlotSessionLevels(timeRange, startHour, endHour, holdHour, hourShift, masterColor, openPlotActive, highLowPlotActive) => 
-    bool isStart = f_isTime( f_timeShift24( startHour, hourShift ) )
-    bool isEnd   = f_isTime( f_timeShift24( endHour,   hourShift ) )
-    bool isHold  = f_isTime( f_timeShift24( holdHour,  hourShift ) )
-    
-    // [isInSession, isInHolding] = _calcInSessionAndInHold(isStart, isEnd, isHold, timeRange)
+_getValuesForPlotting(timeRange, masterColor, openPlotActive, highLowPlotActive) => 
     isInSession = _isInSession(timeRange)
-    isInHolding = not isInSession
 
-    [sessionHigh, sessionLow, sessionOpen] = f_captureSessionHL( isInSession, isInHolding )
-
-    // color lineColor = isInSession ? sessionLineColor : isInHolding ? holdingLineColor : na
-    // color fillColor = isInSession ? sessionFillColor : isInHolding ? holdingFillColor : na
-
-    [openLineColor, highLowLineColor, fillColor] = _getLevelsColors(masterColor, isInSession, isInHolding, openPlotActive, highLowPlotActive)
+    [sessionHigh, sessionLow, sessionOpen] = _captureSessionLevels(timeRange)
+    
+    [openLineColor, highLowLineColor, fillColor] = _getLevelsColors(masterColor, isInSession, openPlotActive, highLowPlotActive)
 
     conditionsMet = _isWithinSessionLevelsLookbackPeriod()
 
@@ -335,49 +279,84 @@ _getValuesToPlotSessionLevels(timeRange, startHour, endHour, holdHour, hourShift
 // Plot + Fill
 // -------------
 
-[asianHigh, asianLow, asianOpen, asianOpenLineColor, asianHighLowLineColor, asianFillColor] = _getValuesToPlotSessionLevels(
+[asianHigh, asianLow, asianOpen, asianOpenLineColor, asianHighLowLineColor, asianFillColor] = _getValuesForPlotting(
      asianTimeRange, 
-     asianStartHour, 
-     asianEndHour, 
-     asianHoldTimeInHours, 
-     sessionLevelsTZShiftHours, 
      asianMasterColor, 
      asianOpenPlotActive, 
      asianHighLowPlotActive)
-// asianPlotHigh = plot(asianHigh, "Asia High", asianHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
-// asianPlotLow  = plot(asianLow,  "Asia Low",  asianHighLowLineColor,  sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
-// asianPlotOpen  = plot(asianOpen,  "Asia Low",  asianOpenLineColor,  sessionLevelsLineWidth, asianOpenPlotStyle, join=sessionLevelsLinesJoined)
-// fill(asianPlotHigh, asianPlotLow, asianFillColor)
 
-[londonHigh, londonLow, londonOpen, londonOpenLineColor, londonHighLowLineColor, londonFillColor] = _getValuesToPlotSessionLevels(
+// asianPlotOpen  = plot(asianOpen,  "Asia Low",  asianOpenLineColor,  sessionLevelsLineWidth, asianOpenPlotStyle, join=sessionLevelsLinesJoined)
+
+asianPlotHigh = plot(
+      fillAsianSession ? asianHigh : na, 
+      "Asia High", 
+      asianHighLowLineColor, 
+      sessionLevelsLineWidth, 
+      sessionLevelsHighLowPlotStyle, 
+      join=sessionLevelsLinesJoined)
+
+asianPlotLow  = plot(
+      fillAsianSession ? asianLow : na, 
+      "Asia Low",  
+      asianHighLowLineColor,  
+      sessionLevelsLineWidth, 
+      sessionLevelsHighLowPlotStyle, 
+      join=sessionLevelsLinesJoined)
+fill(asianPlotHigh, asianPlotLow, asianFillColor)
+
+[londonHigh, londonLow, londonOpen, londonOpenLineColor, londonHighLowLineColor, londonFillColor] = _getValuesForPlotting(
      londonTimeRange, 
-     londonStartHour, 
-     londonEndHour, 
-     londonHoldTimeInHours, 
-     sessionLevelsTZShiftHours, 
      londonMasterColor, 
      londonOpenPlotActive, 
      londonHighLowPlotActive)
-// londonPlotHigh = plot(londonHigh, "London Session High", londonHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
-// londonPlotLow  = plot(londonLow,  "London Low",  londonHighLowLineColor,  sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
+
 // londonPlotOpen  = plot(londonOpen,  "London Low",  londonOpenLineColor,  sessionLevelsLineWidth, londonOpenPlotStyle, join=sessionLevelsLinesJoined)
-// fill(londonPlotHigh, londonPlotLow, londonFillColor)
 
-[nyHigh, nyLow, nyOpen, nyOpenLineColor, nyHighLowLineColor, nyFillColor] = _getValuesToPlotSessionLevels(
-     nyTimeRange, 
-     nyStartHour, 
-     nyEndHour, 
-     nyHoldTimeInHours, 
-     sessionLevelsTZShiftHours, 
-     nyMasterColor, 
-     nyOpenPlotActive, 
-     nyHighLowPlotActive)
-// nyPlotHigh = plot(nyHigh, "New York Session High", nyHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
-// nyPlotLow  = plot(nyLow,  "New York Session Low",  nyHighLowLineColor,  sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
+londonPlotHigh = plot(
+      fillLondonSession ? londonHigh : na, 
+      "London Session High", 
+      londonHighLowLineColor, 
+      sessionLevelsLineWidth, 
+      sessionLevelsHighLowPlotStyle, 
+      join=sessionLevelsLinesJoined)
+      
+londonPlotLow  = plot(
+      fillLondonSession ? londonLow : na,  
+      "London Low",  
+      londonHighLowLineColor,  
+      sessionLevelsLineWidth, 
+      sessionLevelsHighLowPlotStyle, 
+      join=sessionLevelsLinesJoined)
+
+fill(londonPlotHigh, londonPlotLow, londonFillColor)
+
+[nyHigh, nyLow, nyOpen, nyOpenLineColor, nyHighLowLineColor, nyFillColor] = _getValuesForPlotting(
+      nyTimeRange, 
+      nyMasterColor, 
+      nyOpenPlotActive, 
+      nyHighLowPlotActive)
+
 // nyPlotOpen  = plot(nyOpen,  "New York Session Low",  nyOpenLineColor,  sessionLevelsLineWidth, nyOpenPlotStyle, join=sessionLevelsLinesJoined)
-// fill(nyPlotHigh, nyPlotLow, nyFillColor)
 
-[mt4High, mt4Low, mt4Open] = _captureSesionLevels(mt4DailyOpenTimeRange)
+nyPlotHigh = plot(
+      fillNYSession ? nyHigh : na, 
+      "New York Session High", 
+      nyHighLowLineColor, 
+      sessionLevelsLineWidth, 
+      sessionLevelsHighLowPlotStyle, 
+      join=sessionLevelsLinesJoined)
+
+nyPlotLow  = plot(
+      fillNYSession ? nyLow : na,  
+      "New York Session Low",  
+      nyHighLowLineColor,  
+      sessionLevelsLineWidth, 
+      sessionLevelsHighLowPlotStyle, 
+      join=sessionLevelsLinesJoined)
+
+fill(nyPlotHigh, nyPlotLow, nyFillColor)
+
+[mt4High, mt4Low, mt4Open] = _captureSessionLevels(mt4DailyOpenTimeRange)
 
 // ------------------
 // Labels
@@ -424,12 +403,13 @@ _drawSessionLines() =>
     x1 = _getTimeNBarsFromNow(sessionLevelsLineOffsetInBars)
     x2 = _getTimeNBarsFromNow(sessionLevelsLineOffsetInBars + sessionLevelsLineLengthInBars)
     
-    asianLabelColor = color.new(asianMasterColor, sessionLabelOpacity)
-    nyLabelColor = color.new(nyMasterColor, sessionLabelOpacity)
     nyHighLowLabelVisible = false
-    londonLabelColor = color.new(londonMasterColor, sessionLabelOpacity)
     londonHighLowLabelVisible = false
-    mt4DailyOpenHightLowLabelVisible = false
+    mt4DailyOpenHighLowLabelVisible = false
+
+    asianLabelColor = color.new(asianMasterColor, sessionLabelOpacity)
+    londonLabelColor = color.new(londonMasterColor, sessionLabelOpacity)
+    nyLabelColor = color.new(nyMasterColor, sessionLabelOpacity)
     
     labelTextColor = color.new(color.white, 0)
     labelSize = sessionLabelSize
@@ -462,7 +442,7 @@ _drawSessionLines() =>
          x1, 
          x2, 
          asianHigh, 
-         asianHighLowLineColor, 
+         asianMasterColor,
          sessionLevelsLineWidth, 
          sessionLevelsHighLowLineStyle, 
          sessionLevelsLineExtend, 
@@ -480,7 +460,7 @@ _drawSessionLines() =>
          x1, 
          x2, 
          asianLow, 
-         asianHighLowLineColor, 
+         asianMasterColor, 
          sessionLevelsLineWidth, 
          sessionLevelsHighLowLineStyle, 
          sessionLevelsLineExtend, 
@@ -515,14 +495,15 @@ _drawSessionLines() =>
          sessionLabelOffsetInBars, 
          sessionLabelShowPrice)
 
+    nyHLLineOpacity = nyHighLowLineActive ? 50 : 100
     _nyHighLineId = _drawLabelledLine(
          nyHighLineId, 
          x1, 
          x2, 
          nyHigh, 
-         nyHighLowLineColor, 
+         color.new(nyHighLowLineColor, nyHLLineOpacity), 
          sessionLevelsLineWidth, 
-         sessionLevelsHighLowLineStyle, 
+         sessionLevelsHighLowLineStyle,
          sessionLevelsLineExtend, 
          'NY High', 
          sessionLabelStyle, 
@@ -538,9 +519,9 @@ _drawSessionLines() =>
          x1, 
          x2, 
          nyLow, 
-         nyHighLowLineColor, 
+         color.new(nyHighLowLineColor, nyHLLineOpacity),
          sessionLevelsLineWidth, 
-         sessionLevelsHighLowLineStyle, 
+         sessionLevelsHighLowLineStyle,
          sessionLevelsLineExtend, 
          'NY Low', 
          sessionLabelStyle, 
@@ -572,15 +553,16 @@ _drawSessionLines() =>
          labelVisible, 
          sessionLabelOffsetInBars, 
          sessionLabelShowPrice)
-         
+
+    londonHLLineOpacity = nyHighLowLineActive ? 50 : 100
     _londonHighLineId = _drawLabelledLine(
          londonHighLineId, 
          x1, 
          x2, 
          londonHigh, 
-         londonHighLowLineColor, 
+         color.new(londonHighLowLineColor, londonHLLineOpacity), 
          sessionLevelsLineWidth, 
-         sessionLevelsHighLowLineStyle, 
+         sessionLevelsHighLowLineStyle,
          sessionLevelsLineExtend, 
          'London York High', 
          sessionLabelStyle, 
@@ -596,9 +578,9 @@ _drawSessionLines() =>
          x1, 
          x2, 
          londonLow, 
-         londonHighLowLineColor, 
+         color.new(londonHighLowLineColor, londonHLLineOpacity), 
          sessionLevelsLineWidth, 
-         sessionLevelsHighLowLineStyle, 
+         sessionLevelsHighLowLineStyle,
          sessionLevelsLineExtend, 
          'London Low', 
          sessionLabelStyle, 
@@ -613,7 +595,7 @@ _drawSessionLines() =>
          mt4DailyOpenLineId, 
          x1, 
          x2, 
-         mt4DailyOpenPlotActive ? mt4Open : na, 
+         mt4DailyOpenLineActive ? mt4Open : na, 
          mt4DailyOpenColor, 
          sessionLevelsLineWidth, 
          mt4DailyOpenLineStyle, 
