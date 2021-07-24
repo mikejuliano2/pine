@@ -334,19 +334,43 @@ _getValuesToPlotSessionLevels(timeRange, startHour, endHour, holdHour, hourShift
 // Plot + Fill
 // -------------
 
-[asianHigh, asianLow, asianOpen, asianOpenLineColor, asianHighLowLineColor, asianFillColor] = _getValuesToPlotSessionLevels(asianTimeRange, asianStartHour, asianEndHour, asianHoldTimeInHours, sessionLevelsTZShiftHours, asianMasterColor, asianOpenPlotActive, asianHighLowPlotActive)
+[asianHigh, asianLow, asianOpen, asianOpenLineColor, asianHighLowLineColor, asianFillColor] = _getValuesToPlotSessionLevels(
+     asianTimeRange, 
+     asianStartHour, 
+     asianEndHour, 
+     asianHoldTimeInHours, 
+     sessionLevelsTZShiftHours, 
+     asianMasterColor, 
+     asianOpenPlotActive, 
+     asianHighLowPlotActive)
 // asianPlotHigh = plot(asianHigh, "Asia High", asianHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
 // asianPlotLow  = plot(asianLow,  "Asia Low",  asianHighLowLineColor,  sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
 // asianPlotOpen  = plot(asianOpen,  "Asia Low",  asianOpenLineColor,  sessionLevelsLineWidth, asianOpenPlotStyle, join=sessionLevelsLinesJoined)
 // fill(asianPlotHigh, asianPlotLow, asianFillColor)
 
-[londonHigh, londonLow, londonOpen, londonOpenLineColor, londonHighLowLineColor, londonFillColor] = _getValuesToPlotSessionLevels(londonTimeRange, londonStartHour, londonEndHour, londonHoldTimeInHours, sessionLevelsTZShiftHours, londonMasterColor, londonOpenPlotActive, londonHighLowPlotActive)
+[londonHigh, londonLow, londonOpen, londonOpenLineColor, londonHighLowLineColor, londonFillColor] = _getValuesToPlotSessionLevels(
+     londonTimeRange, 
+     londonStartHour, 
+     londonEndHour, 
+     londonHoldTimeInHours, 
+     sessionLevelsTZShiftHours, 
+     londonMasterColor, 
+     londonOpenPlotActive, 
+     londonHighLowPlotActive)
 // londonPlotHigh = plot(londonHigh, "London Session High", londonHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
 // londonPlotLow  = plot(londonLow,  "London Low",  londonHighLowLineColor,  sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
 // londonPlotOpen  = plot(londonOpen,  "London Low",  londonOpenLineColor,  sessionLevelsLineWidth, londonOpenPlotStyle, join=sessionLevelsLinesJoined)
 // fill(londonPlotHigh, londonPlotLow, londonFillColor)
 
-[nyHigh, nyLow, nyOpen, nyOpenLineColor, nyHighLowLineColor, nyFillColor] = _getValuesToPlotSessionLevels(nyTimeRange, nyStartHour, nyEndHour, nyHoldTimeInHours, sessionLevelsTZShiftHours, nyMasterColor, nyOpenPlotActive, nyHighLowPlotActive)
+[nyHigh, nyLow, nyOpen, nyOpenLineColor, nyHighLowLineColor, nyFillColor] = _getValuesToPlotSessionLevels(
+    nyTimeRange, 
+    nyStartHour, 
+    nyEndHour, 
+    nyHoldTimeInHours, 
+    sessionLevelsTZShiftHours, 
+    nyMasterColor, 
+    nyOpenPlotActive, 
+    nyHighLowPlotActive)
 // nyPlotHigh = plot(nyHigh, "New York Session High", nyHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
 // nyPlotLow  = plot(nyLow,  "New York Session Low",  nyHighLowLineColor,  sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
 // nyPlotOpen  = plot(nyOpen,  "New York Session Low",  nyOpenLineColor,  sessionLevelsLineWidth, nyOpenPlotStyle, join=sessionLevelsLinesJoined)

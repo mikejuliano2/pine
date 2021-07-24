@@ -95,3 +95,43 @@ fill(or1u, or1b, color=sess1col, transp=90, editable=false)
 
 
 showOrFunctionX(show_or, sess1, sess1orcalc, or1_h, or1_l, sess1col)
+
+
+_drawLinesAndLabels(linesArray, labelsArray, valuesArray, _color) => 
+    isNew = array.size(linesArray) == 0
+    size = array.size(valuesArray)
+    
+    for _i = 0 to (size -1)
+        _price = array.get(valuesArray, _i)
+        // labelText = _price > 1000 ? tostring(round(_price / 1000)) + 'k' : tostring(_price)
+        
+        line lineId = line.new(
+             x1=x1, 
+             y1=_price, 
+             x2=x2, 
+             y2=_price, 
+             xloc=xloc.bar_time, 
+             extend=lineExtend, 
+             color=_color, 
+             style=lineStyle, 
+             width=lineWidth)
+        
+        labelId = label.new(
+             x=labelTime,
+             y=_price,
+             text=tostring(_price),
+             textcolor=labelTextColor,
+             style=labelStyle,
+             size=labelSize,
+             xloc=xloc.bar_time,
+             color=_color)
+        
+        array.push(linesArray, lineId)
+        array.push(labelsArray, labelId)
+
+        // cleanup
+        if not isNew 
+            lineToDelete = array.shift(linesArray)
+            line.delete(lineToDelete)
+            labelToDelete = array.shift(labelsArray)
+            label.delete(labelToDelete)
