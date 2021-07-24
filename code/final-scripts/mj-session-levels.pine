@@ -363,14 +363,14 @@ _getValuesToPlotSessionLevels(timeRange, startHour, endHour, holdHour, hourShift
 // fill(londonPlotHigh, londonPlotLow, londonFillColor)
 
 [nyHigh, nyLow, nyOpen, nyOpenLineColor, nyHighLowLineColor, nyFillColor] = _getValuesToPlotSessionLevels(
-    nyTimeRange, 
-    nyStartHour, 
-    nyEndHour, 
-    nyHoldTimeInHours, 
-    sessionLevelsTZShiftHours, 
-    nyMasterColor, 
-    nyOpenPlotActive, 
-    nyHighLowPlotActive)
+     nyTimeRange, 
+     nyStartHour, 
+     nyEndHour, 
+     nyHoldTimeInHours, 
+     sessionLevelsTZShiftHours, 
+     nyMasterColor, 
+     nyOpenPlotActive, 
+     nyHighLowPlotActive)
 // nyPlotHigh = plot(nyHigh, "New York Session High", nyHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
 // nyPlotLow  = plot(nyLow,  "New York Session Low",  nyHighLowLineColor,  sessionLevelsLineWidth, sessionLevelsHighLowPlotStyle, join=sessionLevelsLinesJoined)
 // nyPlotOpen  = plot(nyOpen,  "New York Session Low",  nyOpenLineColor,  sessionLevelsLineWidth, nyOpenPlotStyle, join=sessionLevelsLinesJoined)
@@ -434,19 +434,197 @@ _drawSessionLines() =>
     labelSize = sessionLabelSize
     labelVisible = true
 
-    _asianOpenLineId = _drawLabelledLine(asianOpenLineId, x1, x2, asianOpen, mt4DailyOpenColor, sessionLevelsLineWidth, asianOpenLineStyle, sessionLevelsLineExtend, 'Daily Open', sessionLabelStyle, asianLabelColor, labelTextColor, labelSize, labelVisible, sessionLabelOffsetInBars, sessionLabelShowPrice)
-    _asianHighLineId = _drawLabelledLine(asianHighLineId, x1, x2, asianHigh, asianHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'Asia High', sessionLabelStyle, asianLabelColor, labelTextColor, labelSize, labelVisible, sessionLabelOffsetInBars, sessionLabelShowPrice)
-    _asianLowLineId = _drawLabelledLine(asianLowLineId, x1, x2, asianLow, asianHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'Asia Low', sessionLabelStyle, asianLabelColor, labelTextColor, labelSize, labelVisible, sessionLabelOffsetInBars, sessionLabelShowPrice)
-    
-    _nyOpenLineId = _drawLabelledLine(nyOpenLineId, x1, x2, nyOpen, nyOpenLineColor, sessionLevelsLineWidth, nyOpenLineStyle, sessionLevelsLineExtend, 'NY Open', sessionLabelStyle, nyLabelColor, labelTextColor, labelSize, labelVisible, sessionLabelOffsetInBars, sessionLabelShowPrice)
-    _nyHighLineId = _drawLabelledLine(nyHighLineId, x1, x2, nyHigh, nyHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'NY High', sessionLabelStyle, nyLabelColor, labelTextColor, labelSize, nyHighLowLabelVisible, sessionLabelOffsetInBars, sessionLabelShowPrice)
-    _nyLowLineId = _drawLabelledLine(nyLowLineId, x1, x2, nyLow, nyHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'NY Low', sessionLabelStyle, nyLabelColor, labelTextColor, labelSize, nyHighLowLabelVisible, sessionLabelOffsetInBars, sessionLabelShowPrice)
+    // ---------------
+    // Asia Lines
+    // ---------------
 
-    _londonOpenLineId = _drawLabelledLine(londonOpenLineId, x1, x2, londonOpen, londonOpenLineColor, sessionLevelsLineWidth, londonOpenLineStyle, sessionLevelsLineExtend, 'London Open', sessionLabelStyle, londonLabelColor, labelTextColor, labelSize, labelVisible, sessionLabelOffsetInBars, sessionLabelShowPrice)
-    _londonHighLineId = _drawLabelledLine(londonHighLineId, x1, x2, londonHigh, londonHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'London York High', sessionLabelStyle, londonLabelColor, labelTextColor, labelSize, londonHighLowLabelVisible, sessionLabelOffsetInBars, sessionLabelShowPrice)
-    _londonLowLineId = _drawLabelledLine(londonLowLineId, x1, x2, londonLow, londonHighLowLineColor, sessionLevelsLineWidth, sessionLevelsHighLowLineStyle, sessionLevelsLineExtend, 'London Low', sessionLabelStyle, londonLabelColor, labelTextColor, labelSize, londonHighLowLabelVisible, sessionLabelOffsetInBars, sessionLabelShowPrice)
+    _asianOpenLineId = _drawLabelledLine(
+         asianOpenLineId, 
+         x1, 
+         x2, 
+         asianOpen, 
+         mt4DailyOpenColor, 
+         sessionLevelsLineWidth, 
+         asianOpenLineStyle, 
+         sessionLevelsLineExtend, 
+         'Daily Open', 
+         sessionLabelStyle, 
+         asianLabelColor, 
+         labelTextColor, 
+         labelSize, 
+         labelVisible, 
+         sessionLabelOffsetInBars, 
+         sessionLabelShowPrice)
     
-    _mt4DailyOpenLineId = _drawLabelledLine(mt4DailyOpenLineId, x1, x2, mt4DailyOpenPlotActive ? mt4Open : na, mt4DailyOpenColor, sessionLevelsLineWidth, mt4DailyOpenLineStyle, sessionLevelsLineExtend, 'MT4 Daily Open', sessionLabelStyle, londonLabelColor, labelTextColor, labelSize, labelVisible, sessionLabelOffsetInBars, sessionLabelShowPrice)
+    _asianHighLineId = _drawLabelledLine(
+         asianHighLineId, 
+         x1, 
+         x2, 
+         asianHigh, 
+         asianHighLowLineColor, 
+         sessionLevelsLineWidth, 
+         sessionLevelsHighLowLineStyle, 
+         sessionLevelsLineExtend, 
+         'Asia High', 
+         sessionLabelStyle, 
+         asianLabelColor, 
+         labelTextColor, 
+         labelSize, 
+         labelVisible, 
+         sessionLabelOffsetInBars, 
+         sessionLabelShowPrice)
+
+    _asianLowLineId = _drawLabelledLine(
+         asianLowLineId, 
+         x1, 
+         x2, 
+         asianLow, 
+         asianHighLowLineColor, 
+         sessionLevelsLineWidth, 
+         sessionLevelsHighLowLineStyle, 
+         sessionLevelsLineExtend, 
+         'Asia Low', 
+         sessionLabelStyle, 
+         asianLabelColor, 
+         labelTextColor, 
+         labelSize, 
+         labelVisible, 
+         sessionLabelOffsetInBars, 
+         sessionLabelShowPrice)
+    
+    // ---------------
+    // New York Lines
+    // ---------------
+
+    _nyOpenLineId = _drawLabelledLine(
+         nyOpenLineId, 
+         x1, 
+         x2, 
+         nyOpen, 
+         nyOpenLineColor, 
+         sessionLevelsLineWidth, 
+         nyOpenLineStyle, 
+         sessionLevelsLineExtend, 
+         'NY Open', 
+         sessionLabelStyle, 
+         nyLabelColor, 
+         labelTextColor, 
+         labelSize, 
+         labelVisible, 
+         sessionLabelOffsetInBars, 
+         sessionLabelShowPrice)
+
+    _nyHighLineId = _drawLabelledLine(
+         nyHighLineId, 
+         x1, 
+         x2, 
+         nyHigh, 
+         nyHighLowLineColor, 
+         sessionLevelsLineWidth, 
+         sessionLevelsHighLowLineStyle, 
+         sessionLevelsLineExtend, 
+         'NY High', 
+         sessionLabelStyle, 
+         nyLabelColor, 
+         labelTextColor, 
+         labelSize, 
+         nyHighLowLabelVisible, 
+         sessionLabelOffsetInBars, 
+         sessionLabelShowPrice)
+
+    _nyLowLineId = _drawLabelledLine(
+         nyLowLineId, 
+         x1, 
+         x2, 
+         nyLow, 
+         nyHighLowLineColor, 
+         sessionLevelsLineWidth, 
+         sessionLevelsHighLowLineStyle, 
+         sessionLevelsLineExtend, 
+         'NY Low', 
+         sessionLabelStyle, 
+         nyLabelColor, 
+         labelTextColor, 
+         labelSize, 
+         nyHighLowLabelVisible, 
+         sessionLabelOffsetInBars, 
+         sessionLabelShowPrice)
+    
+    // ---------------
+    // London Lines
+    // ---------------         
+
+    _londonOpenLineId = _drawLabelledLine(
+         londonOpenLineId, 
+         x1, 
+         x2, 
+         londonOpen, 
+         londonOpenLineColor, 
+         sessionLevelsLineWidth, 
+         londonOpenLineStyle, 
+         sessionLevelsLineExtend, 
+         'London Open', 
+         sessionLabelStyle, 
+         londonLabelColor, 
+         labelTextColor, 
+         labelSize, 
+         labelVisible, 
+         sessionLabelOffsetInBars, 
+         sessionLabelShowPrice)
+         
+    _londonHighLineId = _drawLabelledLine(
+         londonHighLineId, 
+         x1, 
+         x2, 
+         londonHigh, 
+         londonHighLowLineColor, 
+         sessionLevelsLineWidth, 
+         sessionLevelsHighLowLineStyle, 
+         sessionLevelsLineExtend, 
+         'London York High', 
+         sessionLabelStyle, 
+         londonLabelColor, 
+         labelTextColor, 
+         labelSize, 
+         londonHighLowLabelVisible, 
+         sessionLabelOffsetInBars, 
+         sessionLabelShowPrice)
+
+    _londonLowLineId = _drawLabelledLine(
+         londonLowLineId, 
+         x1, 
+         x2, 
+         londonLow, 
+         londonHighLowLineColor, 
+         sessionLevelsLineWidth, 
+         sessionLevelsHighLowLineStyle, 
+         sessionLevelsLineExtend, 
+         'London Low', 
+         sessionLabelStyle, 
+         londonLabelColor, 
+         labelTextColor, 
+         labelSize, 
+         londonHighLowLabelVisible, 
+         sessionLabelOffsetInBars, 
+         sessionLabelShowPrice)
+    
+    _mt4DailyOpenLineId = _drawLabelledLine(
+         mt4DailyOpenLineId, 
+         x1, 
+         x2, 
+         mt4DailyOpenPlotActive ? mt4Open : na, 
+         mt4DailyOpenColor, 
+         sessionLevelsLineWidth, 
+         mt4DailyOpenLineStyle, 
+         sessionLevelsLineExtend, 
+         'MT4 Daily Open', 
+         sessionLabelStyle, 
+         londonLabelColor, 
+         labelTextColor, 
+         labelSize, 
+         labelVisible, 
+         sessionLabelOffsetInBars, 
+         sessionLabelShowPrice)
     
     [_asianOpenLineId, _asianHighLineId, _asianLowLineId, _nyOpenLineId, _nyHighLineId, _nyLowLineId, _londonOpenLineId, _londonHighLineId, _londonLowLineId, _mt4DailyOpenLineId]
 
