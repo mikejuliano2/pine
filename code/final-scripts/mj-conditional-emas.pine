@@ -16,6 +16,7 @@ COLOR_GOLD = #ffb74d
 // ==== CONDITIONAL EMAs ==== 
 // 
 //////////////////////////////////////////////////////////////////
+
 groupMarkers = 'EMA Cross Markers'
 
 ema5Color = input(color.new(#ffeb3b, 20), '5 EMA Color')

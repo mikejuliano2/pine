@@ -7,7 +7,6 @@
 - plot horizontal lines for the conditional EMAs
 
 - TDI: plot when outside volatility band, then back in, then crosses signal
-- plot the range of the current 4 hour candle
 
 - add brinks high/low to lines
 

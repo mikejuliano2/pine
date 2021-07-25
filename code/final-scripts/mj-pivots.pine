@@ -158,8 +158,8 @@ m5C = (pivR2+pivR3)/2
 groupPivot = 'Pivot'
 
 pivotLineOffsetInBars = input(15, 'Line Offset (in bars)', tooltip='How many bars away from current price to shift x1', group=groupPivot)
-pivotLineLengthInBars = input(15, 'Line Length (in bars)', minval=0, group=groupPivot)
-pivotLabelOffsetInBars = input(7, 'Label Offset (in bars)', group=groupPivot)
+pivotLineLengthInBars = input(20, 'Line Length (in bars)', minval=0, group=groupPivot)
+pivotLabelOffsetInBars = input(4, 'Label Offset (in bars)', group=groupPivot)
 pivotLabelTextColor = input(color.new(color.black, 0), 'Label Text Color')
 
 pivotLineStyle = input(line.style_dashed, 'Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupPivot)

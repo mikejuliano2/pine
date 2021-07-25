@@ -130,14 +130,14 @@ showQuarter = input(true, 'Show Quarter')
 plotRangeInMultiplesOfWhole = input(2, 'Plot Range (in multiples of the whole)', tooltip='Example:  plotRange=2.  open = 31,795.  This would plot a line at each whole level between 34k (32+2) and 30k (32-2).', minval=0)
 wholeLevelOverride = input(0, 'Whole Level Override', minval=0, tooltip='Only active if greater than 0')
 
-lineOffset = input(40, 'Line Offset (in bars)')
+lineOffset = input(43, 'Line Offset (in bars)')
 lineLength = input(20, 'Line Length (in bars)')
-labelOffset = input(-3, 'Label Offset (in bars)')
+labelOffset = input(-4, 'Label Offset (in bars)')
 
 lineWidth = input(2, 'Line Width', options=[1,2,3,4])
 
-lineStyle = input(line.style_dotted, 'Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted])
-lineExtendWhole = input(extend.both, 'Line Extend Whole', options=[extend.none, extend.left, extend.right, extend.both])
+lineStyle = input(line.style_solid, 'Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted])
+lineExtendWhole = input(extend.none, 'Line Extend Whole', options=[extend.none, extend.left, extend.right, extend.both])
 lineExtendHalf = input(extend.none, 'Line Extend Half', options=[extend.none, extend.left, extend.right, extend.both])
 lineExtendQuarter = input(extend.none, 'Line Extend Quarter', options=[extend.none, extend.left, extend.right, extend.both])
 labelStyle = input(label.style_none, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])

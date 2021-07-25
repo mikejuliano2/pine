@@ -160,10 +160,12 @@ londonHighLowLineActive = input(false, 'London HL Line Active', group=groupSwitc
 
 // line style
 
+sessionLevelsLineOffsetInBars = input(15, 'Line Offset (in bars)', group=groupLineStyle)
+sessionLevelsLineLengthInBars = input(20, 'Line Length (in bars)', group=groupLineStyle)
+sessionLabelOffsetInBars = input(-5, 'Label Offset (in bars)', group=groupLineStyle)
+
 dailyOpenLineExtend = input(extend.none, 'Daily Open Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupLineStyle)
 sessionLevelsLineExtend = input(extend.none, 'Session Levels Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupLineStyle)
-sessionLevelsLineLengthInBars = input(15, 'Line Length (in bars)', group=groupLineStyle)
-sessionLevelsLineOffsetInBars = input(15, 'Line Offset (in bars)', group=groupLineStyle)
 
 sessionLevelsHighLowLineStyle = input(line.style_solid, 'Line Style - H/L', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 sessionLevelsLineWidth = input(2, 'Line Width', group=groupLineStyle, options=[1,2,3,4])
@@ -194,7 +196,6 @@ mt4DailyOpenColor = input(#2962ff, 'MT4 Daily Open Color', input.color, group=gr
 
 // labels
 
-sessionLabelOffsetInBars = input(-3, 'Label Offset (in bars)', group=groupLabels)
 sessionLabelStyle = input(label.style_none, 'Session Label Style', group=groupLabels, options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
 sessionLabelOpacity = input(70, 'Label Opacity', group=groupLabels, minval=0, maxval=100)
 sessionLabelSize = input(size.normal, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupLabels)
@@ -600,7 +601,7 @@ _drawSessionLines() =>
          sessionLevelsLineWidth, 
          mt4DailyOpenLineStyle, 
          dailyOpenLineExtend, 
-         'MT4 Daily Open', 
+         'MT4 Open', 
          sessionLabelStyle, 
          londonLabelColor, 
          labelTextColor, 

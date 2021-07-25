@@ -77,6 +77,49 @@ _isFirstBarForCurrentTimeframeAtResolution(Resolution) =>
     currentBar = t
     not na(currentBar) and ( na(previousBar) or currentBar > previousBar)
 
+_print(_text) => var _label = label.new(bar_index, na, _text, xloc.bar_index, yloc.price, color(na), label.style_none, color.gray, size.large, text.align_left), label.set_xy(_label, bar_index, highest(10)[1]), label.set_text(_label, _text)
+
+_getHoursElapsedThis4Hours() => 
+    int hoursElapsedThis4Hours = 
+          hour == 0 ? 0 :
+          hour == 1 ? 1 :
+          hour == 2 ? 2 :
+          hour == 3 ? 3 : 
+          hour == 4 ? 0 :
+          hour == 5 ? 1 :
+          hour == 6 ? 2 :
+          hour == 7 ? 3 :
+          hour == 8 ? 0 : 
+          hour == 9 ? 1 :
+          hour == 10 ? 2 :
+          hour == 11 ? 3 :
+          hour == 12 ? 0 : 
+          hour == 13 ? 1 :
+          hour == 14 ? 2 :
+          hour == 15 ? 3 : 
+          hour == 16 ? 0 :
+          hour == 17 ? 1 :
+          hour == 18 ? 2 :
+          hour == 19 ? 3 : 
+          hour == 20 ? 0 :
+          hour == 21 ? 1 :
+          hour == 22 ? 2 :
+          hour == 23 ? 3 : 
+          0
+
+_getBarsElapsedAndRemainingForCurrent4HourCandle() =>
+    int barLengthInMinutes = (time - time[1]) / MS_PER_MINUTE
+    int barsPerHour = 60 / barLengthInMinutes
+    int barsPer4Hours = barsPerHour * 4
+    
+    int barsElapsedThisHour = minute / barLengthInMinutes 
+    int hoursElapsedThis4Hours = _getHoursElapsedThis4Hours()
+
+    int barsElapsedThis4Hours = barsElapsedThisHour + (hoursElapsedThis4Hours * barsPerHour)
+
+    int barsRemainingThis4Hours = barsPer4Hours - barsElapsedThis4Hours
+    [barsElapsedThis4Hours, barsRemainingThis4Hours]
+
 
 //////////////////////////////////////////////////////////////////
 // 
@@ -91,23 +134,49 @@ _isFirstBarForCurrentTimeframeAtResolution(Resolution) =>
 // ------------------
 // VARIABLES
 // ------------------
-groupCurrentHourRange = 'Current Hour Range'
-_defaultHourRangeColor = color.new(#fbc02d, 40)
+groupColors = 'Colors'
+groupLines = 'Lines'
+groupLabels = 'Labels'
+groupTime = 'Time'
+groupSwitches = 'Switches'
 
-maxTimeframeToShowCurrentHourRange = input(15, 'Max timeframe to show current hour range?', maxval=60, minval=1, group=groupCurrentHourRange)
-rangeLineColor = input(_defaultHourRangeColor, 'Current Hour Range Line Color', group=groupCurrentHourRange)
-rangeLineWidth = input(1, 'Current Hour Range Line Width', options=[1,2,3,4], group=groupCurrentHourRange)
-rangeLineStyle = input(line.style_dashed, 'Current Hour Range Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupCurrentHourRange)
-rangeLineExtend = extend.none
-rangeLabelColor = input(_defaultHourRangeColor, 'Range Label Color', group=groupCurrentHourRange)
-rangeLabelTextColor = input(color.new(color.black, 0), 'Range Label Text Color', group=groupCurrentHourRange)
-rangeOpenLabelStyle = input(label.style_cross, 'Range Open Label Style', group=groupCurrentHourRange, options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
-rangeHighLabelStyle = input(label.style_triangledown, 'Range High Label Style', group=groupCurrentHourRange, options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
-rangeLowLabelStyle = input(label.style_triangleup, 'Range Low Label Style', group=groupCurrentHourRange, options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
-rangeLabelRightJustified = input(true, 'Range Label Right-Justified?', group=groupCurrentHourRange)
-rangeLabelSize = input(size.tiny, 'Range Label Size', group=groupCurrentHourRange, options=[size.auto, size.tiny, size.small, size.normal, size.large])
-showOpenHighLowLabels = input(true, 'Show Open/High/Low Labels?', group=groupCurrentHourRange)
-showOpenHighLowValueInLabel = input(false, 'Show Open/High/Low Values in Label?', group=groupCurrentHourRange)
+COLOR_LIME = #1cd206
+COLOR_VOLT = #affd00
+COLOR_PINK = #e63a97
+COLOR_RED = #f21616
+COLOR_LIGHT_BLUE = #3179f5
+COLOR_MAGENTA = #d612f8
+COLOR_ORANGE = #f57f17
+COLOR_GOLD = #ffb74d
+
+// time
+maxTimeframeToShow1HRange = input(15, 'Max timeframe to show 1H Range?', maxval=60, minval=1, group=groupTime)
+maxTimeframeToShow4HRange = input(60, 'Max timeframe to show 4H Range?', maxval=60, minval=1, group=groupTime)
+
+// colors
+oneHourColor = input(color.new(COLOR_GOLD, 20), '1H Color', group=groupColors)
+fourHourColor = input(color.new(COLOR_ORANGE, 20), '4H Color', group=groupColors)
+labelTextColor = input(color.new(color.black, 0), 'Label Text Color', group=groupColors)
+
+// lines
+show1HLines = input(true, 'Show 1H Lines?', group=groupLines)
+show4HLines = input(true, 'Show 4H Lines?', group=groupLines)
+oneHourLineWidth = input(1, '1H Line Width', options=[1,2,3,4], group=groupLines)
+oneHourLineStyle = input(line.style_dotted, '1H Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLines)
+oneHourLineExtend = extend.none
+fourHourLineWidth = input(1, '4H Line Width', options=[1,2,3,4], group=groupLines)
+fourHourLineStyle = input(line.style_dotted, '4H Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLines)
+fourHourLineExtend = extend.none
+
+// labels
+show1HLabels = input(true, 'Show 1H Labels?', group=groupLabels)
+show4HLabels = input(true, 'Show 4H Labels?', group=groupLabels)
+showValueInLabel = input(false, 'Show Values in Label?', group=groupLabels)
+openLabelStyle = input(label.style_cross, 'Open Label Style', group=groupLabels, options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
+highLabelStyle = input(label.style_triangledown, 'High Label Style', group=groupLabels, options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
+lowLabelStyle = input(label.style_triangleup, 'Low Label Style', group=groupLabels, options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
+labelSize = input(size.tiny, 'Label Size', group=groupLabels, options=[size.auto, size.tiny, size.small, size.normal, size.large])
+labelRightJustified = input(true, 'Label Right-Justified?', group=groupLabels)
 
 // ------------------
 // FUNCTIONS
@@ -117,7 +186,7 @@ var line hourlyHighLineId = na
 var line hourlyLowLineId = na
 var line hourlyOpenLineId = na
 
-_isValidTimeframeToShowCurrentHourRange() => timeframe.multiplier <= maxTimeframeToShowCurrentHourRange
+_isValidTimeframeToShowCurrentHourRange() => timeframe.multiplier <= maxTimeframeToShow1HRange
 
 _getHighAndLow (fromIndex, toIndex) =>
     float pT = 0
@@ -129,47 +198,48 @@ _getHighAndLow (fromIndex, toIndex) =>
 
     [pT, pB]
 
-_drawHourlyRangeHorizontalLine(lineId, x1, x2, y, _color, _width, _style, labelText, labelStyle) => 
-    _lineId = lineId
-    
-    if na(_lineId)
-        _lineId := line.new(x1, y, x2, y, xloc.bar_time, rangeLineExtend)
-
+_drawHourlyRangeHorizontalLine(x1, x2, y, _color, _width, _style) => 
+    _lineId = line.new(x1, y, x2, y, xloc.bar_time, oneHourLineExtend)
     line.set_xy1(_lineId, x1, y)
     line.set_xy2(_lineId, x2, y)
     line.set_color(_lineId, _color)
     line.set_width(_lineId, _width)
     line.set_style(_lineId, _style)
-
-    // ----------------
-    // draw the label
-    // ----------------
-
-    if showOpenHighLowLabels
-        labelPosition = rangeLabelRightJustified ? x2 : x1
-        labelId = label.new(labelPosition, y, labelText, textcolor=rangeLabelTextColor, style=labelStyle, size=rangeLabelSize, xloc=xloc.bar_time, color=rangeLabelColor)
-        label.delete(labelId[1])
-
     _lineId
 
-_plotTheRangeOfTheCurrentHour(_color, _width, _style) => 
-    [barsElapsedThisHour, barsRemainingThisHour] = _getBarsElapsedAndRemainingForCurrentHour()
-    [hourlyHigh, hourlyLow] = _getHighAndLow(0, barsElapsedThisHour)
-    hourlyOpen = open[barsElapsedThisHour]
-    
-    x1 = time[barsElapsedThisHour]
-    x2 = _getFutureTimeNBarsFromNow(barsRemainingThisHour)
+_drawLabel(x, y, text, textColor, _style, _size, _color) => 
+    labelId = label.new(
+      x, 
+      y, 
+      text, 
+      textcolor=textColor, 
+      style=_style, 
+      size=_size, 
+      xloc=xloc.bar_time, 
+      color=_color)
+    label.delete(labelId[1])
 
-    highValueDisplay = ': ' + tostring(hourlyHigh[0])
-    highLabel = 'H' + (showOpenHighLowValueInLabel ? highValueDisplay : '')
-    
-    lowValueDisplay = ': ' +  tostring(hourlyLow[0])
-    lowLabel = 'L' + (showOpenHighLowValueInLabel ? lowValueDisplay : '')
-    
-    openValueDisplay = ': ' + tostring(hourlyOpen[0])
-    openLabel = 'O' + (showOpenHighLowValueInLabel ? openValueDisplay : '')
+_plotRangeByBarsElapsedAndRemaining(linesArray, barsElapsed, barsRemaining, _color, _width, _style, maxTimeframe, showLines, showLabels) => 
+    isNew = array.size(linesArray) == 0
 
-    if not _isValidTimeframeToShowCurrentHourRange()
+    [_high, _low] = _getHighAndLow(0, barsElapsed)
+    _open = open[barsElapsed]
+    
+    x1 = time[barsElapsed]
+    x2 = _getFutureTimeNBarsFromNow(barsRemaining)
+
+    highValueDisplay = ': ' + tostring(_high[0])
+    highLabel = 'H' + (showValueInLabel ? highValueDisplay : '')
+    
+    lowValueDisplay = ': ' +  tostring(_low[0])
+    lowLabel = 'L' + (showValueInLabel ? lowValueDisplay : '')
+    
+    openValueDisplay = ': ' + tostring(_open[0])
+    openLabel = 'O' + (showValueInLabel ? openValueDisplay : '')
+
+    isValidTimeframe = timeframe.multiplier <= maxTimeframe
+    
+    if not isValidTimeframe
         x1 := na
         x2 := na
         highLabel := na
@@ -178,17 +248,73 @@ _plotTheRangeOfTheCurrentHour(_color, _width, _style) =>
         lowValueDisplay := na
         openValueDisplay := na
         highValueDisplay := na
+
+
+    _lineColor = showLines ? _color : color.new(_color, 100)
     
-    _highLineId = _drawHourlyRangeHorizontalLine(hourlyHighLineId, x1, x2, hourlyHigh, _color, _width, _style, highLabel, rangeHighLabelStyle)
-    _lowLineId = _drawHourlyRangeHorizontalLine(hourlyLowLineId, x1, x2, hourlyLow, _color, _width, _style, lowLabel, rangeLowLabelStyle)
-    _openLineId = _drawHourlyRangeHorizontalLine(hourlyOpenLineId, x1, x2, hourlyOpen, _color, _width, _style, openLabel, rangeOpenLabelStyle)
+    // draw lines
+    
+    _highLineId = _drawHourlyRangeHorizontalLine(x1, x2, _high, _lineColor, _width, _style)
+    _lowLineId = _drawHourlyRangeHorizontalLine(x1, x2, _low, _lineColor, _width, _style)
+    _openLineId = _drawHourlyRangeHorizontalLine(x1, x2, _open, _lineColor, _width, _style)
+    
+    array.push(linesArray, _highLineId)
+    array.push(linesArray, _lowLineId)
+    array.push(linesArray, _openLineId)
+
+    // draw labels
+    
+    if showLabels
+        labelPosition = labelRightJustified ? x2 : x1
+        _drawLabel(labelPosition, _high, highLabel, labelTextColor, highLabelStyle, labelSize, _color)
+        _drawLabel(labelPosition, _low, lowLabel, labelTextColor, lowLabelStyle, labelSize, _color)
+        _drawLabel(labelPosition, _open, openLabel, labelTextColor, openLabelStyle, labelSize, _color)
+
+    // cleanup
+    
+    if not isNew 
+        lineToDelete = array.shift(linesArray)
+        line.delete(lineToDelete)
+        lineToDelete := array.shift(linesArray)
+        line.delete(lineToDelete)
+        lineToDelete := array.shift(linesArray)
+        line.delete(lineToDelete)
+        // labelToDelete = array.shift(labels)
+        // label.delete(labelToDelete)
 
     [_highLineId, _lowLineId, _openLineId]
 
+///////////////////////////////////
+// 
+// --- EXECUTE ---
+// 
+///////////////////////////////////
 
-[_highLineId, _lowLineId, _openLineId] = _plotTheRangeOfTheCurrentHour(rangeLineColor, rangeLineWidth, rangeLineStyle)
+var line[] _fourHourLines = array.new_line(0)
+var line[] _oneHourLines = array.new_line(0)
 
-if na(hourlyHighLineId) or na(hourlyLowLineId) or na (hourlyOpenLineId)
-    hourlyHighLineId := _highLineId
-    hourlyLowLineId := _lowLineId
-    hourlyOpenLineId := _openLineId
+[fourHourElapsed, fourHourRemaining] = _getBarsElapsedAndRemainingForCurrent4HourCandle()
+[oneHourElapsed, oneHourRemaining] = _getBarsElapsedAndRemainingForCurrentHour()
+
+
+_plotRangeByBarsElapsedAndRemaining(
+      _oneHourLines,
+      oneHourElapsed,
+      oneHourRemaining,
+      oneHourColor, 
+      oneHourLineWidth, 
+      oneHourLineStyle,
+      maxTimeframeToShow1HRange,
+      show1HLines,
+      show1HLabels)
+
+_plotRangeByBarsElapsedAndRemaining(
+      _fourHourLines,
+      fourHourElapsed,
+      fourHourRemaining,
+      fourHourColor, 
+      fourHourLineWidth, 
+      fourHourLineStyle,
+      maxTimeframeToShow4HRange,
+      show4HLines,
+      show4HLabels)
