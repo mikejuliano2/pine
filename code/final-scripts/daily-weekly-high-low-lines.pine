@@ -148,8 +148,8 @@ groupYesterday = 'Yesterday'
 groupLastWeek = 'Last Week'
 
 // *** `dwhl` stands for dailyWeeklyHighLow ***
-dwhlLineOffsetInBars = input(5, 'Line Offset (in bars)', group=groupDailyWeeklyShared)
-dwhlLineLengthInBars = input(25, 'Line Length (in bars)', group=groupDailyWeeklyShared)
+dwhlLineOffsetInBars = input(15, 'Line Offset (in bars)', group=groupDailyWeeklyShared)
+dwhlLineLengthInBars = input(15, 'Line Length (in bars)', group=groupDailyWeeklyShared)
 dwhlLabelOffsetInBars = input(-7, 'Daily/Weekly Label Offset (in bars)', group=groupDailyWeeklyShared)
 dwhlLabelStyle = input(label.style_none, 'Yesterday H/L Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle], group=groupDailyWeeklyShared)
 dwhlLabelVisible = input(true, 'Daily/Weekly H/L Label Visible?', group=groupDailyWeeklyShared)

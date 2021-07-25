@@ -162,8 +162,8 @@ londonHighLowLineActive = input(false, 'London HL Line Active', group=groupSwitc
 
 dailyOpenLineExtend = input(extend.none, 'Daily Open Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupLineStyle)
 sessionLevelsLineExtend = input(extend.none, 'Session Levels Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupLineStyle)
-sessionLevelsLineLengthInBars = input(25, 'Line Length (in bars)', group=groupLineStyle)
-sessionLevelsLineOffsetInBars = input(5, 'Line Offset (in bars)', group=groupLineStyle)
+sessionLevelsLineLengthInBars = input(15, 'Line Length (in bars)', group=groupLineStyle)
+sessionLevelsLineOffsetInBars = input(15, 'Line Offset (in bars)', group=groupLineStyle)
 
 sessionLevelsHighLowLineStyle = input(line.style_solid, 'Line Style - H/L', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 sessionLevelsLineWidth = input(2, 'Line Width', group=groupLineStyle, options=[1,2,3,4])

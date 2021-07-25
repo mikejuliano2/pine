@@ -38,7 +38,7 @@ showConditionalEma5mLabel = input(true, 'Show Conditional 5m label?')
 showConditionalEma30mLabel = input(true, 'Show Conditional 30m label?')
 
 lineWidth = input(2, 'EMA Line Width', options=[1,2,3,4])
-labelOffsetStandard = input(3, 'Standard EMA Label Offset (in bars)')
+labelOffsetStandard = input(8, 'Standard EMA Label Offset (in bars)')
 labelOffsetConditional = input(
      defval=16, 
      title='Conditional EMA Label Offset (in bars)', 
