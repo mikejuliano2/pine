@@ -26,10 +26,16 @@ ema800Color = input(color.new(#1848cc, 20), '800 EMA Color')
 ema50CloudColor = input(color.new(#26c6da, 85), '50 EMA Cloud Color')
 emaConditional1hColor = input(color.new(COLOR_ORANGE, 15), 'EMA Conditional 1h Color')
 emaConditional15mColor = input(color.new(COLOR_MAGENTA, 40), 'EMA Conditional 15m Color')
+emaConditional5mColor = input(color.new(COLOR_LIME, 40), 'EMA Conditional 5m Color')
+emaConditional30mColor = input(color.new(COLOR_LIGHT_BLUE, 40), 'EMA Conditional 30m Color')
 showConditionalEma1hLine = input(false, 'Show Conditional 1h line?')
 showConditionalEma15mLine = input(false, 'Show Conditional 15m line?')
+showConditionalEma5mLine = input(false, 'Show Conditional 5m line?')
+showConditionalEma30mLine = input(false, 'Show Conditional 30m line?')
 showConditionalEma1hLabel = input(true, 'Show Conditional 1h label?')
 showConditionalEma15mLabel = input(true, 'Show Conditional 15m label?')
+showConditionalEma5mLabel = input(true, 'Show Conditional 5m label?')
+showConditionalEma30mLabel = input(true, 'Show Conditional 30m label?')
 
 lineWidth = input(2, 'EMA Line Width', options=[1,2,3,4])
 labelOffsetStandard = input(3, 'Standard EMA Label Offset (in bars)')
@@ -44,19 +50,23 @@ showLabelText = input(false, 'Show Label Text?')
 
 _getConditionalValues() => 
     if timeframe.period == '1'
-        [ema(close, 3000), ema(close, 750)]
+        [3000, 750, 250, 1500]
     else if timeframe.period == '5'
-        [ema(close, 600), ema(close, 150)]
+        [600, 150, 0, 300]
+    else if timeframe.period == '30'
+        [100, 0, 0, 0]
     else 
-        [na, na]
+        [0, 0, 0, 0]
 
 _getConditionalLabels() => 
     if timeframe.period == '1'
-        ['3000 => 50EMA on 1h', '750 => 50 EMA on 15m']
+        ['3000 => 50EMA on 1h', '750 => 50EMA on 15m', '250 => 50EMA on 5m', '1500 => 50EMA on 30m']
     else if timeframe.period == '5'
-        ['600 => 50EMA on 1h', '150 => 50 EMA on 15m']
+        ['600 => 50EMA on 1h', '150 => 50EMA on 15m', '', '1200 => 50EMA on 30m']
+    else if timeframe.period == '30'
+        ['100 => 50EMA on 1h', '', '', '']
     else 
-        [na, na]
+        ['', '', '', '']
 
 _getFutureTimeNBarsFromNow(numBars) => time + ( ( time - time[1] ) * numBars )
 
@@ -82,13 +92,21 @@ _drawLabel(y, text, Color, textColor, offset) =>
 // Get Values
 // -----------------
 
+_getEmaVal(length) => length > 0 ? ema(close, length) : na
+
 ema5 = ema(close, 5)
 ema13 = ema(close, 13)
 ema50 = ema(close, 50)
 ema200 = ema(close, 200)
 ema800 = ema(close, 800)
-[emaConditional1h, emaConditional15m] = _getConditionalValues()
-[emaConditional1hText, emaConditional15mText] = _getConditionalLabels()
+
+[_1hVal, _15mVal, _5mVal, _30mVal] = _getConditionalValues()
+emaConditional1h = _getEmaVal(_1hVal)
+emaConditional15m = _getEmaVal(_15mVal)
+emaConditional5m = _getEmaVal(_5mVal)
+// emaConditional30m = _getEmaVal(_30mVal)
+
+[emaConditional1hText, emaConditional15mText, emaConditional5mText, emaConditional30mText] = _getConditionalLabels()
 
 // -----------------
 // Plot EMAs
@@ -114,6 +132,16 @@ plot(showConditionalEma15mLine ? emaConditional15m : na,
      color=emaConditional15mColor, 
      linewidth=lineWidth, 
      title='EMA Conditional 15m')
+
+plot(showConditionalEma5mLine ? emaConditional5m : na, 
+     color=emaConditional5mColor, 
+     linewidth=lineWidth, 
+     title='EMA Conditional 5m')
+
+// plot(showConditionalEma30mLine ? emaConditional30m : na, 
+//      color=emaConditional30mColor, 
+//      linewidth=lineWidth, 
+//      title='EMA Conditional 30m')
 
 // ----------------------------
 // Plot 50 EMA Cloud
@@ -154,6 +182,20 @@ labelConditional15m = _drawLabel(
      color.white, 
      _conditionalLabelOffset)
 
+labelConditional5m = _drawLabel(
+     showConditionalEma5mLabel ? emaConditional5m : na, 
+     emaConditional5mText, 
+     emaConditional5mColor, 
+     color.white, 
+     _conditionalLabelOffset)
+
+// labelConditional30m = _drawLabel(
+//      showConditionalEma30mLabel ? emaConditional30m : na, 
+//      emaConditional30mText, 
+//      emaConditional30mColor, 
+//      color.white, 
+//      _conditionalLabelOffset)
+
 label.delete(label5[1])
 label.delete(label13[1])
 label.delete(label50[1])
@@ -161,6 +203,8 @@ label.delete(label200[1])
 label.delete(label800[1])
 label.delete(labelConditional1h[1])
 label.delete(labelConditional15m[1])
+label.delete(labelConditional5m[1])
+// label.delete(labelConditional30m[1])
 
 // -----------------
 // Cross Markers

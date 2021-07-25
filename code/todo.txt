@@ -4,10 +4,7 @@
 // 
 //////////////////////////////////////////////////////////////////
 
-
-- conditional emas => show the 5min 50 on the 1min TF
 - plot horizontal lines for the conditional EMAs
-- add the 50 on 30m to conditional emas
 
 - TDI: plot when outside volatility band, then back in, then crosses signal
 - plot the range of the current 4 hour candle

@@ -142,6 +142,22 @@ string TT_PR = "Final time to which the High and Low of the session will be held
 string TT_TZ = "Offsets all time inputs together to help align to preferred timezone"
 string TT_LB = "The number of days back to plot the session levels"
 
+// switches
+
+asianOpenPlotActive = input(true, 'Plot Asian Open?', group=groupSwitches)
+asianHighLowPlotActive = input(true, 'Plot Asian HighLow?', group=groupSwitches)
+londonOpenPlotActive = input(true, 'Plot London Open?', group=groupSwitches)
+londonHighLowPlotActive = input(true, 'Plot London HighLow?', group=groupSwitches)
+nyOpenPlotActive = input(true, 'Plot NY Open?', group=groupSwitches)
+nyHighLowPlotActive = input(true, 'Plot New York HighLow?', group=groupSwitches)
+mt4DailyOpenLineActive = input(true, 'MT4 Daily Open Line Active', group=groupSwitches)
+fillAsianSession = input(false, 'Fill Asian Session?', group=groupSwitches)
+fillLondonSession = input(false, 'Fill London Session?', group=groupSwitches)
+fillNYSession = input(false, 'Fill NY Session?', group=groupSwitches)
+
+nyHighLowLineActive = input(false, 'NY HL Line Active', group=groupSwitches)
+londonHighLowLineActive = input(false, 'London HL Line Active', group=groupSwitches)
+
 // line style
 
 dailyOpenLineExtend = input(extend.none, 'Daily Open Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupLineStyle)
@@ -158,21 +174,16 @@ londonOpenLineStyle = input(line.style_solid, 'London Open Line Style', group=gr
 nyOpenLineStyle = input(line.style_solid, 'NY Open Line Style', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 mt4DailyOpenLineStyle = input(line.style_solid, 'MT4 Daily Open Line Style', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
-// switches
+// fill
+asianOpenPlotStyle = input(plot.style_cross, 'Asian Open Plot Style', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+londonOpenPlotStyle = input(plot.style_circles, 'London Open Plot Style', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+nyOpenPlotStyle = input(plot.style_cross, 'NY Open Plot Style', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
 
-asianOpenPlotActive = input(true, 'Plot Asian Open?', group=groupSwitches)
-asianHighLowPlotActive = input(true, 'Plot Asian HighLow?', group=groupSwitches)
-londonOpenPlotActive = input(true, 'Plot London Open?', group=groupSwitches)
-londonHighLowPlotActive = input(true, 'Plot London HighLow?', group=groupSwitches)
-nyOpenPlotActive = input(true, 'Plot NY Open?', group=groupSwitches)
-nyHighLowPlotActive = input(true, 'Plot New York HighLow?', group=groupSwitches)
-mt4DailyOpenLineActive = input(true, 'MT4 Daily Open Line Active', group=groupSwitches)
-fillAsianSession = input(true, 'Fill Asian Session?', group=groupSwitches)
-fillLondonSession = input(true, 'Fill London Session?', group=groupSwitches)
-fillNYSession = input(true, 'Fill NY Session?', group=groupSwitches)
-
-nyHighLowLineActive = input(false, 'NY HL Line Active', group=groupSwitches)
-londonHighLowLineActive = input(false, 'London HL Line Active', group=groupSwitches)
+sessionLevelsHighLowPlotStyle = input(plot.style_stepline, 'Plot Style - H/L', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+sessionHighLowLineOpacity = input(30, 'Opacity - Session H/L', minval=0, maxval=100, group=groupFill)
+sessionFillOpacity = input(97, 'Opacity - Session Fill', minval=0, maxval=100, group=groupFill)
+sessionLevelsOpenLineOpacity = input(10, 'Opacity - Open Line', minval=0, maxval=100, group=groupFill)
+sessionLevelsLookbackHours = input(180, 'Lookback Hours', input.integer, minval=0, maxval=24, tooltip=TT_LB, group=groupFill)
 
 // colors
 
@@ -195,17 +206,6 @@ asianTimeRange = input('0000-0600:1234567', 'Asian Session Time', group=groupTim
 londonTimeRange = input('0800-1630:1234567', 'London Session Time', group=groupTimeRanges, type=input.session)
 nyTimeRange = input('1330-2000:1234567', 'New York Session Time', group=groupTimeRanges, type=input.session)
 mt4DailyOpenTimeRange = input('2200-2201:1234567', 'MT4 Daily Open', group=groupTimeRanges, type=input.session)
-
-// fill
-asianOpenPlotStyle = input(plot.style_cross, 'Asian Open Plot Style', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-londonOpenPlotStyle = input(plot.style_circles, 'London Open Plot Style', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-nyOpenPlotStyle = input(plot.style_cross, 'NY Open Plot Style', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-
-sessionLevelsHighLowPlotStyle = input(plot.style_stepline, 'Plot Style - H/L', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-sessionHighLowLineOpacity = input(30, 'Opacity - Session H/L', minval=0, maxval=100, group=groupFill)
-sessionFillOpacity = input(97, 'Opacity - Session Fill', minval=0, maxval=100, group=groupFill)
-sessionLevelsOpenLineOpacity = input(10, 'Opacity - Open Line', minval=0, maxval=100, group=groupFill)
-sessionLevelsLookbackHours = input(180, 'Lookback Hours', input.integer, minval=0, maxval=24, tooltip=TT_LB, group=groupFill)
 
 _captureSessionLevels(timeRange) => 
     _inSession = _isInSession(timeRange)
@@ -482,7 +482,7 @@ _drawSessionLines() =>
          x1, 
          x2, 
          nyOpen, 
-         nyOpenLineColor, 
+         nyOpenPlotActive ? color.new(nyMasterColor, 0) : na, 
          sessionLevelsLineWidth, 
          nyOpenLineStyle, 
          sessionLevelsLineExtend, 
