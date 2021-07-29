@@ -4,34 +4,51 @@
 // 
 //////////////////////////////////////////////////////////////////
 
-- plot horizontal lines for the conditional EMAs
-
+- compile a bundle of entry signal screenshots based on the TDI. Use vertical line to mark entry/exit.  Use date/price range
+- create alertconditions for TDI
 - TDI: plot when outside volatility band, then back in, then crosses signal
+- plot marker for TDI signals
+- think carefully about alert management.  Times of day that would be good to get alerts.
+- mark the london close... good time for alert?
+- change divergence scripts to favor longer lines
+
 
 - add brinks high/low to lines
-
 - vertical hour lines - add labels, optionally just show labels and not lines
-
 - quarters - add a max timeframe input for each level (whole => 1D, half => 60, quarter => 15)
-- add margin to the start of the lines
 
+- pva volume overlay
+- convert ADR 
+- convert PVSRA
+- RDH/RDL
 
-// pva volume overlay
-// convert ADR 
-// convert PVSRA
-// RDH/RDL
-
-// add an alert for MCB divergence on the 15 min
-
+ALERTS
+- have a kill switch input for any script with alerts
+- 15 MFI cross
+- 60 MFI cross
+- 240 MFI cross
+- add an alert for MCB divergence on the 15 min
+- on vector candle that has a body some percentage above the average body size
+- on TDI divergence
 
 /////////////////////////
 // WEEKEND TASKS
 /////////////////////////
 
 - review trade journal
+- make a trade calendar with the best times to trade
+
+////////////////////////////
+// HIGH ACTIVITY TIMES
+////////////////////////////
+7:45-8:00
+8:45-9:00
+10:30-11
 
 
-
+///////////////////////////
+// NOTES
+///////////////////////////
 
 
 GET LIQUIDITY POOLS
@@ -46,4 +63,30 @@ GET LIQUIDITY POOLS
 - 
 
 
+
+
+Guaging a retrace back to the 50
+- 13 support broken
+- 5 cross 13 down
+- retrace to 50
+
+Trading the retrace to the 50 would be considered trading into the peak formation (and a no no)
+
+
+
+
+
+
+
+////////////////////////////////
+// IDEAL MONITOR SETUP
+////////////////////////////////
+Trading View
+Binance
+TradingLite
+screenshots
+Browser
+Browser
+Discord
+Youtube
 

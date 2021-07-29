@@ -392,7 +392,13 @@ r_label(weekLow,"LWeek Lo",label.style_none,color.green,validWHLTimeFrame and sh
 // We want to be able to override where we get the volume data for the candles.
 
 
-pvsra_security(sresolution,sseries) => security(overridesym ? pvsra_sym : syminfo.tickerid ,sresolution,sseries[barstate.isrealtime?1:0], barmerge.gaps_off,barmerge.lookahead_off)
+pvsra_security(sresolution, sseries) => security(
+      overridesym ? pvsra_sym : syminfo.tickerid,
+      sresolution,
+      sseries[barstate.isrealtime?1:0], 
+      barmerge.gaps_off,
+      barmerge.lookahead_off)
+
 pvsra_volume = iff(overridesym == true, pvsra_security("",volume), volume)
 pvsra_high = iff(overridesym == true, pvsra_security("",high), high)
 pvsra_low = iff(overridesym == true, pvsra_security("",low), low)

@@ -10,6 +10,11 @@ COLOR_LIGHT_BLUE = #3179f5
 COLOR_MAGENTA = #d612f8
 COLOR_ORANGE = #f57f17
 COLOR_GOLD = #ffb74d
+COLOR_YELLOW = #ffeb3b
+COLOR_TEAL = #00bcd4
+COLOR_WHITE = #ffffff
+COLOR_BLUE = #1848cc
+COLOR_PURPLE = #3e31c4
 
 //////////////////////////////////////////////////////////////////
 // 
@@ -19,11 +24,11 @@ COLOR_GOLD = #ffb74d
 
 groupMarkers = 'EMA Cross Markers'
 
-ema5Color = input(color.new(#ffeb3b, 20), '5 EMA Color')
+ema5Color = input(color.new(COLOR_YELLOW, 20), '5 EMA Color')
 ema13Color = input(color.new(#b71c1c, 20), '13 EMA Color')
-ema50Color = input(color.new(#00bcd4, 20), '50 EMA Color')
-ema200Color = input(color.new(#ffffff, 20), '200 EMA Color')
-ema800Color = input(color.new(#1848cc, 20), '800 EMA Color')
+ema50Color = input(color.new(COLOR_TEAL, 20), '50 EMA Color')
+ema200Color = input(color.new(COLOR_WHITE, 20), '200 EMA Color')
+ema800Color = input(color.new(COLOR_PURPLE, 20), '800 EMA Color')
 ema50CloudColor = input(color.new(#26c6da, 85), '50 EMA Cloud Color')
 emaConditional1hColor = input(color.new(COLOR_ORANGE, 15), 'EMA Conditional 1h Color')
 emaConditional15mColor = input(color.new(COLOR_MAGENTA, 40), 'EMA Conditional 15m Color')
@@ -256,7 +261,7 @@ _getEmaCrossMarkerVisibility(emaOne, emaTwo, markerActive) =>
 
 markerCrossUpPlotStyle = input(shape.triangleup, 'Shape Style Up', options=[shape.xcross, shape.cross, shape.triangleup, shape.triangledown, shape.flag, shape.circle, shape.arrowup, shape.arrowdown, shape.labelup, shape.labeldown, shape.square, shape.diamond], group=groupMarkers)
 markerCrossDownPlotStyle = input(shape.triangledown, 'Shape Style Down', options=[shape.xcross, shape.cross, shape.triangleup, shape.triangledown, shape.flag, shape.circle, shape.arrowup, shape.arrowdown, shape.labelup, shape.labeldown, shape.square, shape.diamond], group=groupMarkers)
-markerCrossUpPlotLocation = input(location.bottom, 'Shape Location Up', options=[location.abovebar, location.belowbar, location.top, location.bottom, location.absolute], group=groupMarkers)
+markerCrossUpPlotLocation = input(location.top, 'Shape Location Up', options=[location.abovebar, location.belowbar, location.top, location.bottom, location.absolute], group=groupMarkers)
 markerCrossDownPlotLocation = input(location.top, 'Shape Location Down', options=[location.abovebar, location.belowbar, location.top, location.bottom, location.absolute], group=groupMarkers)
 markerShapeSize = size.small
 
