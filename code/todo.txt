@@ -4,13 +4,19 @@
 // 
 //////////////////////////////////////////////////////////////////
 
+NON-CODE
 - compile a bundle of entry signal screenshots based on the TDI. Use vertical line to mark entry/exit.  Use date/price range
-- create alertconditions for TDI
+- study how many candles is a valid retrace
+- analyze best times of day
+
+
 - TDI: plot when outside volatility band, then back in, then crosses signal
 - plot marker for TDI signals
-- think carefully about alert management.  Times of day that would be good to get alerts.
 - mark the london close... good time for alert?
 - change divergence scripts to favor longer lines
+
+- SV marker
+- pins marker
 
 
 - add brinks high/low to lines
@@ -23,6 +29,9 @@
 - RDH/RDL
 
 ALERTS
+- alertcondition 13/50 cross
+- think carefully about alert management.  Times of day that would be good to get alerts.
+- create alertconditions for TDI
 - have a kill switch input for any script with alerts
 - 15 MFI cross
 - 60 MFI cross
@@ -44,6 +53,7 @@ ALERTS
 7:45-8:00
 8:45-9:00
 10:30-11
+12:00 London Close
 
 
 ///////////////////////////

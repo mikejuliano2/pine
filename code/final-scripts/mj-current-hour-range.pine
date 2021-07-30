@@ -220,7 +220,7 @@ _drawLabel(x, y, text, textColor, _style, _size, _color) =>
     label.delete(labelId[1])
 
 _plotRangeByBarsElapsedAndRemaining(linesArray, barsElapsed, barsRemaining, _color, _width, _style, maxTimeframe, showLines, showLabels) => 
-    isNew = array.size(linesArray) == 0
+    initialArraySize = array.size(linesArray)
 
     [_high, _low] = _getHighAndLow(0, barsElapsed)
     _open = open[barsElapsed]
@@ -271,16 +271,10 @@ _plotRangeByBarsElapsedAndRemaining(linesArray, barsElapsed, barsRemaining, _col
         _drawLabel(labelPosition, _open, openLabel, labelTextColor, openLabelStyle, labelSize, _color)
 
     // cleanup
-    
-    if not isNew 
-        lineToDelete = array.shift(linesArray)
-        line.delete(lineToDelete)
-        lineToDelete := array.shift(linesArray)
-        line.delete(lineToDelete)
-        lineToDelete := array.shift(linesArray)
-        line.delete(lineToDelete)
-        // labelToDelete = array.shift(labels)
-        // label.delete(labelToDelete)
+    if initialArraySize > 0
+        for i = 0 to initialArraySize
+            lineToDelete = array.shift(linesArray)
+            line.delete(lineToDelete)
 
     [_highLineId, _lowLineId, _openLineId]
 

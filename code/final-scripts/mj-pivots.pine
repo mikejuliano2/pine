@@ -129,6 +129,26 @@ _drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText,
 // 
 //////////////////////////////////////////////////////////////////
 
+_adr(length) =>
+    // This is effectively an atr, which is what is used in MT4 to get those levels. FWIW, true range can be also calculated with tr(true)
+    trueRange = na(high[1])? high-low : max(max(high - low, abs(high - close[1])), abs(low - close[1]))
+    // Switched to SMA from RMA because somehow it matches MT4 better
+    sma(trueRange[1], length)
+    
+_adrHigh(adr) => high - low < adr ? low + adr : close >= open ? low + adr : high
+_adrLow(adr) => high - low < adr ? high - adr : close >= open ? low : high - adr
+_toPips(val) => round( (val/syminfo.mintick)*100)/100
+
+dayAdr      = security(syminfo.tickerid, 'D', _adr(15), lookahead=barmerge.lookahead_on)
+dayAdrHigh = security(syminfo.tickerid, 'D', _adrHigh(dayAdr), lookahead=barmerge.lookahead_on)
+dayAdrLow  = security(syminfo.tickerid, 'D', _adrLow(dayAdr), lookahead=barmerge.lookahead_on)
+weekAdr      = security(syminfo.tickerid, "W", _adr(1), lookahead=barmerge.lookahead_on)
+weekAdrHigh = security(syminfo.tickerid, "W", _adrHigh(weekAdr), lookahead=barmerge.lookahead_on)
+weekAdrLow  = security(syminfo.tickerid, "W", _adrLow(weekAdr),  lookahead=barmerge.lookahead_on)
+monthAdr      = security(syminfo.tickerid, "M", _adr(1),  lookahead=barmerge.lookahead_on)
+monthAdrHigh = security(syminfo.tickerid, "M", _adrHigh(monthAdr), lookahead=barmerge.lookahead_on)
+monthAdrLow  = security(syminfo.tickerid, "M", _adrLow(monthAdr), lookahead=barmerge.lookahead_on)
+
 dayHigh = security(syminfo.tickerid, 'D', high[1], lookahead=true)
 dayLow = security(syminfo.tickerid, 'D', low[1], lookahead=true)
 dayOpen = security(syminfo.tickerid, 'D', open[1], lookahead=true)
@@ -214,7 +234,9 @@ var line ppLineId = na
 _drawMPivotLine(lineId, x1, x2, y, labelText) =>
     _drawLabelledLine(lineId, x1, x2, y, mLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, labelText, pivotLabelStyle, mLabelColor, mLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
 
-_drawPivots() => 
+_drawPivots(linesArray) => 
+    initialArraySize = array.size(linesArray)
+
     x1 = _getTimeNBarsFromNow(pivotLineOffsetInBars)
     x2 = _getTimeNBarsFromNow(pivotLineOffsetInBars + pivotLineLengthInBars)
 
@@ -232,45 +254,25 @@ _drawPivots() =>
     _r3LineId = _drawLabelledLine(r3LineId, x1, x2, pivR3, rLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'R3', pivotLabelStyle, rLabelColor, rLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
     _ppLineId = _drawLabelledLine(ppLineId, x1, x2, pivotPoint, ppLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'PP', pivotLabelStyle, ppLabelColor, ppLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
 
-    [_m0LineId, _m1LineId, _m2LineId, _m3LineId, _m4LineId, _m5LineId, _s1LineId, _s2LineId, _s3LineId, _r1LineId, _r2LineId, _r3LineId, _ppLineId]
+    array.push(linesArray, _m0LineId)
+    array.push(linesArray, _m1LineId)
+    array.push(linesArray, _m2LineId)
+    array.push(linesArray, _m3LineId)
+    array.push(linesArray, _m4LineId)
+    array.push(linesArray, _m5LineId)
+    array.push(linesArray, _s1LineId)
+    array.push(linesArray, _s2LineId)
+    array.push(linesArray, _s3LineId)
+    array.push(linesArray, _r1LineId)
+    array.push(linesArray, _r2LineId)
+    array.push(linesArray, _r3LineId)
+    array.push(linesArray, _ppLineId)
 
-[_m0LineId, _m1LineId, _m2LineId, _m3LineId, _m4LineId, _m5LineId, _s1LineId, _s2LineId, _s3LineId, _r1LineId, _r2LineId, _r3LineId, _ppLineId] = _drawPivots()
-
-if na(m0LineId)
-    m0LineId := _m0LineId
-
-if na(m1LineId)
-    m1LineId := _m1LineId
-
-if na(m2LineId)
-    m2LineId := _m2LineId
-
-if na(m3LineId)
-    m3LineId := _m3LineId
-
-if na(m4LineId)
-    m4LineId := _m4LineId
-
-if na(m5LineId)
-    m5LineId := _m5LineId
-
-if na(s1LineId)
-    s1LineId := _s1LineId
-
-if na(s2LineId)
-    s2LineId := _s2LineId
-
-if na(s3LineId)
-    s3LineId := _s3LineId
-
-if na(r1LineId)
-    r1LineId := _r1LineId
-
-if na(r2LineId)
-    r2LineId := _r2LineId
-
-if na(r3LineId)
-    r3LineId := _r3LineId
-
-if na(ppLineId)
-    ppLineId := _ppLineId
+    // cleanup
+    if initialArraySize > 0
+        for i = 0 to initialArraySize
+            lineToDelete = array.shift(linesArray)
+            line.delete(lineToDelete)
+    
+var line[] _lines = array.new_line(0)
+_drawPivots(_lines)

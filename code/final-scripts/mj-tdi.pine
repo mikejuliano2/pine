@@ -66,6 +66,7 @@ lbR = divPivotRange
 // SHARK FIN
 //-------------------------
 
+sharkAlertsEnabled = input(true, 'Shark Alerts Enabled')
 sharkPivotRange = input(title="Shark Pivot Range", defval=3, group=groupShark)
 coloredBgWhenOutsideBands = input(true, title='Colored BG when outside bands?', group=groupShark)
 bgColorTransparency = input(94, title='BG color transparency', group=groupShark, minval=0, maxval=100)
@@ -266,6 +267,11 @@ lowSharkValue = belowLowerBand[sharkPivotRange] ? sharkPivotLow : na
 // plot(rsiPivotLow, style=plot.style_cross, linewidth=2, color=color.green, offset=-lbR)
 plot(highSharkValue, style=plot.style_circles, linewidth=3, color=sharkHighColor, offset=-sharkPivotRange, title='Shark Plot High')
 plot(lowSharkValue, style=plot.style_circles, linewidth=3, color=sharkLowColor, offset=-sharkPivotRange, title='Shark Plot Low')
+
+hasHighSharkFin = not na(highSharkValue)
+hasLowSharkFin = not na (lowSharkValue)
+hasSharkFin = hasHighSharkFin or hasLowSharkFin
+alertcondition(hasSharkFin and sharkAlertsEnabled, title="Alert on Shark Fin", message="{{ticker}} Shark Fin on the {{interval}}")
 
 //////////////////////////////////////////////////////
 // 
