@@ -204,7 +204,7 @@ sessionLabelShowPrice = input(false, 'Show Price in Label?', group=groupLabels)
 // time ranges
 
 asianTimeRange = input('0000-0600:1234567', 'Asian Session Time', group=groupTimeRanges, type=input.session)
-londonTimeRange = input('0800-1630:1234567', 'London Session Time', group=groupTimeRanges, type=input.session)
+londonTimeRange = input('0800-1600:1234567', 'London Session Time', group=groupTimeRanges, type=input.session)
 nyTimeRange = input('1330-2000:1234567', 'New York Session Time', group=groupTimeRanges, type=input.session)
 mt4DailyOpenTimeRange = input('2200-2201:1234567', 'MT4 Daily Open', group=groupTimeRanges, type=input.session)
 

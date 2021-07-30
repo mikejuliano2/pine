@@ -1,47 +1,76 @@
 //@version=4
-// Modified by Jakub  a Babo
 
 study("MJ - TDI", shorttitle="MJ - TDI")
 
-rsiPeriod = input(21, minval = 1, title = "RSI Period")
-bandLength = input(34, minval = 1, title = "Band Length")
-fastMaLength = input(7, minval = 0, title = "Fast MA on RSI")
-slowMaLength = input(2, minval = 1, title = "Slow MA on RSI")
+groupTDI = 'TDI'
+groupDivergence = 'Divergence'
+groupShark = 'Shark Fin'
 
-bandsColor = color.new(#2962ff, 40)
-bandsLineWidth = 2
-marketBaseColor = color.new(#ffb74d, 50)
-marketBaseLineWidth = 2
-marketSignalColor = color.new(#ff5252, 20)
-marketSignalLineWidth = 2
-rsiColor = color.new(#006064, 0)
-rsiLineWidth = 2
+COLOR_LIME = #1cd206
+COLOR_VOLT = #affd00
+COLOR_PINK = #e63a97
+COLOR_RED = #f21616
+COLOR_LIGHT_BLUE = #3179f5
+COLOR_MAGENTA = #d612f8
+COLOR_ORANGE = #f57f17
+COLOR_GOLD = #ffb74d
+COLOR_HOT_PINK = #e91e63
 
-lbR = input(title="Pivot Lookback Right", defval=5)
-lbL = input(title="Pivot Lookback Left", defval=5)
-rangeUpper = input(title="Max of Lookback Range", defval=60)
-rangeLower = input(title="Min of Lookback Range", defval=5)
-plotBull = input(title="Plot Bullish", defval=true)
-plotHiddenBull = input(title="Plot Hidden Bullish", defval=false)
-plotBear = input(title="Plot Bearish", defval=true)
-plotHiddenBear = input(title="Plot Hidden Bearish", defval=false)
-bearColor = color.new(#f21616, 0)
-bullColor = color.new(#1cd206, 0)
-hiddenBullColor = color.new(color.green, 80)
-hiddenBearColor = color.new(color.red, 80)
-textColor = color.new(color.black, 0)
-divergenceLineWidth = 4
-divergenceLineTransparency = 0
+// ------------------------
+// TDI
+// ------------------------
 
-coloredBgWhenOutsideBands = input(true, title='Colored BG when outside bands?', group='Background Color')
-bgColorTransparency = input(94, title='BG color transparency', group='Background Color', minval=0, maxval=100)
+bandsColor = input(color.new(#2962ff, 40), 'Bands Color', group=groupTDI)
+marketBaseColor = input(color.new(#ffb74d, 50), 'Market Base Color', group=groupTDI)
+marketSignalColor = input(color.new(#ff5252, 20), 'Market Signal Color', group=groupTDI)
+rsiColor = input(color.new(#006064, 0), 'RSI Color', group=groupTDI)
 
+bandsLineWidth = input(2, 'Bands Line Width', options=[1,2,3,4], group=groupTDI)
+marketBaseLineWidth = input(2, 'Market Base Line Width', options=[1,2,3,4], group=groupTDI)
+marketSignalLineWidth = input(2, 'Market Signal Line Width', options=[1,2,3,4], group=groupTDI)
+rsiLineWidth = input(2, 'RSI Line Width', options=[1,2,3,4], group=groupTDI)
 
-// hline(50, title="Middle Line", linestyle=hline.style_dotted)
-// obLevel = hline(70, title="Overbought", linestyle=hline.style_dotted)
-// osLevel = hline(30, title="Oversold", linestyle=hline.style_dotted)
-// fill(obLevel, osLevel, title="Background", color=color.new(#9915FF, 2))
+bandLength = input(34, minval = 1, title = "Band Length", group=groupTDI)
+rsiPeriod = input(21, minval = 1, title = "RSI Period", group=groupTDI)
+fastMaLength = input(7, minval = 0, title = "Fast MA on RSI", group=groupTDI)
+slowMaLength = input(2, minval = 1, title = "Slow MA on RSI", group=groupTDI)
 
+//-------------------------
+// DIVERGENCE
+//-------------------------
+
+plotBull = input(title="Plot Bullish", defval=true, group=groupDivergence)
+plotHiddenBull = input(title="Plot Hidden Bullish", defval=false, group=groupDivergence)
+plotBear = input(title="Plot Bearish", defval=true, group=groupDivergence)
+plotHiddenBear = input(title="Plot Hidden Bearish", defval=false, group=groupDivergence)
+
+_bullColor = color.new(#1cd206, 0)
+_bearColor = color.new(#f21616, 0)
+bullColor = input(_bullColor, 'Bull Color', group=groupDivergence)
+bearColor = input(_bearColor, 'Bear Color', group=groupDivergence)
+hiddenBullColor = input(color.new(color.green, 80), 'Hidden Bull Color', group=groupDivergence)
+hiddenBearColor = input(color.new(color.red, 80), 'Hidden Bear Color', group=groupDivergence)
+textColor = input(color.new(color.black, 0), 'Divergence Label Text Color', group=groupDivergence)
+
+divergenceLineWidth = input(4, 'Divergence Line Width', options=[1,2,3,4], group=groupDivergence)
+divergenceLineTransparency = input(20, 'Divergence Line Opacity', maxval=100, minval=0, group=groupDivergence)
+rangeUpper = input(title="Max of Lookback Range", defval=60, group=groupDivergence)
+rangeLower = input(title="Min of Lookback Range", defval=5, group=groupDivergence)
+divPivotRange = input(title="Divergence Pivot Range", defval=7, group=groupDivergence)
+lbL = divPivotRange
+lbR = divPivotRange
+// lbR = input(title="Pivot Lookback Right", defval=5)
+// lbL = input(title="Pivot Lookback Left", defval=5)
+
+//-------------------------
+// SHARK FIN
+//-------------------------
+
+sharkPivotRange = input(title="Shark Pivot Range", defval=3, group=groupShark)
+coloredBgWhenOutsideBands = input(true, title='Colored BG when outside bands?', group=groupShark)
+bgColorTransparency = input(94, title='BG color transparency', group=groupShark, minval=0, maxval=100)
+sharkHighColor = input(_bearColor, 'Shark High Color', group=groupShark)
+sharkLowColor = input(_bullColor, 'Shark Low Color', group=groupShark)
 
 //////////////////////////////////////////////////////
 // 
@@ -50,7 +79,7 @@ bgColorTransparency = input(94, title='BG color transparency', group='Background
 //////////////////////////////////////////////////////
 
 src = close
-rsiOfClose = rsi(src, rsiPeriod) // RSI of Close
+rsiOfClose = rsi(src, rsiPeriod)
 slowMA = sma(rsiOfClose, slowMaLength) // Moving Average of RSI 2 bars back
 rsiMa = sma(rsiOfClose, bandLength) // Moving Average of RSI [current]
 
@@ -58,10 +87,11 @@ offset = (1.6185 * stdev(rsiOfClose, bandLength))
 
 upperBand = rsiMa + offset
 lowerBand = rsiMa - offset
+
 marketBase = (upperBand + lowerBand) / 2 // Average of Upper and Lower Bands
 marketSignal = sma(rsiOfClose, fastMaLength) // Moving Average of RSI 7 bars back
-_rsi = slowMA
 
+_rsi = slowMA
 
 //////////////////////////////////////////////////////
 // 
@@ -75,41 +105,63 @@ marketBasePlot = plot(marketBase, "Middle of Bands", color=marketBaseColor, line
 rsiLine = plot(slowMA, "Slow MA", color=rsiColor, linewidth=rsiLineWidth)
 marketSignalLine = plot(marketSignal, "Fast MA", color=marketSignalColor, linewidth=marketSignalLineWidth)  
 
+// hline(50, title="Middle Line", linestyle=hline.style_dotted)
+// obLevel = hline(70, title="Overbought", linestyle=hline.style_dotted)
+// osLevel = hline(30, title="Oversold", linestyle=hline.style_dotted)
+// fill(obLevel, osLevel, title="Background", color=color.new(#9915FF, 2))
 
 //////////////////////////////////////////////////////
 // 
-// --- DIVERGENCE ---
+// --- CALCULATIONS ---
 // 
 //////////////////////////////////////////////////////
 
-pivotLowFound = na(pivotlow(_rsi, lbL, lbR)) ? false : true
-pivotHighFound = na(pivothigh(_rsi, lbL, lbR)) ? false : true
+_print(_text) => var _label = label.new(bar_index, na, _text, xloc.bar_index, yloc.price, color(na), label.style_none, color.gray, size.large, text.align_left), label.set_xy(_label, bar_index, highest(10)[1]), label.set_text(_label, _text)
 
 _inRange(cond) =>
-	bars = barssince(cond == true)
-	rangeLower <= bars and bars <= rangeUpper
+	barsSinceLastTrue = barssince(cond == true)
+	rangeLower <= barsSinceLastTrue and barsSinceLastTrue <= rangeUpper
 
-oscHadHigherLow = _rsi[lbR] > valuewhen(pivotLowFound, _rsi[lbR], 1) and _inRange(pivotLowFound[1]) // Osc: Higher Low
-oscHadLowerLow = _rsi[lbR] < valuewhen(pivotLowFound, _rsi[lbR], 1) and _inRange(pivotLowFound[1]) // Osc: Lower Low
-oscHadLowerHigh = _rsi[lbR] < valuewhen(pivotHighFound, _rsi[lbR], 1) and _inRange(pivotHighFound[1]) // Osc: Lower High
-oscHadHigherHigh = _rsi[lbR] > valuewhen(pivotHighFound, _rsi[lbR], 1) and _inRange(pivotHighFound[1]) // Osc: Higher High
+rsiPivotLow = pivotlow(_rsi, lbL, lbR)
+rsiPivotHigh = pivothigh(_rsi, lbL, lbR)
 
-priceHadLowerLow = low[lbR] < valuewhen(pivotLowFound, low[lbR], 1) // Price: Lower Low
-priceHadHigherLow = low[lbR] > valuewhen(pivotLowFound, low[lbR], 1) // Price: Higher Low
-priceHadHigherHigh = high[lbR] > valuewhen(pivotHighFound, high[lbR], 1) // Price: Higher High
-priceHadLowerHigh = high[lbR] < valuewhen(pivotHighFound, high[lbR], 1) // Price: Lower High
+rsiPivotLowFound = na(rsiPivotLow) ? false : true
+rsiPivotHighFound = na(rsiPivotHigh) ? false : true
+rsiPreviousLowInRange = _inRange(rsiPivotLowFound[1])
+rsiPreviousHighInRange = _inRange(rsiPivotHighFound[1])
 
-hasBullishDiv = plotBull and priceHadLowerLow and oscHadHigherLow and pivotLowFound
-hasHiddenBullishDiv = plotHiddenBull and priceHadHigherLow and oscHadLowerLow and pivotLowFound
-hasBearishDiv = plotBear and priceHadHigherHigh and oscHadLowerHigh and pivotHighFound
-hasHiddenBearishDiv = plotHiddenBear and priceHadLowerHigh and oscHadHigherHigh and pivotHighFound
+prevRsi = _rsi[lbR]
+prevLow = low[lbR]
+prevHigh = high[lbR]
+
+
+rsiHadHigherLow = prevRsi > valuewhen(rsiPivotLowFound, prevRsi, 1) and rsiPreviousLowInRange
+rsiHadLowerLow = prevRsi < valuewhen(rsiPivotLowFound, prevRsi, 1) and rsiPreviousLowInRange
+rsiHadLowerHigh = prevRsi < valuewhen(rsiPivotHighFound, prevRsi, 1) and rsiPreviousHighInRange
+rsiHadHigherHigh = prevRsi > valuewhen(rsiPivotHighFound, prevRsi, 1) and rsiPreviousHighInRange
+
+priceHadLowerLow = prevLow < valuewhen(rsiPivotLowFound, prevLow, 1)
+priceHadHigherLow = prevLow > valuewhen(rsiPivotLowFound, prevLow, 1)
+priceHadHigherHigh = prevHigh > valuewhen(rsiPivotHighFound, prevHigh, 1)
+priceHadLowerHigh = prevHigh < valuewhen(rsiPivotHighFound, prevHigh, 1)
+
+hasBullishDiv = plotBull and priceHadLowerLow and rsiHadHigherLow and rsiPivotLowFound
+hasHiddenBullishDiv = plotHiddenBull and priceHadHigherLow and rsiHadLowerLow and rsiPivotLowFound
+hasBearishDiv = plotBear and priceHadHigherHigh and rsiHadLowerHigh and rsiPivotHighFound
+hasHiddenBearishDiv = plotHiddenBear and priceHadLowerHigh and rsiHadHigherHigh and rsiPivotHighFound
+
+//////////////////////////////////////////////////////
+// 
+// --- PLOT DIVERGENCE ---
+// 
+//////////////////////////////////////////////////////
 
 //-----------------------
 // Regular Bullish
 //-----------------------
 
 plot(
-     pivotLowFound ? _rsi[lbR] : na,
+     rsiPivotLowFound ? _rsi[lbR] : na,
      offset=-lbR,
      title="Regular Bullish",
      linewidth=divergenceLineWidth,
@@ -132,7 +184,7 @@ plotshape(
 //-----------------------
 
 plot(
-	 pivotLowFound ? _rsi[lbR] : na,
+	 rsiPivotLowFound ? _rsi[lbR] : na,
 	 offset=-lbR,
 	 title="Hidden Bullish",
 	 linewidth=divergenceLineWidth,
@@ -155,7 +207,7 @@ plotshape(
 //-----------------------
 
 plot(
-	 pivotHighFound ? _rsi[lbR] : na,
+	 rsiPivotHighFound ? _rsi[lbR] : na,
 	 offset=-lbR,
 	 title="Regular Bearish",
 	 linewidth=divergenceLineWidth,
@@ -178,7 +230,7 @@ plotshape(
 //-----------------------
 
 plot(
-	 pivotHighFound ? _rsi[lbR] : na,
+	 rsiPivotHighFound ? _rsi[lbR] : na,
 	 offset=-lbR,
 	 title="Hidden Bearish",
 	 linewidth=divergenceLineWidth,
@@ -195,12 +247,37 @@ plotshape(
 	 color=color.new(bearColor, 0),
 	 textcolor=textColor
 	 )
-	 
-// #############################################################################
-// BG COlOR (when outside bands)
-// #############################################################################
 
-belowLowerBand = slowMA < lowerBand
-aboveUpperBand = slowMA > upperBand
-bgColor = color.new(coloredBgWhenOutsideBands ? (belowLowerBand ? color.purple : aboveUpperBand ? color.blue : na) : na, bgColorTransparency)
+//////////////////////////////////////////////////////
+// 
+// --- SHARK FIN ---
+// 
+//////////////////////////////////////////////////////
+
+belowLowerBand = _rsi < lowerBand
+aboveUpperBand = _rsi > upperBand
+
+sharkPivotLow = pivotlow(_rsi, sharkPivotRange, sharkPivotRange)
+sharkPivotHigh = pivothigh(_rsi, sharkPivotRange, sharkPivotRange)
+
+highSharkValue = aboveUpperBand[sharkPivotRange] ? sharkPivotHigh : na
+lowSharkValue = belowLowerBand[sharkPivotRange] ? sharkPivotLow : na
+
+// plot(rsiPivotLow, style=plot.style_cross, linewidth=2, color=color.green, offset=-lbR)
+plot(highSharkValue, style=plot.style_circles, linewidth=3, color=sharkHighColor, offset=-sharkPivotRange, title='Shark Plot High')
+plot(lowSharkValue, style=plot.style_circles, linewidth=3, color=sharkLowColor, offset=-sharkPivotRange, title='Shark Plot Low')
+
+//////////////////////////////////////////////////////
+// 
+// --- VOLATILITY BACKGROUND COLOR ---
+// 
+//////////////////////////////////////////////////////
+
+_highlightColor = belowLowerBand ? color.purple : aboveUpperBand ? color.blue : na
+
+bgColor = color.new(
+	  coloredBgWhenOutsideBands ? _highlightColor : na,
+	  bgColorTransparency
+	  )
+
 bgcolor(bgColor)
