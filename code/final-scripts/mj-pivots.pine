@@ -93,14 +93,9 @@ _securityRepaint(_symbol, _res, _src, _repaint) =>
 // 
 //////////////////////////////////////////////////////////////////
 
-_drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText, labelStyle, labelColor, labelTextColor, labelSize, showLabel, labelOffsetInBars) => 
+_drawLabelledLine(x1, x2, y, _color, _width, _style, _extend, labelText, labelStyle, labelColor, labelTextColor, labelSize, showLabel, labelOffsetInBars) => 
     // x1 and x2 are in time (not bars)
-
-    _lineId = lineId
-
-    if na(_lineId)
-        _lineId := line.new(x1, y, x2, y, xloc.bar_time, _extend)
-
+    _lineId = line.new(x1, y, x2, y, xloc.bar_time, _extend)
     line.set_xy1(_lineId, x1, y)
     line.set_xy2(_lineId, x2, y)
     line.set_color(_lineId, _color)
@@ -128,26 +123,6 @@ _drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText,
 // ==== CALCULATIONS ==== 
 // 
 //////////////////////////////////////////////////////////////////
-
-_adr(length) =>
-    // This is effectively an atr, which is what is used in MT4 to get those levels. FWIW, true range can be also calculated with tr(true)
-    trueRange = na(high[1])? high-low : max(max(high - low, abs(high - close[1])), abs(low - close[1]))
-    // Switched to SMA from RMA because somehow it matches MT4 better
-    sma(trueRange[1], length)
-    
-_adrHigh(adr) => high - low < adr ? low + adr : close >= open ? low + adr : high
-_adrLow(adr) => high - low < adr ? high - adr : close >= open ? low : high - adr
-_toPips(val) => round( (val/syminfo.mintick)*100)/100
-
-dayAdr      = security(syminfo.tickerid, 'D', _adr(15), lookahead=barmerge.lookahead_on)
-dayAdrHigh = security(syminfo.tickerid, 'D', _adrHigh(dayAdr), lookahead=barmerge.lookahead_on)
-dayAdrLow  = security(syminfo.tickerid, 'D', _adrLow(dayAdr), lookahead=barmerge.lookahead_on)
-weekAdr      = security(syminfo.tickerid, "W", _adr(1), lookahead=barmerge.lookahead_on)
-weekAdrHigh = security(syminfo.tickerid, "W", _adrHigh(weekAdr), lookahead=barmerge.lookahead_on)
-weekAdrLow  = security(syminfo.tickerid, "W", _adrLow(weekAdr),  lookahead=barmerge.lookahead_on)
-monthAdr      = security(syminfo.tickerid, "M", _adr(1),  lookahead=barmerge.lookahead_on)
-monthAdrHigh = security(syminfo.tickerid, "M", _adrHigh(monthAdr), lookahead=barmerge.lookahead_on)
-monthAdrLow  = security(syminfo.tickerid, "M", _adrLow(monthAdr), lookahead=barmerge.lookahead_on)
 
 dayHigh = security(syminfo.tickerid, 'D', high[1], lookahead=true)
 dayLow = security(syminfo.tickerid, 'D', low[1], lookahead=true)
@@ -217,22 +192,8 @@ ppLineColor = color.new(ppColor, pivotLineOpacity)
 ppLabelColor = color.new(ppColor, pivotLabelOpacity)
 ppLabelTextColor = _getPivotLabelTextColorFromLabelStyle(pivotLabelStyle, ppColor)
 
-var line m0LineId = na
-var line m1LineId = na
-var line m2LineId = na
-var line m3LineId = na
-var line m4LineId = na
-var line m5LineId = na
-var line r1LineId = na
-var line r2LineId = na
-var line r3LineId = na
-var line s1LineId = na
-var line s2LineId = na
-var line s3LineId = na
-var line ppLineId = na
-
-_drawMPivotLine(lineId, x1, x2, y, labelText) =>
-    _drawLabelledLine(lineId, x1, x2, y, mLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, labelText, pivotLabelStyle, mLabelColor, mLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
+_drawMPivotLine(x1, x2, y, labelText) =>
+    _drawLabelledLine(x1, x2, y, mLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, labelText, pivotLabelStyle, mLabelColor, mLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
 
 _drawPivots(linesArray) => 
     initialArraySize = array.size(linesArray)
@@ -240,19 +201,19 @@ _drawPivots(linesArray) =>
     x1 = _getTimeNBarsFromNow(pivotLineOffsetInBars)
     x2 = _getTimeNBarsFromNow(pivotLineOffsetInBars + pivotLineLengthInBars)
 
-    _m0LineId = _drawMPivotLine(m0LineId, x1, x2, m0C, 'M0')
-    _m1LineId = _drawMPivotLine(m1LineId, x1, x2, m1C, 'M1')
-    _m2LineId = _drawMPivotLine(m2LineId, x1, x2, m2C, 'M2')
-    _m3LineId = _drawMPivotLine(m3LineId, x1, x2, m3C, 'M3')
-    _m4LineId = _drawMPivotLine(m4LineId, x1, x2, m4C, 'M4')
-    _m5LineId = _drawMPivotLine(m5LineId, x1, x2, m5C, 'M5')
-    _s1LineId = _drawLabelledLine(s1LineId, x1, x2, pivS1, sLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'S1', pivotLabelStyle, sLabelColor, sLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
-    _s2LineId = _drawLabelledLine(s2LineId, x1, x2, pivS2, sLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'S2', pivotLabelStyle, sLabelColor, sLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
-    _s3LineId = _drawLabelledLine(s3LineId, x1, x2, pivS3, sLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'S3', pivotLabelStyle, sLabelColor, sLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
-    _r1LineId = _drawLabelledLine(r1LineId, x1, x2, pivR1, rLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'R1', pivotLabelStyle, rLabelColor, rLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
-    _r2LineId = _drawLabelledLine(r2LineId, x1, x2, pivR2, rLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'R2', pivotLabelStyle, rLabelColor, rLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
-    _r3LineId = _drawLabelledLine(r3LineId, x1, x2, pivR3, rLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'R3', pivotLabelStyle, rLabelColor, rLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
-    _ppLineId = _drawLabelledLine(ppLineId, x1, x2, pivotPoint, ppLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'PP', pivotLabelStyle, ppLabelColor, ppLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
+    _m0LineId = _drawMPivotLine(x1, x2, m0C, 'M0')
+    _m1LineId = _drawMPivotLine(x1, x2, m1C, 'M1')
+    _m2LineId = _drawMPivotLine(x1, x2, m2C, 'M2')
+    _m3LineId = _drawMPivotLine(x1, x2, m3C, 'M3')
+    _m4LineId = _drawMPivotLine(x1, x2, m4C, 'M4')
+    _m5LineId = _drawMPivotLine(x1, x2, m5C, 'M5')
+    _s1LineId = _drawLabelledLine(x1, x2, pivS1, sLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'S1', pivotLabelStyle, sLabelColor, sLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
+    _s2LineId = _drawLabelledLine(x1, x2, pivS2, sLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'S2', pivotLabelStyle, sLabelColor, sLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
+    _s3LineId = _drawLabelledLine(x1, x2, pivS3, sLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'S3', pivotLabelStyle, sLabelColor, sLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
+    _r1LineId = _drawLabelledLine(x1, x2, pivR1, rLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'R1', pivotLabelStyle, rLabelColor, rLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
+    _r2LineId = _drawLabelledLine(x1, x2, pivR2, rLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'R2', pivotLabelStyle, rLabelColor, rLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
+    _r3LineId = _drawLabelledLine(x1, x2, pivR3, rLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'R3', pivotLabelStyle, rLabelColor, rLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
+    _ppLineId = _drawLabelledLine(x1, x2, pivotPoint, ppLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'PP', pivotLabelStyle, ppLabelColor, ppLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
 
     array.push(linesArray, _m0LineId)
     array.push(linesArray, _m1LineId)
@@ -273,6 +234,12 @@ _drawPivots(linesArray) =>
         for i = 0 to initialArraySize
             lineToDelete = array.shift(linesArray)
             line.delete(lineToDelete)
-    
+
+//////////////////////////////////////////////////////////////////
+// 
+// ==== EXECUTE ==== 
+// 
+//////////////////////////////////////////////////////////////////
+
 var line[] _lines = array.new_line(0)
 _drawPivots(_lines)

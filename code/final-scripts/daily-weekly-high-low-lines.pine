@@ -88,14 +88,10 @@ _securityRepaint(_symbol, _res, _src, _repaint) => security(_symbol, _res, _src[
 // 
 //////////////////////////////////////////////////////////////////
 
-_drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText, labelStyle, labelColor, labelTextColor, labelSize, showLabel, labelOffsetInBars, showPrice) => 
+_drawLabelledLine(x1, x2, y, _color, _width, _style, _extend, labelText, labelStyle, labelColor, labelTextColor, labelSize, showLabel, labelOffsetInBars, showPrice) => 
     // x1 and x2 are in time (not bars)
-
-    _lineId = lineId
-
-    if na(_lineId)
-        _lineId := line.new(x1, y, x2, y, xloc.bar_time, _extend)
-
+    
+    _lineId = line.new(x1, y, x2, y, xloc.bar_time, _extend)
     line.set_xy1(_lineId, x1, y)
     line.set_xy2(_lineId, x2, y)
     line.set_color(_lineId, _color)
@@ -124,12 +120,26 @@ _drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText,
 // 
 //////////////////////////////////////////////////////////////////
 
-// dayHigh = _securityRepaint(syminfo.tickerid, "D",high, false)
-// dayLow = _securityRepaint(syminfo.tickerid, "D",low, false)
-// dayOpen  = _securityRepaint(syminfo.tickerid, "D",open, false)
-// dayClose = _securityRepaint(syminfo.tickerid, "D",close, false)
-// weekHigh = _securityRepaint(syminfo.tickerid, "W",high, false)
-// weekLow = _securityRepaint(syminfo.tickerid, "W",low, false)
+_adr(length) =>
+    // This is effectively an atr, which is what is used in MT4 to get those levels. FWIW, true range can be also calculated with tr(true)
+    trueRange = na(high[1])? high-low : max(max(high - low, abs(high - close[1])), abs(low - close[1]))
+    // Switched to SMA from RMA because somehow it matches MT4 better
+    sma(trueRange[1], length)
+    
+_adrHigh(adr) => high - low < adr ? low + adr : close >= open ? low + adr : high
+_adrLow(adr) => high - low < adr ? high - adr : close >= open ? low : high - adr
+_toPips(val) => round( (val/syminfo.mintick)*100)/100
+
+adr      = security(syminfo.tickerid, 'D', _adr(15), lookahead=barmerge.lookahead_on)
+adrHigh = security(syminfo.tickerid, 'D', _adrHigh(adr), lookahead=barmerge.lookahead_on)
+adrLow  = security(syminfo.tickerid, 'D', _adrLow(adr), lookahead=barmerge.lookahead_on)
+awr      = security(syminfo.tickerid, "W", _adr(1), lookahead=barmerge.lookahead_on)
+awrHigh = security(syminfo.tickerid, "W", _adrHigh(awr), lookahead=barmerge.lookahead_on)
+awrLow  = security(syminfo.tickerid, "W", _adrLow(awr),  lookahead=barmerge.lookahead_on)
+amr      = security(syminfo.tickerid, "M", _adr(1),  lookahead=barmerge.lookahead_on)
+amrHigh = security(syminfo.tickerid, "M", _adrHigh(amr), lookahead=barmerge.lookahead_on)
+amrLow  = security(syminfo.tickerid, "M", _adrLow(amr), lookahead=barmerge.lookahead_on)
+
 dayHigh = security(syminfo.tickerid, 'D', high[1], lookahead=true)
 dayLow = security(syminfo.tickerid, 'D', low[1], lookahead=true)
 dayOpen = security(syminfo.tickerid, 'D', open[1], lookahead=true)
@@ -143,36 +153,57 @@ weekLow = security(syminfo.tickerid, 'W', low[1], lookahead=true)
 // 
 //////////////////////////////////////////////////////////////////
 
-groupDailyWeeklyShared = 'Daily/Weekly Shared'
+groupShared = 'Shared'
 groupYesterday = 'Yesterday'
 groupLastWeek = 'Last Week'
+groupAdr = 'ADR, AWR, AMR'
 
+COLOR_LIME = #1cd206
+COLOR_VOLT = #affd00
+COLOR_PINK = #e63a97
+COLOR_RED = #f21616
+COLOR_LIGHT_BLUE = #3179f5
+COLOR_MAGENTA = #d612f8
+COLOR_ORANGE = #f57f17
+COLOR_GOLD = #ffb74d
+COLOR_YELLOW = #ffeb3b
+COLOR_TEAL = #00bcd4
+COLOR_WHITE = #ffffff
+COLOR_BLUE = #1848cc
+COLOR_PURPLE = #3e31c4
 COLOR_GREY_ONE = #9598a1
+COLOR_GREEN = #4caf50
+COLOR_ROYAL_BLUE = #1848cc
+COLOR_TURQUOISE = #00897b
+COLOR_PEACH = #e57373
 
 // *** `dwhl` stands for dailyWeeklyHighLow ***
-dwhlLineOffsetInBars = input(15, 'Line Offset (in bars)', group=groupDailyWeeklyShared)
-dwhlLineLengthInBars = input(20, 'Line Length (in bars)', group=groupDailyWeeklyShared)
-dwhlLabelOffsetInBars = input(4, 'Daily/Weekly Label Offset (in bars)', group=groupDailyWeeklyShared)
-dwhlLabelStyle = input(label.style_none, 'Yesterday H/L Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle], group=groupDailyWeeklyShared)
-dwhlLabelVisible = input(true, 'Daily/Weekly H/L Label Visible?', group=groupDailyWeeklyShared)
-dwhlLabelSize = input(size.normal, 'Daily/Weekly H/L Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupDailyWeeklyShared)
-dwhlLineExtend = input(extend.none, 'Daily/Weekly H/L Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupDailyWeeklyShared)
-dwhlLabelShowPrice = input(false, 'Daily/Weekly H/L Show Price in Label?', group=groupDailyWeeklyShared)
+sharedLineOffset = input(15, 'Line Offset (in bars)', group=groupShared)
+sharedLineLength = input(20, 'Line Length (in bars)', group=groupShared)
+sharedLabelOffset = input(4, 'Label Offset (in bars)', group=groupShared)
+sharedLabelStyle = input(label.style_none, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle], group=groupShared)
+sharedLabelVisible = input(true, 'Label Visible?', group=groupShared)
+sharedLabelSize = input(size.normal, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupShared)
+sharedLineExtend = input(extend.none, 'Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupShared)
+sharedLabelShowPrice = input(false, 'Show Price in Label?', group=groupShared)
+sharedLineWidth = input(1, 'Line Width', options=[1,2,3,4], group=groupShared)
 
-onlyShowYesterdayHighLowForCurrentDay = input(true, 'Only show yesterday H/L on current day?', group=groupDailyWeeklyShared)
-onlyShowLastWeekHighLowForCurrentDay = input(true, 'Only show last week H/L on current day?', group=groupDailyWeeklyShared)
+onlyShowYesterdayHighLowForCurrentDay = input(true, 'Only show yesterday H/L on current day?', group=groupShared)
+onlyShowLastWeekHighLowForCurrentDay = input(true, 'Only show last week H/L on current day?', group=groupShared)
 
 // *** `yhl` stands for yesterdayHighLow ***
-yhlColor = input(color.new(#f44336, 0), 'Yesterday H/L Color', group=groupYesterday)
-yhlLineWidth = input(1, 'Yesterday H/L Line Width', options=[1,2,3,4], group=groupYesterday)
-yhlLineStyle = input(line.style_solid, 'Yesterday H/L Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupYesterday)
-yhlLabelTextColor = input(color.new(COLOR_GREY_ONE, 0), 'Yesterday H/L Label Text Color', group=groupYesterday)
+yhlColor = input(color.new(#f44336, 0), 'Color', group=groupYesterday)
+yhlLineStyle = input(line.style_solid, 'Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupYesterday)
 
 // *** `lwhl` stands for lastWeekHighLow ***
-lwhlColor = input(color.new(#9c27b0, 0), 'Last Week H/L Color', group=groupLastWeek)
-lwhlLineWidth = input(1, 'Last Week H/L Line Width', options=[1,2,3,4], group=groupLastWeek)
-lwhlLineStyle = input(line.style_solid, 'Last Week H/L Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLastWeek)
-lwhlLabelTextColor = input(color.new(COLOR_GREY_ONE, 0), 'Last Week H/L Label Text Color', group=groupLastWeek)
+lwhlColor = input(color.new(#9c27b0, 0), 'Color', group=groupLastWeek)
+lwhlLineStyle = input(line.style_solid, 'Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLastWeek)
+
+adrColor = input(color.new(COLOR_TEAL, 0), 'ADR Color', group=groupAdr)
+awrColor = input(color.new(COLOR_GREEN, 0), 'AWR Color', group=groupAdr)
+amrColor = input(color.new(COLOR_ROYAL_BLUE, 0), 'AMR Color', group=groupAdr)
+adrLineStyle = input(line.style_solid, 'Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupAdr)
+
 
 // _getLevelsStart() => 
 //     levelsStartTime = iff((timeframe.isseconds == true) or (timeframe.isminutes == true and timeframe.multiplier < 5), time('D'), time('D') - (MS_PER_DAY))
@@ -202,35 +233,49 @@ _getLastWeekHighLowValues() =>
     else 
         [na, na]
 
-var line yesterdayHighLineId = na
-var line yesterdayLowLineId = na
-var line lastWeekHighLineId = na
-var line lastWeekLowLineId = na
+_drawDailyWeeklyHighLowLines(linesArray) => 
+    initialArraySize = array.size(linesArray)
 
-_drawDailyWeeklyHighLowLines() => 
     [yesterdayHigh, yesterdayLow] = _getYesterdayHighLowValues()
     [lastWeekHigh, lastWeekLow] = _getLastWeekHighLowValues()
 
-    // plot(yesterdayHigh, linewidth=yhlLineWidth, color=yhlColor, style=yesterdayHighLowPlotStyle, title='Yesterday High')
-    // plot(yesterdayLow, linewidth=yhlLineWidth, color=yhlColor, style=yesterdayHighLowPlotStyle, title = 'Yesterday Low')
-    // plot(lastWeekHigh, linewidth=lwhlLineWidth, color=lwhlColor, style=lastWeekHighLowPlotStyle, title='Last Week High')
-    // plot(lastWeekLow, linewidth=lwhlLineWidth, color=lwhlColor, style=lastWeekHighLowPlotStyle, title='Last Week Low')
+    x1 = _getTimeNBarsFromNow(sharedLineOffset)
+    x2 = _getTimeNBarsFromNow(sharedLineOffset + sharedLineLength)
 
-    x1 = _getTimeNBarsFromNow(dwhlLineOffsetInBars)
-    x2 = _getTimeNBarsFromNow(dwhlLineOffsetInBars + dwhlLineLengthInBars)
+    _yesterdayHighLineId = _drawLabelledLine(x1, x2, yesterdayHigh, yhlColor, sharedLineWidth, yhlLineStyle, sharedLineExtend, 'YH', sharedLabelStyle, yhlColor, yhlColor, sharedLabelSize, sharedLabelVisible, sharedLabelOffset, sharedLabelShowPrice)
+    _yesterdayLowLineId = _drawLabelledLine(x1, x2, yesterdayLow, yhlColor, sharedLineWidth, yhlLineStyle, sharedLineExtend, 'YL', sharedLabelStyle, yhlColor, yhlColor, sharedLabelSize, sharedLabelVisible, sharedLabelOffset, sharedLabelShowPrice)
+    _lastWeekHighLineId = _drawLabelledLine(x1, x2, lastWeekHigh, lwhlColor, sharedLineWidth, lwhlLineStyle, sharedLineExtend, 'LWH', sharedLabelStyle, lwhlColor, lwhlColor, sharedLabelSize, sharedLabelVisible, sharedLabelOffset, sharedLabelShowPrice)
+    _lastWeekLowLineId = _drawLabelledLine(x1, x2, lastWeekLow, lwhlColor, sharedLineWidth, lwhlLineStyle, sharedLineExtend, 'LWL', sharedLabelStyle, lwhlColor, lwhlColor, sharedLabelSize, sharedLabelVisible, sharedLabelOffset, sharedLabelShowPrice)
+    _adrHighLineId = _drawLabelledLine(x1, x2, adrHigh, adrColor, sharedLineWidth, adrLineStyle, sharedLineExtend, 'ADR High', sharedLabelStyle, adrColor, adrColor, sharedLabelSize, sharedLabelVisible, sharedLabelOffset, sharedLabelShowPrice)
+    _adrLowLineId = _drawLabelledLine(x1, x2, adrLow, adrColor, sharedLineWidth, adrLineStyle, sharedLineExtend, 'ADR Low', sharedLabelStyle, adrColor, adrColor, sharedLabelSize, sharedLabelVisible, sharedLabelOffset, sharedLabelShowPrice)
+    _awrHighLineId = _drawLabelledLine(x1, x2, awrHigh, awrColor, sharedLineWidth, adrLineStyle, sharedLineExtend, 'AWR High', sharedLabelStyle, awrColor, awrColor, sharedLabelSize, sharedLabelVisible, sharedLabelOffset, sharedLabelShowPrice)
+    _awrLowLineId = _drawLabelledLine(x1, x2, awrLow, awrColor, sharedLineWidth, adrLineStyle, sharedLineExtend, 'AWR Low', sharedLabelStyle, awrColor, awrColor, sharedLabelSize, sharedLabelVisible, sharedLabelOffset, sharedLabelShowPrice)
+    _amrHighLineId = _drawLabelledLine(x1, x2, amrHigh, amrColor, sharedLineWidth, adrLineStyle, sharedLineExtend, 'AMR High', sharedLabelStyle, amrColor, amrColor, sharedLabelSize, sharedLabelVisible, sharedLabelOffset, sharedLabelShowPrice)
+    _amrLowLineId = _drawLabelledLine(x1, x2, amrLow, amrColor, sharedLineWidth, adrLineStyle, sharedLineExtend, 'AMR Low', sharedLabelStyle, amrColor, amrColor, sharedLabelSize, sharedLabelVisible, sharedLabelOffset, sharedLabelShowPrice)
 
-    _yesterdayHighLineId = _drawLabelledLine(yesterdayHighLineId, x1, x2, yesterdayHigh, yhlColor, yhlLineWidth, yhlLineStyle, dwhlLineExtend, 'YH', dwhlLabelStyle, yhlColor, yhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible, dwhlLabelOffsetInBars, dwhlLabelShowPrice)
-    _yesterdayLowLineId = _drawLabelledLine(yesterdayLowLineId, x1, x2, yesterdayLow, yhlColor, yhlLineWidth, yhlLineStyle, dwhlLineExtend, 'YL', dwhlLabelStyle, yhlColor, yhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible, dwhlLabelOffsetInBars, dwhlLabelShowPrice)
-    _lastWeekHighLineId = _drawLabelledLine(lastWeekHighLineId, x1, x2, lastWeekHigh, lwhlColor, lwhlLineWidth, lwhlLineStyle, dwhlLineExtend, 'LWH', dwhlLabelStyle, lwhlColor, lwhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible, dwhlLabelOffsetInBars, dwhlLabelShowPrice)
-    _lastWeekLowLineId = _drawLabelledLine(lastWeekLowLineId, x1, x2, lastWeekLow, lwhlColor, lwhlLineWidth, lwhlLineStyle, dwhlLineExtend, 'LWL', dwhlLabelStyle, lwhlColor, lwhlLabelTextColor, dwhlLabelSize, dwhlLabelVisible, dwhlLabelOffsetInBars, dwhlLabelShowPrice)
+    array.push(linesArray, _yesterdayHighLineId)
+    array.push(linesArray, _yesterdayLowLineId)
+    array.push(linesArray, _lastWeekHighLineId)
+    array.push(linesArray, _lastWeekLowLineId)
+    array.push(linesArray, _adrHighLineId)
+    array.push(linesArray, _adrLowLineId)
+    array.push(linesArray, _awrHighLineId)
+    array.push(linesArray, _awrLowLineId)
+    array.push(linesArray, _amrHighLineId)
+    array.push(linesArray, _amrLowLineId)
 
-    [_yesterdayHighLineId, _yesterdayLowLineId, _lastWeekHighLineId, _lastWeekLowLineId]
+    // cleanup
+    if initialArraySize > 0
+        for i = 0 to initialArraySize
+            lineToDelete = array.shift(linesArray)
+            line.delete(lineToDelete)
 
+//////////////////////////////////////////////////////////////////
+// 
+// ==== EXECUTE ==== 
+// 
+//////////////////////////////////////////////////////////////////
 
-[_yesterdayHighLineId, _yesterdayLowLineId, _lastWeekHighLineId, _lastWeekLowLineId] = _drawDailyWeeklyHighLowLines()
+var line[] _lines = array.new_line(0)
+_drawDailyWeeklyHighLowLines(_lines)
 
-if na(_yesterdayHighLineId) or na(_yesterdayLowLineId) or na(_lastWeekHighLineId) or na(_lastWeekLowLineId)
-    yesterdayHighLineId := _yesterdayHighLineId
-    yesterdayLowLineId := _yesterdayLowLineId
-    lastWeekHighLineId := _lastWeekHighLineId
-    lastWeekLowLineId := _lastWeekLowLineId

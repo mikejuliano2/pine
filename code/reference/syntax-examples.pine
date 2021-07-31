@@ -69,6 +69,17 @@ COLOR_PINK = #e63a97
 COLOR_RED = #f21616
 COLOR_LIGHT_BLUE = #3179f5
 COLOR_MAGENTA = #d612f8
+COLOR_ORANGE = #f57f17
+COLOR_GOLD = #ffb74d
+COLOR_YELLOW = #ffeb3b
+COLOR_TEAL = #00bcd4
+COLOR_WHITE = #ffffff
+COLOR_BLUE = #1848cc
+COLOR_PURPLE = #3e31c4
+COLOR_GREY_ONE = #9598a1
+COLOR_GREEN = #4caf50
+COLOR_ROYAL_BLUE = #1848cc
+COLOR_TURQUOISE = #00897b
 COLOR_PEACH = #e57373
 // -------------------------------------------------
 // when you declare an array using var, it doesn't rebuild on every iteration

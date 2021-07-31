@@ -15,6 +15,7 @@ COLOR_TEAL = #00bcd4
 COLOR_WHITE = #ffffff
 COLOR_BLUE = #1848cc
 COLOR_PURPLE = #3e31c4
+COLOR_GREY_ONE = #9598a1
 
 //////////////////////////////////////////////////////////////////
 // 
