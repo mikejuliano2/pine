@@ -28,6 +28,8 @@ sizeChoices = [size.auto, size.tiny, size.small, size.normal, size.large, size.h
 textAlignChoices = [text.align_left, text.align_center, text.align_right]
 xlocChoices=[xloc.bar_index, xloc.bar_time]
 ylocChoices=[yloc.price, yloc.abovebar, yloc.belowbar]
+formatChoices = [format.inherit, format.price, format.volume]
+scaleChoices = [scale.none, scale.right, scale.left]
 // -------------------------------------------------
 // use yloc for placing markers
 label.new(bar_index[10], na, text="Label", yloc=yloc.abovebar)

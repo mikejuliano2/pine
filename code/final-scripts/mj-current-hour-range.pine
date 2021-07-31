@@ -78,6 +78,7 @@ _isFirstBarForCurrentTimeframeAtResolution(Resolution) =>
     not na(currentBar) and ( na(previousBar) or currentBar > previousBar)
 
 _print(_text) => var _label = label.new(bar_index, na, _text, xloc.bar_index, yloc.price, color(na), label.style_none, color.gray, size.large, text.align_left), label.set_xy(_label, bar_index, highest(10)[1]), label.set_text(_label, _text)
+_printNum(_num) => _print(tostring(_num))
 
 _getHoursElapsedThis4Hours() => 
     int hoursElapsedThis4Hours = 
