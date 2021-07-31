@@ -252,10 +252,11 @@ _drawLinesAndLabels(linesArray, labelsArray, valuesArray, _color, lineExtend) =>
         // create a label on the last bar (aka the current bar)
         // the `var` keyword will make it only create once
         // set_xy, and set_text will update the label
+
         labelId = label.new(
              x=labelTime,
              y=_price,
-             text=tostring(_price),
+             text=_timeDisplay(),
              textcolor=labelTextColor,
              style=labelStyle,
              size=labelSize,

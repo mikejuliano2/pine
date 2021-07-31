@@ -75,6 +75,26 @@ _isFirstBarForCurrentTimeframeAtResolution(Resolution) =>
     currentBar = t
     not na(currentBar) and ( na(previousBar) or currentBar > previousBar)
 
+COLOR_LIME = #1cd206
+COLOR_VOLT = #affd00
+COLOR_PINK = #e63a97
+COLOR_RED = #f21616
+COLOR_LIGHT_BLUE = #3179f5
+COLOR_MAGENTA = #d612f8
+COLOR_ORANGE = #f57f17
+COLOR_GOLD = #ffb74d
+COLOR_YELLOW = #ffeb3b
+COLOR_TEAL = #00bcd4
+COLOR_WHITE = #ffffff
+COLOR_BLUE = #1848cc
+COLOR_PURPLE = #3e31c4
+COLOR_GREY_ONE = #9598a1
+COLOR_GREEN = #4caf50
+COLOR_ROYAL_BLUE = #1848cc
+COLOR_TURQUOISE = #00897b
+COLOR_PEACH = #e57373
+COLOR_BLACK = #000000
+
 //////////////////////////////////////////////////////////////////
 // 
 // ==== VERTICAL HOUR LINES ==== 
@@ -86,12 +106,21 @@ _isFirstBarForCurrentTimeframeAtResolution(Resolution) =>
 // -----------------------
 
 groupVerticalHourLInes = 'Vertical Hour Lines'
-verticalHourLinesActive = input(false, 'Show Vertical Hour Lines', group=groupVerticalHourLInes)
-maxTimeFrameToShowVerticalLines = input(title='Max timeframe to show hourly vertical lines', defval=5, maxval=60, minval=1, group=groupVerticalHourLInes)
-hourLineColor = input(color.new(#fbc02d, 40), 'Vertical Hour Line Color', group=groupVerticalHourLInes)
-hourLineStyle = input(line.style_dashed, 'Vertical Hour Line Style', group=groupVerticalHourLInes, options=[line.style_solid, line.style_dashed, line.style_dotted])
-hourLineWidth = input(1, 'Vertical Hour Line Width', group=groupVerticalHourLInes, options=[1, 2, 3, 4])
+showLines = input(false, 'Show Lines', group=groupVerticalHourLInes)
+maxTimeFrameToShowLines = input(title='Max timeframe to show hourly vertical lines', defval=5, maxval=60, minval=1, group=groupVerticalHourLInes)
+lineColor = input(color.new(COLOR_GOLD, 40), 'Vertical Hour Line Color', group=groupVerticalHourLInes)
+lineStyle = input(line.style_dashed, 'Vertical Hour Line Style', group=groupVerticalHourLInes, options=[line.style_solid, line.style_dashed, line.style_dotted])
+lineWidth = input(1, 'Vertical Hour Line Width', group=groupVerticalHourLInes, options=[1, 2, 3, 4])
 numVerticalLinesBackward = input(6, 'Number of previous hour vertical lines to show', group=groupVerticalHourLInes, minval=0, maxval=100)
+
+showLabels = input(true, 'Show Labels?')
+labelSize = input(size.large, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large, size.huge])
+labelColor = input(color.new(COLOR_BLACK, 25), 'Label Color')
+labelTextColor = input(COLOR_VOLT, 'Label Text Color')
+labelStyle = input(label.style_label_up, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
+labelLocation = input(yloc.belowbar, 'Label Location', options=[yloc.price, yloc.abovebar, yloc.belowbar])
+
+var label[] labels = array.new_label(0)
 
 _isWithinVerticalHourLineLookbackPeriod() => 
     lookbackTimeInMs = MS_PER_DAY * numVerticalLinesBackward / 24
@@ -103,15 +132,33 @@ _isWithinVerticalHourLineLookbackPeriod() =>
 _plotVerticalLineAtIndex(BarIndex, Color, LineStyle, LineWidth) => // Verticle Line Function, ≈50-54 lines maximum allowable per indicator
     return = line.new(BarIndex, low - tr, BarIndex, high + tr, xloc.bar_index, extend.both, Color, LineStyle, LineWidth) // Suitable for study(overlay=true)
 
-_isAtOrBelowMaxTimeframe() => timeframe.multiplier <= maxTimeFrameToShowVerticalLines
+_isAtOrBelowMaxTimeframe() => timeframe.multiplier <= maxTimeFrameToShowLines
 
 _plotVerticalLineForNewBarsAtResolution(Resolution, Color, LineStyle, LineWidth, conditionsMet) =>
     isNewBar = _isFirstBarForCurrentTimeframeAtResolution(Resolution)
     barIndex = isNewBar and conditionsMet ? bar_index : na
-    _plotVerticalLineAtIndex(barIndex, hourLineColor, hourLineStyle, hourLineWidth)
+    _plotVerticalLineAtIndex(barIndex, lineColor, lineStyle, lineWidth)
+    barIndex
+
+_drawLabel() => 
+    isNewBar = _isFirstBarForCurrentTimeframeAtResolution('60')
+    conditionsMet = isNewBar and showLabels and _isWithinVerticalHourLineLookbackPeriod()
+    barIndex = conditionsMet ? bar_index : na
+    labelId = label.new(
+             x=showLabels ? barIndex : na,
+             y=high,
+             text=tostring(hour < 4 ? hour + 20 : hour - 4) + ':00',
+             textcolor=labelTextColor,
+             style=labelStyle,
+             size=labelSize,
+             xloc=xloc.bar_index,
+             yloc=labelLocation,
+             color=labelColor)
 
 _plotHourLines() =>
-    conditionsMet = _isAtOrBelowMaxTimeframe() and verticalHourLinesActive and _isWithinVerticalHourLineLookbackPeriod()
-    _plotVerticalLineForNewBarsAtResolution('60', hourLineColor, hourLineStyle, hourLineWidth, conditionsMet)
+    conditionsMet = _isAtOrBelowMaxTimeframe() and showLines and _isWithinVerticalHourLineLookbackPeriod()
+    barIndex = _plotVerticalLineForNewBarsAtResolution('60', lineColor, lineStyle, lineWidth, conditionsMet)
+
 
 _plotHourLines()
+_drawLabel()

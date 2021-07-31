@@ -158,7 +158,7 @@ groupYesterday = 'Yesterday'
 groupLastWeek = 'Last Week'
 groupAdr = 'ADR, AWR, AMR'
 
-COLOR_LIME = #1cd206
+COLOR_LIME = #1cd206F
 COLOR_VOLT = #affd00
 COLOR_PINK = #e63a97
 COLOR_RED = #f21616
