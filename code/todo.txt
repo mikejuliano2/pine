@@ -24,7 +24,6 @@ NON-CODE
 - quarters - add a max timeframe input for each level (whole => 1D, half => 60, quarter => 15)
 
 - pva volume overlay
-- convert ADR 
 - convert PVSRA
 - RDH/RDL
 
