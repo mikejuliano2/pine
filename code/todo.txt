@@ -26,6 +26,11 @@ NON-CODE
 - pva volume overlay
 - RDH/RDL
 
+LITSCRIPT
+- liquidations
+- pvsra
+
+
 ALERTS
 - alertcondition 13/50 cross
 - think carefully about alert management.  Times of day that would be good to get alerts.
