@@ -18,6 +18,7 @@ NON-CODE
 - SV marker
 - pins marker
 
+- session levels: max timeframe for filling sessions
 
 - add brinks high/low to lines
 - vertical hour lines - add labels, optionally just show labels and not lines
