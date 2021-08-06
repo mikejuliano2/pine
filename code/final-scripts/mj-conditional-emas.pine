@@ -38,7 +38,7 @@ emaConditional30mColor = input(color.new(COLOR_LIGHT_BLUE, 40), 'EMA Conditional
 showConditionalEma1hLine = input(false, 'Show Conditional 1h line?')
 showConditionalEma15mLine = input(false, 'Show Conditional 15m line?')
 showConditionalEma5mLine = input(false, 'Show Conditional 5m line?')
-showConditionalEma30mLine = input(false, 'Show Conditional 30m line?')
+// showConditionalEma30mLine = input(false, 'Show Conditional 30m line?')
 showConditionalEma1hLabel = input(true, 'Show Conditional 1h label?')
 showConditionalEma15mLabel = input(true, 'Show Conditional 15m label?')
 showConditionalEma5mLabel = input(true, 'Show Conditional 5m label?')
@@ -218,12 +218,12 @@ label.delete(labelConditional5m[1])
 // -----------------
 // Active
 allMarkersActive = input(true, 'Markers Active?', group=groupMarkers)
-marker5x13Active = input(false, 'Plot 5/13 Cross?', group=groupMarkers)
-marker5x50Active = input(false, 'Plot 5/50 Cross?', group=groupMarkers)
+// marker5x13Active = input(false, 'Plot 5/13 Cross?', group=groupMarkers)
+// marker5x50Active = input(false, 'Plot 5/50 Cross?', group=groupMarkers)
 marker13x50Active = input(true, 'Plot 13/50 Cross?', group=groupMarkers)
-marker13x200Active = input(false, 'Plot 13/200 Cross?', group=groupMarkers)
+// marker13x200Active = input(false, 'Plot 13/200 Cross?', group=groupMarkers)
 marker50x200Active = input(true, 'Plot 50/200 Cross?', group=groupMarkers)
-marker50x800Active = input(true, 'Plot 50/800 Cross?', group=groupMarkers)
+// marker50x800Active = input(true, 'Plot 50/800 Cross?', group=groupMarkers)
 marker200x800Active = input(true, 'Plot 200/800 Cross?', group=groupMarkers)
 // Color
 markerTextColorSameAsMarker = input(false, 'Text Color Same as Marker?', group=groupMarkers)
@@ -231,19 +231,19 @@ markerTextColorDefault = input(color.new(color.white, 0), 'Text Color Default', 
 markerCrossUpColor = input(color.new(COLOR_LIGHT_BLUE, 0), 'Cross Up Color', group=groupMarkers)
 markerCrossDownColor = input(color.new(COLOR_MAGENTA, 0), 'Cross Down Color', group=groupMarkers)
 // Opacity
-shapeOpacity5x13 = input(70, 'Shape Opacity 5x13', minval=0, maxval=100, group=groupMarkers)
-shapeOpacity5x50 = input(70, 'Shape Opacity 5x50', minval=0, maxval=100, group=groupMarkers)
+// shapeOpacity5x13 = input(70, 'Shape Opacity 5x13', minval=0, maxval=100, group=groupMarkers)
+// shapeOpacity5x50 = input(70, 'Shape Opacity 5x50', minval=0, maxval=100, group=groupMarkers)
 shapeOpacity13x50 = input(0, 'Shape Opacity 13x50', minval=0, maxval=100, group=groupMarkers)
-shapeOpacity13x200 = input(40, 'Shape Opacity 13x200', minval=0, maxval=100, group=groupMarkers)
+// shapeOpacity13x200 = input(40, 'Shape Opacity 13x200', minval=0, maxval=100, group=groupMarkers)
 shapeOpacity50x200 = input(0, 'Shape Opacity 50x200', minval=0, maxval=100, group=groupMarkers)
-shapeOpacity50x800 = input(20, 'Shape Opacity 50x800', minval=0, maxval=100, group=groupMarkers)
+// shapeOpacity50x800 = input(20, 'Shape Opacity 50x800', minval=0, maxval=100, group=groupMarkers)
 shapeOpacity200x800 = input(20, 'Shape Opacity 200x800', minval=0, maxval=100, group=groupMarkers)
-textOpacity5x13 = input(20, 'Text Opacity 5x13', minval=0, maxval=100, group=groupMarkers)
-textOpacity5x50 = input(20, 'Text Opacity 5x50', minval=0, maxval=100, group=groupMarkers)
+// textOpacity5x13 = input(20, 'Text Opacity 5x13', minval=0, maxval=100, group=groupMarkers)
+// textOpacity5x50 = input(20, 'Text Opacity 5x50', minval=0, maxval=100, group=groupMarkers)
 textOpacity13x50 = input(0, 'Text Opacity 13x50', minval=0, maxval=100, group=groupMarkers)
-textOpacity13x200 = input(10, 'Text Opacity 13x200', minval=0, maxval=100, group=groupMarkers)
+// textOpacity13x200 = input(10, 'Text Opacity 13x200', minval=0, maxval=100, group=groupMarkers)
 textOpacity50x200 = input(0, 'Text Opacity 50x200', minval=0, maxval=100, group=groupMarkers)
-textOpacity50x800 = input(10, 'Text Opacity 50x800', minval=0, maxval=100, group=groupMarkers)
+// textOpacity50x800 = input(10, 'Text Opacity 50x800', minval=0, maxval=100, group=groupMarkers)
 textOpacity200x800 = input(10, 'Text Opacity 200x800', minval=0, maxval=100, group=groupMarkers)
 
 upTextColor = markerTextColorSameAsMarker ? markerCrossUpColor : markerTextColorDefault
@@ -266,61 +266,66 @@ markerCrossUpPlotLocation = input(location.top, 'Shape Location Up', options=[lo
 markerCrossDownPlotLocation = input(location.top, 'Shape Location Down', options=[location.abovebar, location.belowbar, location.top, location.bottom, location.absolute], group=groupMarkers)
 markerShapeSize = size.small
 
-[isVisible5x13Up, isVisible5x13Down] = _getEmaCrossMarkerVisibility(ema5, ema13, marker5x13Active)
-[isVisible5x50Up, isVisible5x50Down] = _getEmaCrossMarkerVisibility(ema5, ema50, marker5x50Active)
+// [isVisible5x13Up, isVisible5x13Down] = _getEmaCrossMarkerVisibility(ema5, ema13, marker5x13Active)
+// [isVisible5x50Up, isVisible5x50Down] = _getEmaCrossMarkerVisibility(ema5, ema50, marker5x50Active)
 [isVisible13x50Up, isVisible13x50Down] = _getEmaCrossMarkerVisibility(ema13, ema50, marker13x50Active)
-[isVisible13x200Up, isVisible13x200Down] = _getEmaCrossMarkerVisibility(ema13, ema200, marker13x200Active)
+// [isVisible13x200Up, isVisible13x200Down] = _getEmaCrossMarkerVisibility(ema13, ema200, marker13x200Active)
 [isVisible50x200Up, isVisible50x200Down] = _getEmaCrossMarkerVisibility(ema50, ema200, marker50x200Active)
-[isVisible50x800Up, isVisible50x800Down] = _getEmaCrossMarkerVisibility(ema50, ema800, marker50x800Active)
+// [isVisible50x800Up, isVisible50x800Down] = _getEmaCrossMarkerVisibility(ema50, ema800, marker50x800Active)
 [isVisible200x800Up, isVisible200x800Down] = _getEmaCrossMarkerVisibility(ema200, ema800, marker200x800Active)
+
+// ***************
+// Had to deactivate some of these plots to make room for alerts.
+// Was getting max outputs (67) reached
+// ***************
 
 // ----------------------
 // 5x13
 // ----------------------
 
-plotshape(
-     series=isVisible5x13Up, 
-     text='5x13',
-     title='5x13Up', 
-     style=markerCrossUpPlotStyle, 
-     location=markerCrossUpPlotLocation, 
-     color=color.new(markerCrossUpColor, shapeOpacity5x13),
-     textcolor=color.new(upTextColor, textOpacity5x13),
-     size=markerShapeSize)
+// plotshape(
+//      series=isVisible5x13Up, 
+//      text='5x13',
+//      title='5x13Up', 
+//      style=markerCrossUpPlotStyle, 
+//      location=markerCrossUpPlotLocation, 
+//      color=color.new(markerCrossUpColor, shapeOpacity5x13),
+//      textcolor=color.new(upTextColor, textOpacity5x13),
+//      size=markerShapeSize)
 
-plotshape(
-     series=isVisible5x13Down, 
-     text='5x13',
-     title='5x13Down', 
-     style=markerCrossDownPlotStyle, 
-     location=markerCrossDownPlotLocation, 
-     color=color.new(markerCrossDownColor, shapeOpacity5x13),
-     textcolor=color.new(downTextColor, textOpacity5x13),
-     size=markerShapeSize)
+// plotshape(
+//      series=isVisible5x13Down, 
+//      text='5x13',
+//      title='5x13Down', 
+//      style=markerCrossDownPlotStyle, 
+//      location=markerCrossDownPlotLocation, 
+//      color=color.new(markerCrossDownColor, shapeOpacity5x13),
+//      textcolor=color.new(downTextColor, textOpacity5x13),
+//      size=markerShapeSize)
 
 // ----------------------
 // 5x50
 // ----------------------
 
-plotshape(
-     series=isVisible5x50Up, 
-     text='5x50',
-     title='5x50Up', 
-     style=markerCrossUpPlotStyle, 
-     location=markerCrossUpPlotLocation, 
-     color=color.new(markerCrossUpColor, shapeOpacity5x50),
-     textcolor=color.new(upTextColor, textOpacity5x50),
-     size=markerShapeSize)
+// plotshape(
+//      series=isVisible5x50Up, 
+//      text='5x50',
+//      title='5x50Up', 
+//      style=markerCrossUpPlotStyle, 
+//      location=markerCrossUpPlotLocation, 
+//      color=color.new(markerCrossUpColor, shapeOpacity5x50),
+//      textcolor=color.new(upTextColor, textOpacity5x50),
+//      size=markerShapeSize)
 
-plotshape(
-     series=isVisible5x50Down, 
-     text='5x50',
-     title='5x50Down', 
-     style=markerCrossDownPlotStyle, 
-     location=markerCrossDownPlotLocation, 
-     color=color.new(markerCrossDownColor, shapeOpacity5x50),
-     textcolor=color.new(downTextColor, textOpacity5x50),
-     size=markerShapeSize)
+// plotshape(
+//      series=isVisible5x50Down, 
+//      text='5x50',
+//      title='5x50Down', 
+//      style=markerCrossDownPlotStyle, 
+//      location=markerCrossDownPlotLocation, 
+//      color=color.new(markerCrossDownColor, shapeOpacity5x50),
+//      textcolor=color.new(downTextColor, textOpacity5x50),
+//      size=markerShapeSize)
 
 // ----------------------
 // 13x50
@@ -350,25 +355,25 @@ plotshape(
 // 13x200
 // ----------------------
 
-plotshape(
-     series=isVisible13x200Up, 
-     text='13x200',
-     title='13x200Up', 
-     style=markerCrossUpPlotStyle, 
-     location=markerCrossUpPlotLocation, 
-     color=color.new(markerCrossUpColor, shapeOpacity13x200),
-     textcolor=color.new(upTextColor, textOpacity13x200),
-     size=markerShapeSize)
+// plotshape(
+//      series=isVisible13x200Up, 
+//      text='13x200',
+//      title='13x200Up', 
+//      style=markerCrossUpPlotStyle, 
+//      location=markerCrossUpPlotLocation, 
+//      color=color.new(markerCrossUpColor, shapeOpacity13x200),
+//      textcolor=color.new(upTextColor, textOpacity13x200),
+//      size=markerShapeSize)
 
-plotshape(
-     series=isVisible13x200Down, 
-     text='13x200',
-     title='13x200Down', 
-     style=markerCrossDownPlotStyle, 
-     location=markerCrossDownPlotLocation, 
-     color=color.new(markerCrossDownColor, shapeOpacity13x200),
-     textcolor=color.new(downTextColor, textOpacity13x200),
-     size=markerShapeSize)
+// plotshape(
+//      series=isVisible13x200Down, 
+//      text='13x200',
+//      title='13x200Down', 
+//      style=markerCrossDownPlotStyle, 
+//      location=markerCrossDownPlotLocation, 
+//      color=color.new(markerCrossDownColor, shapeOpacity13x200),
+//      textcolor=color.new(downTextColor, textOpacity13x200),
+//      size=markerShapeSize)
 
 // ----------------------
 // 50x200
@@ -398,25 +403,25 @@ plotshape(
 // 50x800
 // ----------------------
 
-plotshape(
-     series=isVisible50x800Up, 
-     text='50x800',
-     title='50x800Up', 
-     style=markerCrossUpPlotStyle, 
-     location=markerCrossUpPlotLocation, 
-     color=color.new(markerCrossUpColor, shapeOpacity50x800),
-     textcolor=color.new(upTextColor, textOpacity50x800),
-     size=markerShapeSize)
+// plotshape(
+//      series=isVisible50x800Up, 
+//      text='50x800',
+//      title='50x800Up', 
+//      style=markerCrossUpPlotStyle, 
+//      location=markerCrossUpPlotLocation, 
+//      color=color.new(markerCrossUpColor, shapeOpacity50x800),
+//      textcolor=color.new(upTextColor, textOpacity50x800),
+//      size=markerShapeSize)
 
-plotshape(
-     series=isVisible50x800Down, 
-     text='50x800',
-     title='50x800Down', 
-     style=markerCrossDownPlotStyle, 
-     location=markerCrossDownPlotLocation, 
-     color=color.new(markerCrossDownColor, shapeOpacity50x800),
-     textcolor=color.new(downTextColor, textOpacity50x800),
-     size=markerShapeSize)
+// plotshape(
+//      series=isVisible50x800Down, 
+//      text='50x800',
+//      title='50x800Down', 
+//      style=markerCrossDownPlotStyle, 
+//      location=markerCrossDownPlotLocation, 
+//      color=color.new(markerCrossDownColor, shapeOpacity50x800),
+//      textcolor=color.new(downTextColor, textOpacity50x800),
+//      size=markerShapeSize)
 
 // ----------------------
 // 200x800
@@ -443,50 +448,17 @@ plotshape(
      size=markerShapeSize)
 
 
-// =====================================
-// MARKERS USING LABEL
-// =====================================
+/////////////////////////////////////////////////////////////
+//
+// === Alerts ===
+//
+/////////////////////////////////////////////////////////////
 
-// LABEL VARIABLES
-// markerCrossUpLabelStyle = input(label.style_arrowup, 'Label Style Up', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle], group=groupMarkers)
-// markerCrossDownLabelStyle = input(label.style_arrowdown, 'Label Style Down', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle], group=groupMarkers)
-// markerCrossUpLabelLocation = input(yloc.belowbar, 'Label Location Up', options=[yloc.price, yloc.abovebar, yloc.belowbar], group=groupMarkers)
-// markerCrossDownLabelLocation = input(yloc.abovebar, 'Label Location Down', options=[yloc.price, yloc.abovebar, yloc.belowbar], group=groupMarkers)
-// markerLabelSize = input(size.normal, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large, size.huge], group=groupMarkers)
+// alertcondition(cross(close, ema5), title='5 EMA Cross', message='{{ticker}} crossed the 5 EMA on the {{interval}}')
+alertcondition(cross(close, ema13), title='Price x 13', message='{{ticker}} crossed the 13 EMA on the {{interval}}')
+alertcondition(cross(close, ema50), title='Price x 50', message='{{ticker}} crossed the 50 EMA on the {{interval}}')
+alertcondition(cross(close, ema200), title='Price x 200', message='{{ticker}} crossed the 200 EMA on the {{interval}}')
+alertcondition(cross(close, ema800), title='Price x 800', message='{{ticker}} crossed the 800 EMA on the {{interval}}')
 
-// _drawEmaCrossMarkers(emaOne, emaTwo, labelText, markerActive) => 
-//     [showUpMarker, showDownMarker] = _getEmaCrossMarkerVisibility(emaOne, emaTwo, markerActive)
-
-//     label.new(
-//          showUpMarker ? bar_index : na, 
-//          showUpMarker ? high : na, 
-//          labelText, 
-//          xloc.bar_index,
-//          markerCrossUpLabelLocation,
-//          markerCrossUpColor,
-//          markerCrossUpLabelStyle,
-//          upTextColor,
-//          markerLabelSize,
-//          text.align_center,
-//          tooltip=labelText + ' Crossed Up')
-
-//     label.new(
-//          showDownMarker ? bar_index : na, 
-//          showDownMarker ? low : na, 
-//          labelText, 
-//          xloc.bar_index,
-//          markerCrossDownLabelLocation,
-//          markerCrossDownColor,
-//          markerCrossDownLabelStyle,
-//          downTextColor,
-//          markerLabelSize,
-//          text.align_center,
-//          tooltip=labelText + 'Crossed Down')
-
-// _drawEmaCrossMarkers(ema5, ema13, '5x13', marker5x13Active)
-// _drawEmaCrossMarkers(ema5, ema50, '5x50', marker5x50Active)
-// _drawEmaCrossMarkers(ema13, ema50, '13x50', marker13x50Active)
-// _drawEmaCrossMarkers(ema13, ema200, '13x200', marker13x200Active)
-// _drawEmaCrossMarkers(ema50, ema200, '50x200', marker50x200Active)
-// _drawEmaCrossMarkers(ema50, ema800, '50x800', marker50x800Active)
-// _drawEmaCrossMarkers(ema200, ema800, '200x800', marker200x800Active)
+alertcondition(cross(ema13, ema50), title='EMA Cross 13x50', message='{{ticker}} 13x50 on the {{interval}}')
+alertcondition(cross(ema50, ema200), title='EMA Cross 50x200', message='{{ticker}} 50x200 on the {{interval}}')
