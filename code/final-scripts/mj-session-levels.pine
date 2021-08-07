@@ -119,7 +119,7 @@ _drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText,
 
 //////////////////////////////////////////////////////////////////
 // 
-// ==== SESSION LEVELS ==== 
+// ==== INPUTS ==== 
 // 
 //////////////////////////////////////////////////////////////////
 
@@ -127,7 +127,6 @@ _drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText,
 // dependencies: dateUtils, plotUtils
 // -----------------------
 
-groupSessionLevels = 'Session Levels'
 groupOffset = 'Offset'
 groupFill = 'Fill'
 groupSwitches = 'Switches'
@@ -135,6 +134,7 @@ groupColors = 'Colors'
 groupTimeRanges = 'Time Ranges'
 groupLineStyle = 'Line Style'
 groupLabels = 'Labels'
+groupDailyOpenPlot='Daily Open Plot'
 
 // ----------------------------------------------------------------------------------
 // tooltips
@@ -151,7 +151,9 @@ londonHighLowPlotActive = input(true, 'Plot London HighLow?', group=groupSwitche
 nyOpenPlotActive = input(true, 'Plot NY Open?', group=groupSwitches)
 nyHighLowPlotActive = input(true, 'Plot New York HighLow?', group=groupSwitches)
 mt4DailyOpenLineActive = input(true, 'MT4 Daily Open Line Active', group=groupSwitches)
-fillAsianSession = input(false, 'Fill Asian Session?', group=groupSwitches)
+dailyOpenPlotActive = input(true, 'Daily Open Plot Active', group=groupSwitches)
+mt4DailyOpenPlotActive = input(true, 'MT4 Daily Open Plot Active', group=groupSwitches)
+fillAsianSession = input(true, 'Fill Asian Session?', group=groupSwitches)
 fillLondonSession = input(false, 'Fill London Session?', group=groupSwitches)
 fillNYSession = input(false, 'Fill NY Session?', group=groupSwitches)
 
@@ -169,30 +171,41 @@ sessionLevelsLineExtend = input(extend.none, 'Session Levels Line Extend', optio
 
 sessionLevelsHighLowLineStyle = input(line.style_solid, 'Line Style - H/L', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 sessionLevelsLineWidth = input(2, 'Line Width', group=groupLineStyle, options=[1,2,3,4])
-sessionLevelsLinesJoined = input(false, 'Join points?', group=groupLineStyle)
 
-asianOpenLineStyle = input(line.style_solid, 'Asian Open Line Style', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
-londonOpenLineStyle = input(line.style_solid, 'London Open Line Style', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
-nyOpenLineStyle = input(line.style_solid, 'NY Open Line Style', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
-mt4DailyOpenLineStyle = input(line.style_solid, 'MT4 Daily Open Line Style', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+asianOpenLineStyle = input(line.style_solid, 'Line Style - Asia Open', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+londonOpenLineStyle = input(line.style_solid, 'Line Style - London Open', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+nyOpenLineStyle = input(line.style_solid, 'Line Style - NY Open', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+dailyOpenLineStyle = input(line.style_solid, 'Line Style - Daily Open', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
 // fill
-asianOpenPlotStyle = input(plot.style_cross, 'Asian Open Plot Style', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-londonOpenPlotStyle = input(plot.style_circles, 'London Open Plot Style', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-nyOpenPlotStyle = input(plot.style_cross, 'NY Open Plot Style', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+
+sessionLevelsLinesJoined = input(false, 'Join points?', group=groupFill)
+asianOpenPlotStyle = input(plot.style_cross, 'Plot Style - Asia Open', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+londonOpenPlotStyle = input(plot.style_circles, 'Plot Style - London Open', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+nyOpenPlotStyle = input(plot.style_cross, 'Plot Style - NY Open', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
 
 sessionLevelsHighLowPlotStyle = input(plot.style_stepline, 'Plot Style - H/L', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
 sessionHighLowLineOpacity = input(30, 'Opacity - Session H/L', minval=0, maxval=100, group=groupFill)
-sessionFillOpacity = input(97, 'Opacity - Session Fill', minval=0, maxval=100, group=groupFill)
+sessionFillOpacity = input(85, 'Opacity - Session Fill', minval=0, maxval=100, group=groupFill)
 sessionLevelsOpenLineOpacity = input(10, 'Opacity - Open Line', minval=0, maxval=100, group=groupFill)
 sessionLevelsLookbackHours = input(180, 'Lookback Hours', input.integer, minval=0, maxval=24, tooltip=TT_LB, group=groupFill)
+sessionFillMaxTimeframe = input(title='Max Timeframe - Session Fill', defval=60, maxval=240, minval=1, group=groupFill)
+
+// daily open plot
+
+dailyOpenPlotStyle = input(plot.style_circles, 'Plot Style - Daily Open', group=groupDailyOpenPlot, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+mt4DailyOpenPlotStyle = input(plot.style_circles, 'Plot Style - MT4 Daily Open', group=groupDailyOpenPlot, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+dailyOpenPlotOpacity = input(0, 'Plot Opacity - Daily Open', group=groupDailyOpenPlot, minval=0, maxval=100)
+mt4DailyOpenPlotOpacity = input(50, 'Plot Opacity - MT4 Daily Open', group=groupDailyOpenPlot, minval=0, maxval=100)
+dailyOpenPlotMaxTimeframe = input(title='Max Timeframe', defval=60, maxval=240, minval=1, group=groupDailyOpenPlot)
 
 // colors
 
-asianMasterColor = input(#00897b, 'Asian Color', input.color, group=groupSessionLevels)
-londonMasterColor = input(#ff851a, 'London Color', input.color, group=groupSessionLevels)
-nyMasterColor = input(#fff176, 'New York Color', input.color, group=groupSessionLevels)
-mt4DailyOpenColor = input(#2962ff, 'MT4 Daily Open Color', input.color, group=groupSessionLevels)
+asianMasterColor = input(#00897b, 'Asian Color', input.color, group=groupColors)
+londonMasterColor = input(#ff851a, 'London Color', input.color, group=groupColors)
+nyMasterColor = input(#fff176, 'New York Color', input.color, group=groupColors)
+dailyOpenColor = input(#2962ff, 'Daily Open Color', input.color, group=groupColors)
+mt4DailyOpenColor = input(#2962ff, 'MT4 Daily Open Color', input.color, group=groupColors)
 
 // labels
 
@@ -206,7 +219,8 @@ sessionLabelShowPrice = input(false, 'Show Price in Label?', group=groupLabels)
 asianTimeRange = input('0000-0600:1234567', 'Asian Session Time', group=groupTimeRanges, type=input.session)
 londonTimeRange = input('0800-1600:1234567', 'London Session Time', group=groupTimeRanges, type=input.session)
 nyTimeRange = input('1330-2000:1234567', 'New York Session Time', group=groupTimeRanges, type=input.session)
-mt4DailyOpenTimeRange = input('2200-2201:1234567', 'MT4 Daily Open', group=groupTimeRanges, type=input.session)
+dailyOpenTimeRange = input('0000-0015:1234567', 'Daily Open Time', group=groupTimeRanges, type=input.session)
+mt4DailyOpenTimeRange = input('2200-2215:1234567', 'MT4 Daily Open Time', group=groupTimeRanges, type=input.session)
 
 _captureSessionLevels(timeRange) => 
     _inSession = _isInSession(timeRange)
@@ -258,35 +272,37 @@ _getLevelsColors(masterColor, inSession, openPlotActive, highLowPlotActive) =>
 
     [openLineColor, highLowLineColor, fillColor]    
 
-_getValuesForPlotting(timeRange, masterColor, openPlotActive, highLowPlotActive) => 
+_getValuesForSessionFillPlotting(timeRange, masterColor, openPlotActive, highLowPlotActive) => 
     isInSession = _isInSession(timeRange)
 
     [sessionHigh, sessionLow, sessionOpen] = _captureSessionLevels(timeRange)
     
     [openLineColor, highLowLineColor, fillColor] = _getLevelsColors(masterColor, isInSession, openPlotActive, highLowPlotActive)
 
-    conditionsMet = _isWithinSessionLevelsLookbackPeriod()
+    isWithinMaxTimeframe = timeframe.multiplier <= sessionFillMaxTimeframe
+    conditionsMet = _isWithinSessionLevelsLookbackPeriod() and isWithinMaxTimeframe
 
     if conditionsMet
         [sessionHigh, sessionLow, sessionOpen, openLineColor, highLowLineColor, fillColor]
     else 
         [na, na, na, na, na, na]
 
-// ====================================
-// Session Levels using plot
-// ====================================
+/////////////////////////////////////////////////////////
+// 
+// --- Session Levels using plot ---
+// 
+/////////////////////////////////////////////////////////
 
 // -------------
 // Plot + Fill
 // -------------
 
-[asianHigh, asianLow, asianOpen, asianOpenLineColor, asianHighLowLineColor, asianFillColor] = _getValuesForPlotting(
+[asianHigh, asianLow, asianOpen, asianOpenLineColor, asianHighLowLineColor, asianFillColor] = _getValuesForSessionFillPlotting(
      asianTimeRange, 
      asianMasterColor, 
      asianOpenPlotActive, 
      asianHighLowPlotActive)
-
-// asianPlotOpen  = plot(asianOpen,  "Asia Low",  asianOpenLineColor,  sessionLevelsLineWidth, asianOpenPlotStyle, join=sessionLevelsLinesJoined)
+// asianPlotOpen  = plot(asianOpen,  "Daily Open",  mt4DailyOpenColor,  sessionLevelsLineWidth, asianOpenPlotStyle, join=sessionLevelsLinesJoined)
 
 asianPlotHigh = plot(
       fillAsianSession ? asianHigh : na, 
@@ -305,7 +321,7 @@ asianPlotLow  = plot(
       join=sessionLevelsLinesJoined)
 fill(asianPlotHigh, asianPlotLow, asianFillColor)
 
-[londonHigh, londonLow, londonOpen, londonOpenLineColor, londonHighLowLineColor, londonFillColor] = _getValuesForPlotting(
+[londonHigh, londonLow, londonOpen, londonOpenLineColor, londonHighLowLineColor, londonFillColor] = _getValuesForSessionFillPlotting(
      londonTimeRange, 
      londonMasterColor, 
      londonOpenPlotActive, 
@@ -331,7 +347,7 @@ londonPlotLow  = plot(
 
 fill(londonPlotHigh, londonPlotLow, londonFillColor)
 
-[nyHigh, nyLow, nyOpen, nyOpenLineColor, nyHighLowLineColor, nyFillColor] = _getValuesForPlotting(
+[nyHigh, nyLow, nyOpen, nyOpenLineColor, nyHighLowLineColor, nyFillColor] = _getValuesForSessionFillPlotting(
       nyTimeRange, 
       nyMasterColor, 
       nyOpenPlotActive, 
@@ -357,18 +373,41 @@ nyPlotLow  = plot(
 
 fill(nyPlotHigh, nyPlotLow, nyFillColor)
 
+////////////////////////////////////////////////////////
+// 
+// ---- Daily Open Plot ---
+// 
+////////////////////////////////////////////////////////
+
 [mt4High, mt4Low, mt4Open] = _captureSessionLevels(mt4DailyOpenTimeRange)
+[dailyHigh, dailyLow, dailyOpen] = _captureSessionLevels(dailyOpenTimeRange)
+
+isValidTimeframeToPlotDailyOpen = timeframe.multiplier <= dailyOpenPlotMaxTimeframe
+
+dailyOpenPlot  = plot(
+     dailyOpenPlotActive and isValidTimeframeToPlotDailyOpen ? dailyOpen : na,  
+     "Daily Open",  
+     dailyOpenPlotActive ? color.new(dailyOpenColor, dailyOpenPlotOpacity) : na,  
+     sessionLevelsLineWidth, 
+     dailyOpenPlotStyle, 
+     join=sessionLevelsLinesJoined)
+
+mt4DailyOpenPlot  = plot(
+     mt4DailyOpenPlotActive and isValidTimeframeToPlotDailyOpen ? mt4Open : na,  
+     "MT4 Daily Open",  
+     mt4DailyOpenPlotActive ? color.new(mt4DailyOpenColor, mt4DailyOpenPlotOpacity) : na,  
+     sessionLevelsLineWidth, 
+     mt4DailyOpenPlotStyle, 
+     join=sessionLevelsLinesJoined)
 
 // ------------------
 // Labels
 // ------------------
 
-_drawSessionnLabel(x, y, text, style, size, Color, textColor) => 
-    x and y ? label.new(x, y, text, style=style, textcolor=textColor, color=color.new(Color, sessionLabelOpacity), size=size, xloc=xloc.bar_time) : na
+// _drawSessionnLabel(x, y, text, style, size, Color, textColor) => 
+//     x and y ? label.new(x, y, text, style=style, textcolor=textColor, color=color.new(Color, sessionLabelOpacity), size=size, xloc=xloc.bar_time) : na
 
-
-
-sessionLabelX2 = _getTimeNBarsFromNow(sessionLabelOffsetInBars)
+// sessionLabelX2 = _getTimeNBarsFromNow(sessionLabelOffsetInBars)
 
 // asianHighlabelId = _drawSessionnLabel(sessionLabelX2, asianHigh, 'Asia High', sessionLabelStyle, size.normal, asianMasterColor, color.white)
 // label.delete(asianHighlabelId[1])
@@ -385,9 +424,11 @@ sessionLabelX2 = _getTimeNBarsFromNow(sessionLabelOffsetInBars)
 // nyOpenLabelId = _drawSessionnLabel(sessionLabelX2, nyOpen, 'NY Open', sessionLabelStyle, size.normal, nyMasterColor, color.white)
 // label.delete(nyOpenLabelId[1])
 
-// ====================================
-// Session Levels using labelled lines
-// ====================================
+////////////////////////////////////////////////////////
+// 
+// ---- Labelled Lines ---
+// 
+////////////////////////////////////////////////////////
 
 var line asianOpenLineId = na
 var line asianHighLineId = na
@@ -599,7 +640,7 @@ _drawSessionLines() =>
          mt4DailyOpenLineActive ? mt4Open : na, 
          mt4DailyOpenColor, 
          sessionLevelsLineWidth, 
-         mt4DailyOpenLineStyle, 
+         dailyOpenLineStyle, 
          dailyOpenLineExtend, 
          'MT4 Open', 
          sessionLabelStyle, 

@@ -4,47 +4,27 @@
 // 
 //////////////////////////////////////////////////////////////////
 
+- M candles PVSRA
+- M Candles - optionally auto-set the higher TF from the lower
+- Marker on London Close
+- quarters - add a max timeframe input for each level (whole => 1D, half => 60, quarter => 15)
+- add brinks high/low to lines
+- SV marker
+- pins marker
+- RDH/RDL
+
+
+
+
 NON-CODE
 - compile a bundle of entry signal screenshots based on the TDI. Use vertical line to mark entry/exit.  Use date/price range
 - study how many candles is a valid retrace
 - analyze best times of day
 
-
-- TDI: plot when outside volatility band, then back in, then crosses signal
-- plot marker for TDI signals
-- mark the london close... good time for alert?
-- change divergence scripts to favor longer lines
-
-- SV marker
-- pins marker
-
-- session levels: max timeframe for filling sessions
-
-- add brinks high/low to lines
-- vertical hour lines - add labels, optionally just show labels and not lines
-- quarters - add a max timeframe input for each level (whole => 1D, half => 60, quarter => 15)
-
-- pva volume overlay
-- RDH/RDL
-
-LITSCRIPT
-- liquidations
-- pvsra
-
-M candles
-- get PVSRA on the higher TF candles
-- optionally auto-set the higher TF from the lower
-
-*** set alertcondition for each EMA ***
-
 ALERTS
-- alertcondition 13/50 cross
 - think carefully about alert management.  Times of day that would be good to get alerts.
 - create alertconditions for TDI
-- have a kill switch input for any script with alerts
-- 15 MFI cross
-- 60 MFI cross
-- 240 MFI cross
+- 15 MFI cross, 60 MFI cross, 240 MFI cross
 - add an alert for MCB divergence on the 15 min
 - on vector candle that has a body some percentage above the average body size
 - on TDI divergence

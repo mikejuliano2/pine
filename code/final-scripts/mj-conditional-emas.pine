@@ -454,11 +454,10 @@ plotshape(
 //
 /////////////////////////////////////////////////////////////
 
-// alertcondition(cross(close, ema5), title='5 EMA Cross', message='{{ticker}} crossed the 5 EMA on the {{interval}}')
-alertcondition(cross(close, ema13), title='Price x 13', message='{{ticker}} crossed the 13 EMA on the {{interval}}')
-alertcondition(cross(close, ema50), title='Price x 50', message='{{ticker}} crossed the 50 EMA on the {{interval}}')
-alertcondition(cross(close, ema200), title='Price x 200', message='{{ticker}} crossed the 200 EMA on the {{interval}}')
-alertcondition(cross(close, ema800), title='Price x 800', message='{{ticker}} crossed the 800 EMA on the {{interval}}')
+alertcondition(cross(close, ema13), title='Price x 13', message='{{ticker}} Price x 13 on the {{interval}}')
+alertcondition(cross(close, ema50), title='Price x 50', message='{{ticker}} Price x 50 on the {{interval}}')
+alertcondition(cross(close, ema200), title='Price x 200', message='{{ticker}} Price x 200 on the {{interval}}')
+alertcondition(cross(close, ema800), title='Price x 800', message='{{ticker}} Price x 800 on the {{interval}}')
 
-alertcondition(cross(ema13, ema50), title='EMA Cross 13x50', message='{{ticker}} 13x50 on the {{interval}}')
-alertcondition(cross(ema50, ema200), title='EMA Cross 50x200', message='{{ticker}} 50x200 on the {{interval}}')
+alertcondition(cross(ema13, ema50), title='EMA Cross 13x50', message='{{ticker}} 13 x 50 on the {{interval}}')
+alertcondition(cross(ema50, ema200), title='EMA Cross 50x200', message='{{ticker}} 50 x 200 on the {{interval}}')
