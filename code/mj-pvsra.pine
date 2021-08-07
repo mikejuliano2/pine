@@ -1,0 +1,158 @@
+//@version=4
+
+study("MJ - PVSRA", overlay=true, precision=0, scale=scale.none)
+
+//////////////////////////////////////////////////
+// 
+// === INFO ===
+// 
+//////////////////////////////////////////////////
+
+// PVSRA
+// From MT4 source:
+
+//   Situation "Climax"
+//   Bars with volume >= 200% of the average volume of the 10 previous chart TFs, and bars
+//   where the product of candle spread x candle volume is >= the highest for the 10 previous
+//   chart time TFs.
+//   Default Colors:  Bull bars are green and bear bars are red.
+
+//   Situation "Volume Rising Above Average"
+//   Bars with volume >= 150% of the average volume of the 10 previous chart TFs.
+//   Default Colors:  Bull bars are blue and bear are blue-violet.
+
+// We want to be able to override where we get the volume data for the candles.
+
+//////////////////////////////////////////////////
+// 
+// === INPUTS ===
+// 
+//////////////////////////////////////////////////
+
+groupOverlay = 'Overlay'
+groupColors = 'Colors'
+groupSymbol = 'Symbol'
+
+// OVERLAY
+overlayEnabled = input(true, 'Enabled', group=groupOverlay)
+overlayScreenPercentage = input(8, 'Screen %', minval=1, maxval=100, group=groupOverlay)
+overlayOpacity = input(30, 'Opacity', minval=0, maxval=100, group=groupOverlay)
+overlayStyle = input(plot.style_histogram, 'Plot Style', group=groupOverlay, options=[plot.style_columns, plot.style_histogram, plot.style_area, plot.style_areabr, plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+overlayLineWidth = input(4, 'Line Width', group=groupOverlay)
+
+// COLORS
+climaxVolBullColor = input(color.lime, 'Climax Bull Color', group=groupColors)
+climaxVolBearColor = input(color.red, 'Climax Bear Color', group=groupColors)
+aboveAvgVolBullColor = input(color.blue, 'Above Average Volume Bull Color', group=groupColors)
+aboveAvgVolBearColor = input(color.fuchsia, 'Above Average Volume Bear Color', group=groupColors)
+standardVolBullColor = input(#999999, 'Standard Volume Bull Color', group=groupColors)
+standardVolBearColor = input(#4d4d4d, 'Standard Volume Bear Color', group=groupColors)
+
+// SYMBOL
+overrideSymbol = input(false, 'Override chart symbol?', group=groupSymbol)
+
+pvsraSymbol = input(
+  defval="INDEX:BTCUSD", 
+  title="Symbol to use for volume candles", 
+  group=groupSymbol, 
+  type=input.symbol, 
+  tooltip="You can use INDEX:BTCUSD or you can combine multiple feeds, for example '(BINANCE:BTCUSDT+COINBASE:BTCUSD)'. Note that adding too many will slow things down.")
+
+//////////////////////////////////////////////////
+// 
+// === FUNCTIONS ===
+// 
+//////////////////////////////////////////////////
+
+_print(_text) => var _label = label.new(bar_index, na, _text, xloc.bar_index, yloc.price, color(na), label.style_none, color.gray, size.large, text.align_left), label.set_xy(_label, bar_index, highest(10)[1]), label.set_text(_label, _text)
+_printNum(_num) => _print(tostring(_num))
+
+_pvsraSecurity(sresolution, sseries) => security(
+      overrideSymbol ? pvsraSymbol : syminfo.tickerid,
+      sresolution,
+      sseries[barstate.isrealtime ? 1 : 0], 
+      barmerge.gaps_off,
+      barmerge.lookahead_off)
+
+
+_getBarColorByVolWeight(volWeight, _open, _close) => 
+    if _close > _open
+        volWeight == 1 
+          ? climaxVolBullColor 
+          : volWeight == 2 
+              ? aboveAvgVolBullColor 
+              : standardVolBullColor
+    else
+        volWeight == 1 
+          ? climaxVolBearColor 
+          : volWeight == 2 
+              ? aboveAvgVolBearColor 
+              : standardVolBearColor
+
+
+_getVolumeWeight(_open, _high, _low, _close, _vol) => 
+    // The math below matches MT4 PVSRA indicator source
+    avgVol = sma(_vol, 10) // average volume from last 10 candles
+    volWeightedPriceSpread = _vol * (_high - _low) //climax volume on the previous candle
+    highestVolWeightedPriceSpread = highest(volWeightedPriceSpread, 10) // highest climax volume of the last 10 candles
+
+    isClimaxVolume = _vol >= (avgVol * 2) or volWeightedPriceSpread >= highestVolWeightedPriceSpread
+    isAboveAvgVolume = _vol >= avgVol * 1.5 and not isClimaxVolume
+    volWeight = isClimaxVolume ? 1 : isAboveAvgVolume ? 2 : 0
+
+
+//////////////////////////////////////////////////
+// 
+// === CALCULATIONS ===
+// 
+//////////////////////////////////////////////////
+
+_vol = overrideSymbol ? _pvsraSecurity("", volume) : volume
+_high = overrideSymbol ? _pvsraSecurity("", high) : high
+_low = overrideSymbol ? _pvsraSecurity("", low) : low
+_open = overrideSymbol ? _pvsraSecurity("", open) : open
+_close = overrideSymbol ? _pvsraSecurity("", close) : close
+
+volWeight = _getVolumeWeight(_open, _high, _low, _close, _vol)
+barColor = _getBarColorByVolWeight(volWeight, _open, _close)
+
+//////////////////////////////////////////////////
+// 
+// === PLOT ===
+// 
+//////////////////////////////////////////////////
+
+barcolor(barColor) 
+
+//////////////////////////////////////////////////
+// 
+// === VOLUME OVERLAY ===
+// 
+//////////////////////////////////////////////////
+
+// to scale the volume overlay
+// we get the max volume of the last 100 candles
+// then multiple the volume to plot be the scale percentage defined in inputs
+
+maxVolOfLastNCandles = max(_vol, 100)
+scaledVolume = _vol * overlayScreenPercentage / 100
+
+// plot the max vol (transparent)
+plot(maxVolOfLastNCandles, color=color.new(color.blue, 100))
+
+// plot the volume overlay
+plot(
+  series=overlayEnabled ? scaledVolume : na, 
+  style=overlayStyle, 
+  color=color.new(barColor, overlayOpacity), 
+  linewidth=overlayLineWidth
+  )
+
+//////////////////////////////////////////////////
+// 
+// === ALERTS ===
+// 
+//////////////////////////////////////////////////
+
+alertcondition(volWeight == 2, title="Alert on Green or Red Candle", message="{{ticker}} Green or Red Candle on the {{interval}}")
+alertcondition(volWeight > 0, title="Alert on Vector Candle", message="{{ticker}} Vector Candle on the {{interval}}")

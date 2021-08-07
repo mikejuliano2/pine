@@ -1,0 +1,143 @@
+//@version=4
+study("MJ - M Candles", overlay=true)
+
+//////////////////////////////////////////////////////////
+// 
+// === INPUTS ===
+// 
+//////////////////////////////////////////////////////////
+
+groupColors = 'Colors'
+
+useAutoResolution = input(true, 'Use Auto Resolution?', tooltip='Auto-adjust the higher timeframe resolution based on the current timeframe')
+usePvsraColor = input(true, 'Use PVSRA Candle Color')
+fixedResolution = input("60", 'Fixed Resolution', type=input.resolution, tooltip='Only Relevant if auto resolution is off')
+maxTimeframe = input(60, 'Max Timeframe', minval=1, maxval=240)
+
+fillOpacity = input(90, 'Opacity - Fill', minval=0, maxval=100)
+borderOpacity = input(0, 'Opacity - Border', minval=0, maxval=100)
+wickWidth = input(2.0, title="Wick width in bars", step=0.1) * timeframe.multiplier /  2
+
+// COLORS
+
+climaxVolBullColor = input(color.lime, 'Climax Bull Color', group=groupColors)
+climaxVolBearColor = input(color.red, 'Climax Bear Color', group=groupColors)
+aboveAvgVolBullColor = input(color.blue, 'Above Average Volume Bull Color', group=groupColors)
+aboveAvgVolBearColor = input(color.fuchsia, 'Above Average Volume Bear Color', group=groupColors)
+standardVolBullColor = input(#999999, 'Standard Volume Bull Color', group=groupColors)
+standardVolBearColor = input(#4d4d4d, 'Standard Volume Bear Color', group=groupColors)
+
+//////////////////////////////////////////////////////////
+// 
+// === CALCULATIONS ===
+// 
+//////////////////////////////////////////////////////////
+
+intervalValue = timeframe.isintraday ? timeframe.multiplier : timeframe.multiplier * 1440
+
+_getAutoResolution(_interval) => 
+    _interval == 1 
+      ? '15' 
+      : _interval <= 5  
+         ? '60' 
+         : _interval <= 60 
+          ? '240' 
+          : '1D'
+
+_resolution = useAutoResolution ? _getAutoResolution(intervalValue) : fixedResolution     
+_interval = security(syminfo.tickerid, _resolution, intervalValue)
+
+_security(expression) => 
+     security(syminfo.tickerid, _resolution, expression, barmerge.gaps_off, barmerge.lookahead_on)
+
+_open = _security(open)
+_close = _security(close)
+_high = _security(high)
+_low = _security(low)
+_vol = _security(volume)
+
+isValidTimeframe = timeframe.isintraday and timeframe.multiplier <= maxTimeframe
+
+minuteOfDay = (hour * 60) + minute
+midpoint = floor(_interval / 2)
+isWickTime = ((minuteOfDay % _interval > midpoint - wickWidth) and (minuteOfDay % _interval  <= midpoint + wickWidth)) ? true : false
+isBullish = _close >= _open
+
+bodyMax = isBullish ? _close : _open
+bodyMin = isBullish ? _open : _close
+
+bodyTopBorder = isWickTime ? na : bodyMax
+bodyBottomBorder = isWickTime ? na : bodyMin
+wickTopBorder = isWickTime ? _high : na
+wickBottomBorder = isWickTime ? _low : na
+
+topBorder = isWickTime ? wickTopBorder : bodyTopBorder
+bottomBorder = isWickTime ? wickBottomBorder : bodyBottomBorder
+borderPlotStyle = plot.style_stepline
+
+//////////////////////////////////////////////////////////
+// 
+// === PVSRA Color ===
+// 
+//////////////////////////////////////////////////////////
+
+_getBarColorByVolWeight(volWeight, _open, _close) => 
+    if _close > _open
+        volWeight == 1 
+          ? climaxVolBullColor 
+          : volWeight == 2 
+              ? aboveAvgVolBullColor 
+              : standardVolBullColor
+    else
+        volWeight == 1 
+          ? climaxVolBearColor 
+          : volWeight == 2 
+              ? aboveAvgVolBearColor 
+              : standardVolBearColor
+
+_volWeightedPriceSpread() => volume * (high - low)
+_highestVolWeightedPriceSpread() => highest(_volWeightedPriceSpread(), 10)
+
+_getVolumeWeight(_open, _high, _low, _close, _vol) => 
+    // The math below matches MT4 PVSRA indicator source
+    avgVol = _security(sma(volume, 10)) // average volume from last 10 candles
+    volWeightedPriceSpread = _security(_volWeightedPriceSpread()) //climax volume on the previous candle
+    highestVolWeightedPriceSpread = _security(_highestVolWeightedPriceSpread()) // highest climax volume of the last 10 candles
+
+    isClimaxVolume = _vol >= (avgVol * 2) or volWeightedPriceSpread >= highestVolWeightedPriceSpread
+    isAboveAvgVolume = _vol >= avgVol * 1.5 and not isClimaxVolume
+    volWeight = isClimaxVolume ? 1 : isAboveAvgVolume ? 2 : 0
+
+_getColor(_open, _high, _low, _close, _vol) =>
+    if usePvsraColor
+        volWeight = _getVolumeWeight(_open, _high, _low, _close, _vol)
+        barColor = _getBarColorByVolWeight(volWeight, _open, _close)
+    else
+        isBullish ? climaxVolBullColor : climaxVolBearColor
+
+
+_color = _getColor(_open, _high, _low, _close, _vol)
+borderColor = color.new(_color, borderOpacity)
+fillColor = color.new(_color, fillOpacity)
+
+//////////////////////////////////////////////////////////
+// 
+// === PLOT ===
+// 
+//////////////////////////////////////////////////////////
+
+topBorderPlot = plot(
+      isValidTimeframe ? topBorder : na, 
+      color=borderColor, 
+      title="Top Border", 
+      style=borderPlotStyle
+      )
+
+bottomBorderPlot = plot(
+      isValidTimeframe ? bottomBorder : na, 
+      color=borderColor, 
+      title="Bottom Border", 
+      style=borderPlotStyle
+      )      
+
+fill(topBorderPlot, bottomBorderPlot, fillColor)
