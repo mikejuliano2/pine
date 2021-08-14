@@ -136,6 +136,7 @@ groupTimeRanges = 'Time Ranges'
 groupLineStyle = 'Line Style'
 groupLabels = 'Labels'
 groupDailyOpenPlot='Daily Open Plot'
+groupMarkers='Markers'
 
 // ----------------------------------------------------------------------------------
 // tooltips
@@ -698,3 +699,90 @@ if na(_londonLowLineId)
 
 if na(_mt4DailyOpenLineId)
     mt4DailyOpenLineId := _mt4DailyOpenLineId
+
+
+/////////////////////////////////////////////////////////////
+// 
+// --- MARKERS ---
+//
+/////////////////////////////////////////////////////////////
+
+didCrossMT4DailyOpen = cross(close, mt4Open)
+didCrossDailyOpen = cross(close, asianOpen)
+didCrossNyOpen = cross(close, nyOpen)
+didCrossLondonOpen = cross(close, londonOpen)
+
+markerCrossPlotStyle = input(
+     shape.xcross, 
+     'Cross Marker Style', 
+     options=[shape.xcross, shape.cross, shape.triangleup, shape.triangledown, shape.flag, shape.circle, shape.arrowup, shape.arrowdown, shape.labelup, shape.labeldown, shape.square, shape.diamond], 
+     group=groupMarkers)
+
+markerCrossPlotLocation = input(
+     location.bottom, 
+     'Cross Marker Location', 
+     options=[location.abovebar, location.belowbar, location.top, location.bottom, location.absolute], 
+     group=groupMarkers)
+
+markerOpacity = input(10, 'Marker Shape Opacity', minval=0, maxval=100, group=groupMarkers)
+markerTextOpacity = input(0, 'Marker Text Opacity', minval=0, maxval=100, group=groupMarkers)
+markerShapeSize = size.small // must be constant or compiler will complain
+
+markerTextColorSameAsMarkerColor = input(false, 'Text Color Same As Marker Color?', group=groupMarkers)
+showCrossMarkerMt4Open = input(false, 'Show Cross Marker - MT4 Daily Open', group=groupMarkers)
+showCrossMarkerDailyOpen = input(true, 'Show Cross Marker - Daily Open', group=groupMarkers)
+showCrossMarkerNyOpen = input(false, 'Show Cross Marker - NY Open', group=groupMarkers)
+showCrossMarkerLondonOpen = input(false, 'Show Cross Marker - London Open', group=groupMarkers)
+
+_markerTextColor(baseColor) => color.new(markerTextColorSameAsMarkerColor ? baseColor : color.white, markerTextOpacity)
+
+plotshape(
+     series=showCrossMarkerMt4Open ? didCrossMT4DailyOpen : na, 
+     text='MT4',
+     title='Cross - MT4 Daily Open', 
+     style=markerCrossPlotStyle, 
+     location=markerCrossPlotLocation, 
+     color=color.new(mt4DailyOpenColor, markerOpacity),
+     textcolor=_markerTextColor(mt4DailyOpenColor),
+     size=markerShapeSize)
+
+plotshape(
+     series=showCrossMarkerDailyOpen ? didCrossDailyOpen : na, 
+     text='D',
+     title='Cross - Daily Open', 
+     style=markerCrossPlotStyle, 
+     location=markerCrossPlotLocation, 
+     color=color.new(dailyOpenColor, markerOpacity),
+     textcolor=_markerTextColor(dailyOpenColor),
+     size=markerShapeSize)
+
+plotshape(
+     series=showCrossMarkerNyOpen ? didCrossNyOpen : na, 
+     text='NY',
+     title='Cross - NY Open', 
+     style=markerCrossPlotStyle, 
+     location=markerCrossPlotLocation, 
+     color=color.new(nyMasterColor, markerOpacity),
+     textcolor=_markerTextColor(nyMasterColor),
+     size=markerShapeSize)
+
+plotshape(
+     series=showCrossMarkerLondonOpen ? didCrossLondonOpen : na, 
+     text='L',
+     title='Cross - London', 
+     style=markerCrossPlotStyle, 
+     location=markerCrossPlotLocation, 
+     color=color.new(londonMasterColor, markerOpacity),
+     textcolor=_markerTextColor(londonMasterColor),
+     size=markerShapeSize)
+
+/////////////////////////////////////////////////////////////
+// 
+// --- ALERTS ---
+//
+/////////////////////////////////////////////////////////////
+
+alertcondition(didCrossMT4DailyOpen, title='Price x MT4 Daily Open', message='{{ticker}} Price x MT4 Daily Open')
+alertcondition(didCrossDailyOpen, title='Price x Daily Open', message='{{ticker}} Price x Daily Open')
+alertcondition(didCrossNyOpen, title='Price x NY Open', message='{{ticker}} Price x NY Open')
+alertcondition(didCrossLondonOpen, title='Price x London Open', message='{{ticker}} Price x London Open')     

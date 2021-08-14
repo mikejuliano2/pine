@@ -4,6 +4,13 @@
 // 
 //////////////////////////////////////////////////////////////////
 
+alert condition for daily open
+make the pvsra average input (10) tweakable
+alert for 800 ema
+some way to indicate that we are in high/low volume time
+color each ema cross marker differently
+camarilla pivots
+
 - quarters - add a max timeframe input for each level (whole => 1D, half => 60, quarter => 15)
 - add brinks high/low to lines
 - SV marker
@@ -18,7 +25,7 @@ NON-CODE
 
 ALERTS
 - think carefully about alert management.  Times of day that would be good to get alerts.
-- create alertconditions for TDI
+- alert when open interest shifts >= some percentage
 - 15 MFI cross, 60 MFI cross, 240 MFI cross
 - add an alert for MCB divergence on the 15 min
 - on vector candle that has a body some percentage above the average body size
