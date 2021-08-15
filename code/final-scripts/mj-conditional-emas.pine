@@ -62,7 +62,7 @@ showConditionalEma30mLabel = input(true, 'Show Conditional 30m label?', group=gr
 // --------------------------
 
 lineWidth = input(1, 'EMA Line Width', options=[1,2,3,4], group=groupLines)
-lineOpacity = input(20, 'Line Opacity', maxval=100, minval=0, group=groupLines)
+lineOpacity = input(0, 'Line Opacity', maxval=100, minval=0, group=groupLines)
 
 // --------------------------
 // Labels
@@ -253,7 +253,7 @@ marker50x200Active = input(true, 'Plot 50/200 Cross?', group=groupMarkers)
 marker50x800Active = input(true, 'Plot 50/800 Cross?', group=groupMarkers)
 marker200x800Active = input(true, 'Plot 200/800 Cross?', group=groupMarkers)
 // Color
-invertMarkerColors = input(false, 'Invert Marker/Text Color?', group=groupMarkers)
+invertMarkerColors = input(true, 'Invert Marker/Text Color?', group=groupMarkers)
 markerTextColorDefault = input(color.new(color.white, 0), 'Text Color Default', group=groupMarkers)
 markerCrossUpColor = input(color.new(COLOR_LIGHT_BLUE, 0), 'Cross Up Color', group=groupMarkers)
 markerCrossDownColor = input(color.new(COLOR_MAGENTA, 0), 'Cross Down Color', group=groupMarkers)

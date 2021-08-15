@@ -2,6 +2,26 @@
 
 study("MJ - Pivots", overlay=true)
 
+COLOR_VOLT = #affd00
+COLOR_PINK = #e63a97
+COLOR_RED = #f21616
+COLOR_LIGHT_BLUE = #3179f5
+COLOR_MAGENTA = #d612f8
+COLOR_ORANGE = #f57f17
+COLOR_GOLD = #ffb74d
+COLOR_YELLOW = #ffeb3b
+COLOR_TEAL = #00bcd4
+COLOR_WHITE = #ffffff
+COLOR_BLUE = #1848cc
+COLOR_PURPLE = #3e31c4
+COLOR_GREY_ONE = #9598a1
+COLOR_GREEN = #4caf50
+COLOR_ROYAL_BLUE = #1848cc
+COLOR_TURQUOISE = #00897b
+COLOR_PEACH = #e57373
+COLOR_POWDER_BLUE = #5b9cf6
+COLOR_LAVENDER = #7e57c2
+
 //////////////////////////////////////////////////////////////////
 // 
 // ==== DATE UTILS ==== 
@@ -66,7 +86,7 @@ _isFirstOrLastFiveMinOfAnyHour() =>
     _isInSession('2355-0005') or _isInSession('0055-0105') or _isInSession('0155-0205') or _isInSession('0255-0305') or _isInSession('0355-0405') or _isInSession('0455-0505') or _isInSession('0555-0605') or _isInSession('0655-0705') or _isInSession('0755-0805') or _isInSession('0855-0905') or _isInSession('0955-1005') or _isInSession('1055-1105') or _isInSession('1155-1205') or _isInSession('1255-1305') or _isInSession('1355-1405') or _isInSession('1455-1505') or _isInSession('1555-1605') or _isInSession('1655-1705') or _isInSession('1755-1805') or _isInSession('1855-1905') or _isInSession('1955-2005') or _isInSession('2055-2105') or _isInSession('2155-2205') or _isInSession('2255-2305')    
 
 _isLastBarForCurrentTimeframeAtResolution(Resolution) =>
-    t = time(Resolution, session.regular) // e.g. "1440" = Daily Resolution
+    t = time(Resolution, session.regular) // e.g. "1440" = DailyF Resolution
     not na(t[1]) and na(t) or t[1] < t
 
 _isFirstBarForCurrentTimeframeAtResolution(Resolution) =>
@@ -124,25 +144,50 @@ _drawLabelledLine(x1, x2, y, _color, _width, _style, _extend, labelText, labelSt
 // 
 //////////////////////////////////////////////////////////////////
 
-dayHigh = security(syminfo.tickerid, 'D', high[1], lookahead=true)
-dayLow = security(syminfo.tickerid, 'D', low[1], lookahead=true)
-dayOpen = security(syminfo.tickerid, 'D', open[1], lookahead=true)
-dayClose = security(syminfo.tickerid, 'D', close[1], lookahead=true)
+_high = security(syminfo.tickerid, 'D', high[1], lookahead=true)
+_low = security(syminfo.tickerid, 'D', low[1], lookahead=true)
+_open = security(syminfo.tickerid, 'D', open[1], lookahead=true)
+_close = security(syminfo.tickerid, 'D', close[1], lookahead=true)
+_range = _high - _low
+
 // weekHigh = security(syminfo.tickerid, 'W', high[1], lookahead=9true)
 // weekLow = security(syminfo.tickerid, 'W', low[1], lookahead=true)
-pivotPoint = (dayHigh + dayLow + dayClose)/3
-pivR1 = (2 * pivotPoint) - dayLow
-pivS1 = (2 * pivotPoint) - dayHigh
-pivR2 = pivotPoint-pivS1+pivR1
-pivS2 = pivotPoint-pivR1+pivS1
-pivR3 = (2*pivotPoint)+(dayHigh-(2*dayLow))
-pivS3 = (2*pivotPoint)-((2*dayHigh)-dayLow)
-m0C = (pivS2+pivS3)/2
-m1C = (pivS1+pivS2)/2
-m2C = (pivotPoint+pivS1)/2
-m3C = (pivotPoint+pivR1)/2
-m4C = (pivR1+pivR2)/2
-m5C = (pivR2+pivR3)/2
+
+// ------------------
+// Standard
+// ------------------
+
+pp = (_high + _low + _close)/3
+r1 = (2 * pp) - _low
+s1 = (2 * pp) - _high
+r2 = pp-s1+r1
+s2 = pp-r1+s1
+r3 = (2*pp)+(_high-(2*_low))
+s3 = (2*pp)-((2*_high)-_low)
+m0 = (s2+s3)/2
+m1 = (s1+s2)/2
+m2 = (pp+s1)/2
+m3 = (pp+r1)/2
+m4 = (r1+r2)/2
+m5 = (r2+r3)/2
+
+// ------------------
+// Camarilla
+// ------------------
+
+h5 = (_high/_low) * _close 
+h4 = _close + _range * 1.1 / 2.0
+h3 = _close + _range * 1.1 / 4.0
+h2 = _close + _range * 1.1 / 6.0
+h1 = _close + _range * 1.1 / 12.0
+l1 = _close - _range * 1.1 / 12.0
+l2 = _close - _range * 1.1 / 6.0
+l3 = _close - _range * 1.1 / 4.0
+l4 = _close - _range * 1.1 / 2.0
+h6 = h5 + 1.168 * (h5 - h4) 
+l5 = _close - (h5 - _close)
+l6 = _close - (h6 - _close)
+
 
 //////////////////////////////////////////////////////////////////
 // 
@@ -150,71 +195,158 @@ m5C = (pivR2+pivR3)/2
 // 
 //////////////////////////////////////////////////////////////////
 
-groupPivot = 'Pivot'
+groupColors = 'Colors'
+groupPositioning = 'Positioning'
+groupLines = 'Lines'
+groupLabels = 'Labels'
+groupSwitches = 'Switches'
+groupPlot = 'Plot'
 
-pivotLineOffsetInBars = input(15, 'Line Offset (in bars)', tooltip='How many bars away from current price to shift x1', group=groupPivot)
-pivotLineLengthInBars = input(20, 'Line Length (in bars)', minval=0, group=groupPivot)
-pivotLabelOffsetInBars = input(4, 'Label Offset (in bars)', group=groupPivot)
-pivotLabelTextColor = input(color.new(color.black, 0), 'Label Text Color')
+standardPlotActive = input(false, 'Standard Plot', group=groupSwitches)
+camarillaPlotActive = input(true, 'Camarilla Plot', group=groupSwitches)
+showStandardLines = input(true, 'Standard Lines', group=groupSwitches)
+showCamarillaLines = input(true, 'Camarilla Lines', group=groupSwitches)
+fixedToPriceLinesStandard = input(false, 'Fix Standard Pivots to Current Price', group=groupSwitches)
+fixedToPriceLinesCamarilla = input(true, 'Fix Camarilla Pivots to Current Price', group=groupSwitches)
 
-pivotLineStyle = input(line.style_dashed, 'Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupPivot)
-pivotLineWidth = input(1, 'Line Width', options=[1,2,3,4], group=groupPivot)
-pivotLineExtend = input(extend.none, 'Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupPivot)
-pivotLabelStyle = input(label.style_none, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle], group=groupPivot)
-pivotLabelVisible = input(true, 'Labels Visible', group=groupPivot)
-pivotLabelSize = input(size.normal, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupPivot)
-pivotLineOpacity = input(10, 'Line Opacity')
-pivotLabelOpacity = input(50, 'Label Opacity')
-pivotLabelTextOpacity = input(0, 'Label Text Opacity')
+lineOffset = input(15, 'Line Offset (in bars)', tooltip='How many bars away from current price to shift x1', group=groupPositioning)
+lineLength = input(20, 'Line Length (in bars)', minval=0, group=groupPositioning)
+labelOffsetNotFixed = input(4, 'Label Offset when NOT fixed to price (in bars)', group=groupPositioning)
+labelOffsetFixed = input(4, 'Label Offset when fixed to price (in bars)', group=groupPositioning)
 
-mColor = input(color.white, 'M Color', group=groupPivot)
-sColor = input(color.red, 'S Color', group=groupPivot)
-rColor = input(color.green, 'R Color', group=groupPivot)
-ppColor = input(color.yellow, 'PP Color', group=groupPivot)
+lineStyle = input(line.style_dashed, 'Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLines)
+lineWidth = input(1, 'Line Width', options=[1,2,3,4], group=groupLines)
+lineExtendStandard = input(extend.none, 'Line Extend Standard', options=[extend.none, extend.left, extend.right, extend.both], group=groupLines)
+lineExtendCamarilla = input(extend.none, 'Line Extend Camarilla', options=[extend.none, extend.left, extend.right, extend.both], group=groupLines)
+lineOpacity = input(50, 'Line Opacity', group=groupLines)
+
+labelVisible = input(true, 'Labels Visible', group=groupLabels)
+labelStyle = input(label.style_none, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle], group=groupLabels)
+labelSize = input(size.normal, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupLabels)
+labelOpacity = input(50, 'Label Opacity', group=groupLabels)
+labelTextOpacity = input(0, 'Label Text Opacity', group=groupLabels)
+
+mColor = input(COLOR_WHITE, 'M Color', group=groupColors)
+sColor = input(color.red, 'S Color', group=groupColors)
+rColor = input(color.green, 'R Color', group=groupColors)
+ppColor = input(COLOR_YELLOW, 'PP Color', group=groupColors)
+hColor = input(COLOR_POWDER_BLUE, 'H Color', group=groupColors)
+lColor = input(COLOR_LAVENDER, 'L Color', group=groupColors)
+labelTextColor = input(color.new(color.black, 0), 'Label Text Color', group=groupColors, tooltip='Not applicable if label style == \'none\'')
 
 _getPivotLabelTextColorFromLabelStyle(labelStyle, masterColor) => 
-    defaultColor = color.new(pivotLabelTextColor, pivotLabelTextOpacity)
-    labelStyle == label.style_none ? color.new(masterColor, pivotLabelTextOpacity) : defaultColor
+    defaultColor = color.new(labelTextColor, labelTextOpacity)
+    labelStyle == label.style_none ? color.new(masterColor, labelTextOpacity) : defaultColor
 
-mLineColor = color.new(mColor, pivotLineOpacity)
-mLabelColor = color.new(mColor, pivotLabelOpacity)
-mLabelTextColor = _getPivotLabelTextColorFromLabelStyle(pivotLabelStyle, mColor)
+mLineColor = color.new(mColor, lineOpacity)
+mLabelColor = color.new(mColor, labelOpacity)
+mLabelTextColor = _getPivotLabelTextColorFromLabelStyle(labelStyle, mColor)
 
-sLineColor = color.new(sColor, pivotLineOpacity)
-sLabelColor = color.new(sColor, pivotLabelOpacity)
-sLabelTextColor = _getPivotLabelTextColorFromLabelStyle(pivotLabelStyle, sColor)
+sLineColor = color.new(sColor, lineOpacity)
+sLabelColor = color.new(sColor, labelOpacity)
+sLabelTextColor = _getPivotLabelTextColorFromLabelStyle(labelStyle, sColor)
 
-rLineColor = color.new(rColor, pivotLineOpacity)
-rLabelColor = color.new(rColor, pivotLabelOpacity)
-rLabelTextColor = _getPivotLabelTextColorFromLabelStyle(pivotLabelStyle, rColor)
+rLineColor = color.new(rColor, lineOpacity)
+rLabelColor = color.new(rColor, labelOpacity)
+rLabelTextColor = _getPivotLabelTextColorFromLabelStyle(labelStyle, rColor)
 
-ppLineColor = color.new(ppColor, pivotLineOpacity)
-ppLabelColor = color.new(ppColor, pivotLabelOpacity)
-ppLabelTextColor = _getPivotLabelTextColorFromLabelStyle(pivotLabelStyle, ppColor)
+ppLineColor = color.new(ppColor, lineOpacity)
+ppLabelColor = color.new(ppColor, labelOpacity)
+ppLabelTextColor = _getPivotLabelTextColorFromLabelStyle(labelStyle, ppColor)
 
-_drawMPivotLine(x1, x2, y, labelText) =>
-    _drawLabelledLine(x1, x2, y, mLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, labelText, pivotLabelStyle, mLabelColor, mLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
+hLineColor = color.new(hColor, lineOpacity)
+hLabelColor = color.new(hColor, labelOpacity)
+hLabelTextColor = _getPivotLabelTextColorFromLabelStyle(labelStyle, hColor)
+
+lLineColor = color.new(lColor, lineOpacity)
+lLabelColor = color.new(lColor, labelOpacity)
+lLabelTextColor = _getPivotLabelTextColorFromLabelStyle(labelStyle, lColor)
+
+_drawPivot(isFixedToPrice, y, labelText, lineColor, labelColor, labelTextColor, isVisible, _extend) =>
+    _lineOffset = isFixedToPrice ? (lineLength * -1) : lineOffset
+    
+    x1 = _getTimeNBarsFromNow(_lineOffset)
+    x2 = _getTimeNBarsFromNow(_lineOffset + lineLength)
+    // x1, x2, y, _color, _width, _style, _extend, labelText, labelStyle, labelColor, labelTextColor, labelSize, showLabel, labelOffsetInBars) => 
+
+    _drawLabelledLine(
+         x1=x1, 
+         x2=x2, 
+         y=isVisible ? y : na, 
+         _color=lineColor, 
+         _width=lineWidth, 
+         _style=lineStyle, 
+         _extend=_extend, 
+         labelText=labelText, 
+         labelStyle=labelStyle, 
+         labelColor=labelColor, 
+         labelTextColor=labelTextColor, 
+         labelSize=labelSize, 
+         showLabel=labelVisible, 
+         labelOffsetInBars=isFixedToPrice ? labelOffsetFixed : labelOffsetNotFixed
+         )
 
 _drawPivots(linesArray) => 
     initialArraySize = array.size(linesArray)
+    
+    // --------
+    // pp 
+    // --------
+    
+    eitherIsVisible = showStandardLines or showCamarillaLines
+    eitherIsFixed = fixedToPriceLinesStandard or fixedToPriceLinesCamarilla
+    eitherIsNotFixed = not (fixedToPriceLinesStandard and fixedToPriceLinesCamarilla)
 
-    x1 = _getTimeNBarsFromNow(pivotLineOffsetInBars)
-    x2 = _getTimeNBarsFromNow(pivotLineOffsetInBars + pivotLineLengthInBars)
+    _ppStandardLine = _drawPivot(fixedToPriceLinesStandard, pp, 'PP', ppLineColor, ppLabelColor, ppLabelTextColor, true, lineExtendStandard)
+    _ppCamarillaLine = _drawPivot(fixedToPriceLinesCamarilla, pp, 'PP', ppLineColor, ppLabelColor, ppLabelTextColor, fixedToPriceLinesStandard != fixedToPriceLinesCamarilla, lineExtendCamarilla)
 
-    _m0LineId = _drawMPivotLine(x1, x2, m0C, 'M0')
-    _m1LineId = _drawMPivotLine(x1, x2, m1C, 'M1')
-    _m2LineId = _drawMPivotLine(x1, x2, m2C, 'M2')
-    _m3LineId = _drawMPivotLine(x1, x2, m3C, 'M3')
-    _m4LineId = _drawMPivotLine(x1, x2, m4C, 'M4')
-    _m5LineId = _drawMPivotLine(x1, x2, m5C, 'M5')
-    _s1LineId = _drawLabelledLine(x1, x2, pivS1, sLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'S1', pivotLabelStyle, sLabelColor, sLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
-    _s2LineId = _drawLabelledLine(x1, x2, pivS2, sLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'S2', pivotLabelStyle, sLabelColor, sLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
-    _s3LineId = _drawLabelledLine(x1, x2, pivS3, sLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'S3', pivotLabelStyle, sLabelColor, sLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
-    _r1LineId = _drawLabelledLine(x1, x2, pivR1, rLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'R1', pivotLabelStyle, rLabelColor, rLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
-    _r2LineId = _drawLabelledLine(x1, x2, pivR2, rLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'R2', pivotLabelStyle, rLabelColor, rLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
-    _r3LineId = _drawLabelledLine(x1, x2, pivR3, rLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'R3', pivotLabelStyle, rLabelColor, rLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
-    _ppLineId = _drawLabelledLine(x1, x2, pivotPoint, ppLineColor, pivotLineWidth, pivotLineStyle, pivotLineExtend, 'PP', pivotLabelStyle, ppLabelColor, ppLabelTextColor, pivotLabelSize, pivotLabelVisible, pivotLabelOffsetInBars)
+    // --------
+    // M 
+    // --------
+    
+    _m0LineId = _drawPivot(fixedToPriceLinesStandard, m0, 'M0', mLineColor, mLabelColor, mLabelTextColor, showStandardLines, lineExtendStandard)
+    _m1LineId = _drawPivot(fixedToPriceLinesStandard, m1, 'M1', mLineColor, mLabelColor, mLabelTextColor, showStandardLines, lineExtendStandard)
+    _m2LineId = _drawPivot(fixedToPriceLinesStandard, m2, 'M2', mLineColor, mLabelColor, mLabelTextColor, showStandardLines, lineExtendStandard)
+    _m3LineId = _drawPivot(fixedToPriceLinesStandard, m3, 'M3', mLineColor, mLabelColor, mLabelTextColor, showStandardLines, lineExtendStandard)
+    _m4LineId = _drawPivot(fixedToPriceLinesStandard, m4, 'M4', mLineColor, mLabelColor, mLabelTextColor, showStandardLines, lineExtendStandard)
+    _m5LineId = _drawPivot(fixedToPriceLinesStandard, m5, 'M5', mLineColor, mLabelColor, mLabelTextColor, showStandardLines, lineExtendStandard)
+    
+    // --------
+    // S
+    // --------
+    
+    _s1LineId = _drawPivot(fixedToPriceLinesStandard, s1, 'S1', sLineColor, sLabelColor, sLabelTextColor, showStandardLines, lineExtendStandard)
+    _s2LineId = _drawPivot(fixedToPriceLinesStandard, s2, 'S2', sLineColor, sLabelColor, sLabelTextColor, showStandardLines, lineExtendStandard)
+    _s3LineId = _drawPivot(fixedToPriceLinesStandard, s3, 'S3', sLineColor, sLabelColor, sLabelTextColor, showStandardLines, lineExtendStandard)
+    
+    // --------
+    // R
+    // --------
+    
+    _r1LineId = _drawPivot(fixedToPriceLinesStandard, r1, 'R1', rLineColor, rLabelColor, rLabelTextColor, showStandardLines, lineExtendStandard)
+    _r2LineId = _drawPivot(fixedToPriceLinesStandard, r2, 'R2', rLineColor, rLabelColor, rLabelTextColor, showStandardLines, lineExtendStandard)
+    _r3LineId = _drawPivot(fixedToPriceLinesStandard, r3, 'R3', rLineColor, rLabelColor, rLabelTextColor, showStandardLines, lineExtendStandard)
 
+    // --------
+    // H 
+    // --------
+
+    lineH1 = _drawPivot(fixedToPriceLinesCamarilla, h1, 'H1', hLineColor, hLabelColor, hLabelTextColor, showCamarillaLines, lineExtendCamarilla)
+    lineH2 = _drawPivot(fixedToPriceLinesCamarilla, h2, 'H2', hLineColor, hLabelColor, hLabelTextColor, showCamarillaLines, lineExtendCamarilla)
+    lineH3 = _drawPivot(fixedToPriceLinesCamarilla, h3, 'H3', hLineColor, hLabelColor, hLabelTextColor, showCamarillaLines, lineExtendCamarilla)
+    lineH4 = _drawPivot(fixedToPriceLinesCamarilla, h4, 'H4', hLineColor, hLabelColor, hLabelTextColor, showCamarillaLines, lineExtendCamarilla)
+    lineH5 = _drawPivot(fixedToPriceLinesCamarilla, h5, 'H5', hLineColor, hLabelColor, hLabelTextColor, showCamarillaLines, lineExtendCamarilla)
+
+    // --------
+    // L
+    // --------
+
+    lineL1 = _drawPivot(fixedToPriceLinesCamarilla, l1, 'L1', lLineColor, lLabelColor, lLabelTextColor, showCamarillaLines, lineExtendCamarilla)
+    lineL2 = _drawPivot(fixedToPriceLinesCamarilla, l2, 'L2', lLineColor, lLabelColor, lLabelTextColor, showCamarillaLines, lineExtendCamarilla)
+    lineL3 = _drawPivot(fixedToPriceLinesCamarilla, l3, 'L3', lLineColor, lLabelColor, lLabelTextColor, showCamarillaLines, lineExtendCamarilla)
+    lineL4 = _drawPivot(fixedToPriceLinesCamarilla, l4, 'L4', lLineColor, lLabelColor, lLabelTextColor, showCamarillaLines, lineExtendCamarilla)
+    lineL5 = _drawPivot(fixedToPriceLinesCamarilla, l5, 'L5', lLineColor, lLabelColor, lLabelTextColor, showCamarillaLines, lineExtendCamarilla)
+    
     array.push(linesArray, _m0LineId)
     array.push(linesArray, _m1LineId)
     array.push(linesArray, _m2LineId)
@@ -227,7 +359,18 @@ _drawPivots(linesArray) =>
     array.push(linesArray, _r1LineId)
     array.push(linesArray, _r2LineId)
     array.push(linesArray, _r3LineId)
-    array.push(linesArray, _ppLineId)
+    array.push(linesArray, _ppStandardLine)
+    array.push(linesArray, _ppCamarillaLine)
+    array.push(linesArray, lineH1)
+    array.push(linesArray, lineH2)
+    array.push(linesArray, lineH3)
+    array.push(linesArray, lineH4)
+    array.push(linesArray, lineH5)
+    array.push(linesArray, lineL1)
+    array.push(linesArray, lineL2)
+    array.push(linesArray, lineL3)
+    array.push(linesArray, lineL4)
+    array.push(linesArray, lineL5)
 
     // cleanup
     if initialArraySize > 0
@@ -243,3 +386,126 @@ _drawPivots(linesArray) =>
 
 var line[] _lines = array.new_line(0)
 _drawPivots(_lines)
+
+//////////////////////////////////////////////////////////////////
+// 
+// ==== PLOT ==== 
+// 
+//////////////////////////////////////////////////////////////////
+
+plotStyle = input(plot.style_circles, 'Plot Style', group=groupPlot, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+
+plotH1 = plot(
+      camarillaPlotActive ? h1 : na, 
+      "H1 Plot", 
+      hLineColor, lineWidth, plotStyle)
+
+plotH2 = plot(
+      camarillaPlotActive ? h2 : na, 
+      "H2 Plot", 
+      hLineColor, lineWidth, plotStyle)
+
+plotH3 = plot(
+      camarillaPlotActive ? h3 : na, 
+      "H3 Plot", 
+      hLineColor, lineWidth, plotStyle)
+
+plotH4 = plot(
+      camarillaPlotActive ? h4 : na, 
+      "H4 Plot", 
+      hLineColor, lineWidth, plotStyle)
+
+plotH5 = plot(
+      camarillaPlotActive ? h5 : na, 
+      "H5 Plot", 
+      hLineColor, lineWidth, plotStyle)
+
+plotL1 = plot(
+      camarillaPlotActive ? l1 : na, 
+      "L1 Plot", 
+      lLineColor, lineWidth, plotStyle)
+
+plotL2 = plot(
+      camarillaPlotActive ? l2 : na, 
+      "L2 Plot", 
+      lLineColor, lineWidth, plotStyle)
+
+plotL3 = plot(
+      camarillaPlotActive ? l3 : na, 
+      "L3 Plot", 
+      lLineColor, lineWidth, plotStyle)
+
+plotL4 = plot(
+      camarillaPlotActive ? l4 : na, 
+      "L4 Plot", 
+      lLineColor, lineWidth, plotStyle)
+
+plotL5 = plot(
+      camarillaPlotActive ? l5 : na, 
+      "L5 Plot", 
+      lLineColor, lineWidth, plotStyle)
+
+plotM0 = plot(
+      standardPlotActive ? m0 : na, 
+      "M0 Plot", 
+      mLineColor, lineWidth, plotStyle)
+
+plotM1 = plot(
+      standardPlotActive ? m1 : na, 
+      "M1 Plot", 
+      mLineColor, lineWidth, plotStyle)
+
+plotM2 = plot(
+      standardPlotActive ? m2 : na, 
+      "M2 Plot", 
+      mLineColor, lineWidth, plotStyle)
+
+plotM3 = plot(
+      standardPlotActive ? m3 : na, 
+      "M3 Plot", 
+      mLineColor, lineWidth, plotStyle)
+
+plotM4 = plot(
+      standardPlotActive ? m4 : na, 
+      "M4 Plot", 
+      mLineColor, lineWidth, plotStyle)
+
+plotM5 = plot(
+      standardPlotActive ? m5 : na, 
+      "M5 Plot", 
+      mLineColor, lineWidth, plotStyle)
+
+plotS1 = plot(
+      standardPlotActive ? s1 : na, 
+      "S1 Plot", 
+      sLineColor, lineWidth, plotStyle)
+
+plotS2 = plot(
+      standardPlotActive ? s2 : na, 
+      "S2 Plot", 
+      sLineColor, lineWidth, plotStyle)
+
+plotS3 = plot(
+      standardPlotActive ? s3 : na, 
+      "S3 Plot", 
+      sLineColor, lineWidth, plotStyle)
+
+plotR1 = plot(
+      standardPlotActive ? r1 : na, 
+      "R1 Plot", 
+      rLineColor, lineWidth, plotStyle)
+
+plotR2 = plot(
+      standardPlotActive ? r2 : na, 
+      "R2 Plot", 
+      rLineColor, lineWidth, plotStyle)
+
+plotR3 = plot(
+      standardPlotActive ? r3 : na, 
+      "R3 Plot", 
+      rLineColor, lineWidth, plotStyle)
+
+plotPP = plot(
+      standardPlotActive or camarillaPlotActive ? pp : na, 
+      "PP Plot", 
+      ppLineColor, lineWidth, plotStyle)      

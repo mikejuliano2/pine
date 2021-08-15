@@ -4,11 +4,8 @@
 // 
 //////////////////////////////////////////////////////////////////
 
-alert condition for daily open
 make the pvsra average input (10) tweakable
-alert for 800 ema
 some way to indicate that we are in high/low volume time
-color each ema cross marker differently
 camarilla pivots
 
 - quarters - add a max timeframe input for each level (whole => 1D, half => 60, quarter => 15)
