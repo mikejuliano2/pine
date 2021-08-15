@@ -262,11 +262,12 @@ lLineColor = color.new(lColor, lineOpacity)
 lLabelColor = color.new(lColor, labelOpacity)
 lLabelTextColor = _getPivotLabelTextColorFromLabelStyle(labelStyle, lColor)
 
-_drawPivot(isFixedToPrice, y, labelText, lineColor, labelColor, labelTextColor, isVisible, _extend) =>
-    _lineOffset = isFixedToPrice ? (lineLength * -1) : lineOffset
+_drawPivot(isFixedToPrice, y, labelText, lineColor, labelColor, labelTextColor, isVisible, _extend, plotActive) =>
+    _lineLength = plotActive ? 0 : lineLength
+    _lineOffset = isFixedToPrice ? (_lineLength * -1) : lineOffset
     
     x1 = _getTimeNBarsFromNow(_lineOffset)
-    x2 = _getTimeNBarsFromNow(_lineOffset + lineLength)
+    x2 = _getTimeNBarsFromNow(_lineOffset + _lineLength)
     // x1, x2, y, _color, _width, _style, _extend, labelText, labelStyle, labelColor, labelTextColor, labelSize, showLabel, labelOffsetInBars) => 
 
     _drawLabelledLine(
@@ -286,6 +287,32 @@ _drawPivot(isFixedToPrice, y, labelText, lineColor, labelColor, labelTextColor, 
          labelOffsetInBars=isFixedToPrice ? labelOffsetFixed : labelOffsetNotFixed
          )
 
+_standardLine(y, labelText, lineColor, labelColor, labelTextColor) => 
+    _drawPivot(
+         fixedToPriceLinesStandard, 
+         y, 
+         labelText, 
+         lineColor, 
+         labelColor, 
+         labelTextColor, 
+         showStandardLines, 
+         lineExtendStandard, 
+         standardPlotActive
+         )
+
+_camarillaLine(y, labelText, lineColor, labelColor, labelTextColor) => 
+    _drawPivot(
+         fixedToPriceLinesCamarilla, 
+         y, 
+         labelText, 
+         lineColor, 
+         labelColor, 
+         labelTextColor, 
+         showCamarillaLines, 
+         lineExtendCamarilla, 
+         camarillaPlotActive
+         )
+
 _drawPivots(linesArray) => 
     initialArraySize = array.size(linesArray)
     
@@ -297,55 +324,57 @@ _drawPivots(linesArray) =>
     eitherIsFixed = fixedToPriceLinesStandard or fixedToPriceLinesCamarilla
     eitherIsNotFixed = not (fixedToPriceLinesStandard and fixedToPriceLinesCamarilla)
 
-    _ppStandardLine = _drawPivot(fixedToPriceLinesStandard, pp, 'PP', ppLineColor, ppLabelColor, ppLabelTextColor, true, lineExtendStandard)
-    _ppCamarillaLine = _drawPivot(fixedToPriceLinesCamarilla, pp, 'PP', ppLineColor, ppLabelColor, ppLabelTextColor, fixedToPriceLinesStandard != fixedToPriceLinesCamarilla, lineExtendCamarilla)
+    // _ppStandardLine = _drawPivot(fixedToPriceLinesStandard, pp, 'PP', ppLineColor, ppLabelColor, ppLabelTextColor, true, lineExtendStandard)
+    // _ppCamarillaLine = _drawPivot(fixedToPriceLinesCamarilla, pp, 'PP', ppLineColor, ppLabelColor, ppLabelTextColor, fixedToPriceLinesStandard != fixedToPriceLinesCamarilla, lineExtendCamarilla)
+    _ppStandardLine = _standardLine(pp, 'PP', ppLineColor, ppLabelColor, ppLabelTextColor)
+    _ppCamarillaLine = _camarillaLine(pp, 'PP', ppLineColor, ppLabelColor, ppLabelTextColor)
 
     // --------
     // M 
     // --------
     
-    _m0LineId = _drawPivot(fixedToPriceLinesStandard, m0, 'M0', mLineColor, mLabelColor, mLabelTextColor, showStandardLines, lineExtendStandard)
-    _m1LineId = _drawPivot(fixedToPriceLinesStandard, m1, 'M1', mLineColor, mLabelColor, mLabelTextColor, showStandardLines, lineExtendStandard)
-    _m2LineId = _drawPivot(fixedToPriceLinesStandard, m2, 'M2', mLineColor, mLabelColor, mLabelTextColor, showStandardLines, lineExtendStandard)
-    _m3LineId = _drawPivot(fixedToPriceLinesStandard, m3, 'M3', mLineColor, mLabelColor, mLabelTextColor, showStandardLines, lineExtendStandard)
-    _m4LineId = _drawPivot(fixedToPriceLinesStandard, m4, 'M4', mLineColor, mLabelColor, mLabelTextColor, showStandardLines, lineExtendStandard)
-    _m5LineId = _drawPivot(fixedToPriceLinesStandard, m5, 'M5', mLineColor, mLabelColor, mLabelTextColor, showStandardLines, lineExtendStandard)
+    _m0LineId = _standardLine(m0, 'M0', mLineColor, mLabelColor, mLabelTextColor)
+    _m1LineId = _standardLine(m1, 'M1', mLineColor, mLabelColor, mLabelTextColor)
+    _m2LineId = _standardLine(m2, 'M2', mLineColor, mLabelColor, mLabelTextColor)
+    _m3LineId = _standardLine(m3, 'M3', mLineColor, mLabelColor, mLabelTextColor)
+    _m4LineId = _standardLine(m4, 'M4', mLineColor, mLabelColor, mLabelTextColor)
+    _m5LineId = _standardLine(m5, 'M5', mLineColor, mLabelColor, mLabelTextColor)
     
     // --------
     // S
     // --------
     
-    _s1LineId = _drawPivot(fixedToPriceLinesStandard, s1, 'S1', sLineColor, sLabelColor, sLabelTextColor, showStandardLines, lineExtendStandard)
-    _s2LineId = _drawPivot(fixedToPriceLinesStandard, s2, 'S2', sLineColor, sLabelColor, sLabelTextColor, showStandardLines, lineExtendStandard)
-    _s3LineId = _drawPivot(fixedToPriceLinesStandard, s3, 'S3', sLineColor, sLabelColor, sLabelTextColor, showStandardLines, lineExtendStandard)
+    _s1LineId = _standardLine(s1, 'S1', sLineColor, sLabelColor, sLabelTextColor)
+    _s2LineId = _standardLine(s2, 'S2', sLineColor, sLabelColor, sLabelTextColor)
+    _s3LineId = _standardLine(s3, 'S3', sLineColor, sLabelColor, sLabelTextColor)
     
     // --------
     // R
     // --------
     
-    _r1LineId = _drawPivot(fixedToPriceLinesStandard, r1, 'R1', rLineColor, rLabelColor, rLabelTextColor, showStandardLines, lineExtendStandard)
-    _r2LineId = _drawPivot(fixedToPriceLinesStandard, r2, 'R2', rLineColor, rLabelColor, rLabelTextColor, showStandardLines, lineExtendStandard)
-    _r3LineId = _drawPivot(fixedToPriceLinesStandard, r3, 'R3', rLineColor, rLabelColor, rLabelTextColor, showStandardLines, lineExtendStandard)
+    _r1LineId = _standardLine(r1, 'R1', rLineColor, rLabelColor, rLabelTextColor)
+    _r2LineId = _standardLine(r2, 'R2', rLineColor, rLabelColor, rLabelTextColor)
+    _r3LineId = _standardLine(r3, 'R3', rLineColor, rLabelColor, rLabelTextColor)
 
     // --------
     // H 
     // --------
 
-    lineH1 = _drawPivot(fixedToPriceLinesCamarilla, h1, 'H1', hLineColor, hLabelColor, hLabelTextColor, showCamarillaLines, lineExtendCamarilla)
-    lineH2 = _drawPivot(fixedToPriceLinesCamarilla, h2, 'H2', hLineColor, hLabelColor, hLabelTextColor, showCamarillaLines, lineExtendCamarilla)
-    lineH3 = _drawPivot(fixedToPriceLinesCamarilla, h3, 'H3', hLineColor, hLabelColor, hLabelTextColor, showCamarillaLines, lineExtendCamarilla)
-    lineH4 = _drawPivot(fixedToPriceLinesCamarilla, h4, 'H4', hLineColor, hLabelColor, hLabelTextColor, showCamarillaLines, lineExtendCamarilla)
-    lineH5 = _drawPivot(fixedToPriceLinesCamarilla, h5, 'H5', hLineColor, hLabelColor, hLabelTextColor, showCamarillaLines, lineExtendCamarilla)
+    lineH1 = _camarillaLine(h1, 'H1', hLineColor, hLabelColor, hLabelTextColor)
+    lineH2 = _camarillaLine(h2, 'H2', hLineColor, hLabelColor, hLabelTextColor)
+    lineH3 = _camarillaLine(h3, 'H3', hLineColor, hLabelColor, hLabelTextColor)
+    lineH4 = _camarillaLine(h4, 'H4', hLineColor, hLabelColor, hLabelTextColor)
+    lineH5 = _camarillaLine(h5, 'H5', hLineColor, hLabelColor, hLabelTextColor)
 
     // --------
     // L
     // --------
 
-    lineL1 = _drawPivot(fixedToPriceLinesCamarilla, l1, 'L1', lLineColor, lLabelColor, lLabelTextColor, showCamarillaLines, lineExtendCamarilla)
-    lineL2 = _drawPivot(fixedToPriceLinesCamarilla, l2, 'L2', lLineColor, lLabelColor, lLabelTextColor, showCamarillaLines, lineExtendCamarilla)
-    lineL3 = _drawPivot(fixedToPriceLinesCamarilla, l3, 'L3', lLineColor, lLabelColor, lLabelTextColor, showCamarillaLines, lineExtendCamarilla)
-    lineL4 = _drawPivot(fixedToPriceLinesCamarilla, l4, 'L4', lLineColor, lLabelColor, lLabelTextColor, showCamarillaLines, lineExtendCamarilla)
-    lineL5 = _drawPivot(fixedToPriceLinesCamarilla, l5, 'L5', lLineColor, lLabelColor, lLabelTextColor, showCamarillaLines, lineExtendCamarilla)
+    lineL1 = _camarillaLine(l1, 'L1', lLineColor, lLabelColor, lLabelTextColor)
+    lineL2 = _camarillaLine(l2, 'L2', lLineColor, lLabelColor, lLabelTextColor)
+    lineL3 = _camarillaLine(l3, 'L3', lLineColor, lLabelColor, lLabelTextColor)
+    lineL4 = _camarillaLine(l4, 'L4', lLineColor, lLabelColor, lLabelTextColor)
+    lineL5 = _camarillaLine(l5, 'L5', lLineColor, lLabelColor, lLabelTextColor)
     
     array.push(linesArray, _m0LineId)
     array.push(linesArray, _m1LineId)
