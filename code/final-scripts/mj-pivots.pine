@@ -2,6 +2,7 @@
 
 study("MJ - Pivots", overlay=true)
 
+COLOR_LIME = #1cd206
 COLOR_VOLT = #affd00
 COLOR_PINK = #e63a97
 COLOR_RED = #f21616
@@ -201,9 +202,10 @@ groupLines = 'Lines'
 groupLabels = 'Labels'
 groupSwitches = 'Switches'
 groupPlot = 'Plot'
+groupCamarillaOpacity = 'Camarilla Opacity'
 
 standardPlotActive = input(false, 'Standard Plot', group=groupSwitches)
-camarillaPlotActive = input(true, 'Camarilla Plot', group=groupSwitches)
+camarillaPlotActive = input(false, 'Camarilla Plot', group=groupSwitches)
 showStandardLines = input(true, 'Standard Lines', group=groupSwitches)
 showCamarillaLines = input(true, 'Camarilla Lines', group=groupSwitches)
 fixedToPriceLinesStandard = input(false, 'Fix Standard Pivots to Current Price', group=groupSwitches)
@@ -214,8 +216,8 @@ lineLength = input(20, 'Line Length (in bars)', minval=0, group=groupPositioning
 labelOffsetNotFixed = input(4, 'Label Offset when NOT fixed to price (in bars)', group=groupPositioning)
 labelOffsetFixed = input(4, 'Label Offset when fixed to price (in bars)', group=groupPositioning)
 
-lineStyle = input(line.style_dashed, 'Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLines)
-lineWidth = input(1, 'Line Width', options=[1,2,3,4], group=groupLines)
+lineStyle = input(line.style_dotted, 'Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLines)
+lineWidth = input(3, 'Line Width', options=[1,2,3,4], group=groupLines)
 lineExtendStandard = input(extend.none, 'Line Extend Standard', options=[extend.none, extend.left, extend.right, extend.both], group=groupLines)
 lineExtendCamarilla = input(extend.none, 'Line Extend Camarilla', options=[extend.none, extend.left, extend.right, extend.both], group=groupLines)
 lineOpacity = input(50, 'Line Opacity', group=groupLines)
@@ -230,9 +232,15 @@ mColor = input(COLOR_WHITE, 'M Color', group=groupColors)
 sColor = input(color.red, 'S Color', group=groupColors)
 rColor = input(color.green, 'R Color', group=groupColors)
 ppColor = input(COLOR_YELLOW, 'PP Color', group=groupColors)
-hColor = input(COLOR_POWDER_BLUE, 'H Color', group=groupColors)
-lColor = input(COLOR_LAVENDER, 'L Color', group=groupColors)
+hColor = input(#ec407a, 'H Color', group=groupColors)
+lColor = input(COLOR_LIME, 'L Color', group=groupColors)
 labelTextColor = input(color.new(color.black, 0), 'Label Text Color', group=groupColors, tooltip='Not applicable if label style == \'none\'')
+
+opacityCamarillaOne = input(70, 'Opacity Camarilla - 1', group=groupCamarillaOpacity)
+opacityCamarillaTwo = input(70, 'Opacity Camarilla - 2', group=groupCamarillaOpacity)
+opacityCamarillaThree = input(0, 'Opacity Camarilla - 3', group=groupCamarillaOpacity)
+opacityCamarillaFour = input(0, 'Opacity Camarilla - 4', group=groupCamarillaOpacity)
+opacityCamarillaFive = input(70, 'Opacity Camarilla - 5', group=groupCamarillaOpacity)
 
 _getPivotLabelTextColorFromLabelStyle(labelStyle, masterColor) => 
     defaultColor = color.new(labelTextColor, labelTextOpacity)
@@ -254,11 +262,19 @@ ppLineColor = color.new(ppColor, lineOpacity)
 ppLabelColor = color.new(ppColor, labelOpacity)
 ppLabelTextColor = _getPivotLabelTextColorFromLabelStyle(labelStyle, ppColor)
 
-hLineColor = color.new(hColor, lineOpacity)
+hLineColorOne = color.new(hColor, opacityCamarillaOne)
+hLineColorTwo = color.new(hColor, opacityCamarillaTwo)
+hLineColorThree = color.new(hColor, opacityCamarillaThree)
+hLineColorFour = color.new(hColor, opacityCamarillaFour)
+hLineColorFive = color.new(hColor, opacityCamarillaFive)
 hLabelColor = color.new(hColor, labelOpacity)
 hLabelTextColor = _getPivotLabelTextColorFromLabelStyle(labelStyle, hColor)
 
-lLineColor = color.new(lColor, lineOpacity)
+lLineColorOne = color.new(lColor, opacityCamarillaOne)
+lLineColorTwo = color.new(lColor, opacityCamarillaTwo)
+lLineColorThree = color.new(lColor, opacityCamarillaThree)
+lLineColorFour = color.new(lColor, opacityCamarillaFour)
+lLineColorFive = color.new(lColor, opacityCamarillaFive)
 lLabelColor = color.new(lColor, labelOpacity)
 lLabelTextColor = _getPivotLabelTextColorFromLabelStyle(labelStyle, lColor)
 
@@ -360,21 +376,21 @@ _drawPivots(linesArray) =>
     // H 
     // --------
 
-    lineH1 = _camarillaLine(h1, 'H1', hLineColor, hLabelColor, hLabelTextColor)
-    lineH2 = _camarillaLine(h2, 'H2', hLineColor, hLabelColor, hLabelTextColor)
-    lineH3 = _camarillaLine(h3, 'H3', hLineColor, hLabelColor, hLabelTextColor)
-    lineH4 = _camarillaLine(h4, 'H4', hLineColor, hLabelColor, hLabelTextColor)
-    lineH5 = _camarillaLine(h5, 'H5', hLineColor, hLabelColor, hLabelTextColor)
+    lineH1 = _camarillaLine(h1, 'H1', hLineColorOne, hLabelColor, hLabelTextColor)
+    lineH2 = _camarillaLine(h2, 'H2', hLineColorTwo, hLabelColor, hLabelTextColor)
+    lineH3 = _camarillaLine(h3, 'H3', hLineColorThree, hLabelColor, hLabelTextColor)
+    lineH4 = _camarillaLine(h4, 'H4', hLineColorFour, hLabelColor, hLabelTextColor)
+    lineH5 = _camarillaLine(h5, 'H5', hLineColorFive, hLabelColor, hLabelTextColor)
 
     // --------
     // L
     // --------
 
-    lineL1 = _camarillaLine(l1, 'L1', lLineColor, lLabelColor, lLabelTextColor)
-    lineL2 = _camarillaLine(l2, 'L2', lLineColor, lLabelColor, lLabelTextColor)
-    lineL3 = _camarillaLine(l3, 'L3', lLineColor, lLabelColor, lLabelTextColor)
-    lineL4 = _camarillaLine(l4, 'L4', lLineColor, lLabelColor, lLabelTextColor)
-    lineL5 = _camarillaLine(l5, 'L5', lLineColor, lLabelColor, lLabelTextColor)
+    lineL1 = _camarillaLine(l1, 'L1', lLineColorOne, lLabelColor, lLabelTextColor)
+    lineL2 = _camarillaLine(l2, 'L2', lLineColorTwo, lLabelColor, lLabelTextColor)
+    lineL3 = _camarillaLine(l3, 'L3', lLineColorThree, lLabelColor, lLabelTextColor)
+    lineL4 = _camarillaLine(l4, 'L4', lLineColorFour, lLabelColor, lLabelTextColor)
+    lineL5 = _camarillaLine(l5, 'L5', lLineColorFive, lLabelColor, lLabelTextColor)
     
     array.push(linesArray, _m0LineId)
     array.push(linesArray, _m1LineId)
@@ -422,119 +438,159 @@ _drawPivots(_lines)
 // 
 //////////////////////////////////////////////////////////////////
 
-plotStyle = input(plot.style_circles, 'Plot Style', group=groupPlot, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+plotStyle = input(plot.style_line, 'Plot Style', group=groupPlot, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+
+isFirstPointOfDay = _open != _open[1]
+
+hPlotColor = isFirstPointOfDay ? na : hColor
+lPlotColor = isFirstPointOfDay ? na : lColor
+rPlotColor = isFirstPointOfDay ? na : rLineColor
+sPlotColor = isFirstPointOfDay ? na : sLineColor
+mPlotColor = isFirstPointOfDay ? na : mLineColor
+ppPlotColor = isFirstPointOfDay ? na : ppLineColor
+
 
 plotH1 = plot(
       camarillaPlotActive ? h1 : na, 
       "H1 Plot", 
-      hLineColor, lineWidth, plotStyle)
+      color.new(hPlotColor, opacityCamarillaOne),
+      lineWidth, 
+      plotStyle
+      )
 
 plotH2 = plot(
       camarillaPlotActive ? h2 : na, 
       "H2 Plot", 
-      hLineColor, lineWidth, plotStyle)
+      color.new(hPlotColor, opacityCamarillaTwo),
+      lineWidth, 
+      plotStyle
+      )
 
 plotH3 = plot(
       camarillaPlotActive ? h3 : na, 
       "H3 Plot", 
-      hLineColor, lineWidth, plotStyle)
+      color.new(hPlotColor, opacityCamarillaThree),
+      lineWidth, 
+      plotStyle
+      )
 
 plotH4 = plot(
       camarillaPlotActive ? h4 : na, 
       "H4 Plot", 
-      hLineColor, lineWidth, plotStyle)
+      color.new(hPlotColor, opacityCamarillaFour),
+      lineWidth, 
+      plotStyle
+      )
 
 plotH5 = plot(
       camarillaPlotActive ? h5 : na, 
       "H5 Plot", 
-      hLineColor, lineWidth, plotStyle)
+      color.new(hPlotColor, opacityCamarillaFive),
+      lineWidth, 
+      plotStyle
+      )
 
 plotL1 = plot(
       camarillaPlotActive ? l1 : na, 
       "L1 Plot", 
-      lLineColor, lineWidth, plotStyle)
+      color.new(lPlotColor, opacityCamarillaOne), 
+      lineWidth, 
+      plotStyle
+      )
 
 plotL2 = plot(
       camarillaPlotActive ? l2 : na, 
       "L2 Plot", 
-      lLineColor, lineWidth, plotStyle)
+      color.new(lPlotColor, opacityCamarillaTwo), 
+      lineWidth, 
+      plotStyle
+      )
 
 plotL3 = plot(
       camarillaPlotActive ? l3 : na, 
-      "L3 Plot", 
-      lLineColor, lineWidth, plotStyle)
+      "L3 Plot",
+      color.new(lPlotColor, opacityCamarillaThree),
+      lineWidth, 
+      plotStyle
+      )
 
 plotL4 = plot(
       camarillaPlotActive ? l4 : na, 
       "L4 Plot", 
-      lLineColor, lineWidth, plotStyle)
+      color.new(lPlotColor, opacityCamarillaFour),
+      lineWidth, 
+      plotStyle
+      )
 
 plotL5 = plot(
       camarillaPlotActive ? l5 : na, 
       "L5 Plot", 
-      lLineColor, lineWidth, plotStyle)
+      color.new(lPlotColor, opacityCamarillaFive),
+      lineWidth, 
+      plotStyle
+      )
 
 plotM0 = plot(
       standardPlotActive ? m0 : na, 
       "M0 Plot", 
-      mLineColor, lineWidth, plotStyle)
+      mPlotColor, lineWidth, plotStyle)
 
 plotM1 = plot(
       standardPlotActive ? m1 : na, 
       "M1 Plot", 
-      mLineColor, lineWidth, plotStyle)
+      mPlotColor, lineWidth, plotStyle)
 
 plotM2 = plot(
       standardPlotActive ? m2 : na, 
       "M2 Plot", 
-      mLineColor, lineWidth, plotStyle)
+      mPlotColor, lineWidth, plotStyle)
 
 plotM3 = plot(
       standardPlotActive ? m3 : na, 
       "M3 Plot", 
-      mLineColor, lineWidth, plotStyle)
+      mPlotColor, lineWidth, plotStyle)
 
 plotM4 = plot(
       standardPlotActive ? m4 : na, 
       "M4 Plot", 
-      mLineColor, lineWidth, plotStyle)
+      mPlotColor, lineWidth, plotStyle)
 
 plotM5 = plot(
       standardPlotActive ? m5 : na, 
       "M5 Plot", 
-      mLineColor, lineWidth, plotStyle)
+      mPlotColor, lineWidth, plotStyle)
 
 plotS1 = plot(
       standardPlotActive ? s1 : na, 
       "S1 Plot", 
-      sLineColor, lineWidth, plotStyle)
+      sPlotColor, lineWidth, plotStyle)
 
 plotS2 = plot(
       standardPlotActive ? s2 : na, 
       "S2 Plot", 
-      sLineColor, lineWidth, plotStyle)
+      sPlotColor, lineWidth, plotStyle)
 
 plotS3 = plot(
       standardPlotActive ? s3 : na, 
       "S3 Plot", 
-      sLineColor, lineWidth, plotStyle)
+      sPlotColor, lineWidth, plotStyle)
 
 plotR1 = plot(
       standardPlotActive ? r1 : na, 
       "R1 Plot", 
-      rLineColor, lineWidth, plotStyle)
+      rPlotColor, lineWidth, plotStyle)
 
 plotR2 = plot(
       standardPlotActive ? r2 : na, 
       "R2 Plot", 
-      rLineColor, lineWidth, plotStyle)
+      rPlotColor, lineWidth, plotStyle)
 
 plotR3 = plot(
       standardPlotActive ? r3 : na, 
       "R3 Plot", 
-      rLineColor, lineWidth, plotStyle)
+      rPlotColor, lineWidth, plotStyle)
 
 plotPP = plot(
       standardPlotActive or camarillaPlotActive ? pp : na, 
       "PP Plot", 
-      ppLineColor, lineWidth, plotStyle)      
+      ppPlotColor, lineWidth, plotStyle)

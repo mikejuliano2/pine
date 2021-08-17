@@ -33,7 +33,7 @@ groupSwitches = 'Switches'
 // Colors
 // --------------------------
 
-ema5Color = input(color.new(COLOR_YELLOW, 20), '5 EMA Color', group=groupColors)
+ema5Color = input(color.new(COLOR_GOLD, 20), '5 EMA Color', group=groupColors)
 ema13Color = input(color.new(#b71c1c, 20), '13 EMA Color', group=groupColors)
 ema50Color = input(color.new(COLOR_TEAL, 20), '50 EMA Color', group=groupColors)
 ema200Color = input(color.new(COLOR_WHITE, 20), '200 EMA Color', group=groupColors)
@@ -258,8 +258,8 @@ markerTextColorDefault = input(color.new(color.white, 0), 'Text Color Default', 
 markerCrossUpColor = input(color.new(COLOR_LIGHT_BLUE, 0), 'Cross Up Color', group=groupMarkers)
 markerCrossDownColor = input(color.new(COLOR_MAGENTA, 0), 'Cross Down Color', group=groupMarkers)
 // Opacity
-markerOpacity = input(10, 'Marker Opacity', minval=0, maxval=100, group=groupMarkers)
-textOpacity = input(0, 'Text Opacity', minval=0, maxval=100, group=groupMarkers)
+markerOpacity = input(50, 'Marker Opacity', minval=0, maxval=100, group=groupMarkers)
+textOpacity = input(20, 'Text Opacity', minval=0, maxval=100, group=groupMarkers)
 
 _getEmaCrossMarkerVisibility(emaOne, emaTwo, markerActive) => 
     didCross = cross(emaOne, emaTwo)
