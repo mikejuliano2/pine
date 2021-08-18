@@ -136,32 +136,38 @@ _printNum(_num) => _print(tostring(_num))
 // 
 //////////////////////////////////////////////////////////////////
 
-showWhole = input(true, 'Show Whole')
-showHalf = input(true, 'Show Half')
-showQuarter = input(true, 'Show Quarter')
-plotRangeInMultiplesOfWhole = input(2, 'Plot Range (in multiples of the whole)', tooltip='Example:  plotRange=2.  open = 31,795.  This would plot a line at each whole level between 34k (32+2) and 30k (32-2).', minval=0)
-wholeLevelOverride = input(0, 'Whole Level Override', minval=0, tooltip='Only active if greater than 0')
+groupSweetSpot = '---- Sweet Spot ----'
 
-lineOffset = input(43, 'Line Offset (in bars)')
-lineLength = input(20, 'Line Length (in bars)')
-labelOffset = input(-4, 'Label Offset (in bars)')
+showWhole = input(true, 'Show Whole', group=groupSweetSpot)
+showHalf = input(true, 'Show Half', group=groupSweetSpot)
+showQuarter = input(true, 'Show Quarter', group=groupSweetSpot)
+plotRangeInMultiplesOfWhole = input(2, 'Plot Range (in multiples of the whole)', 
+ minval=0,
+ tooltip='Example:  plotRange=2.  open = 31,795.  This would plot a line at each whole level between 34k (32+2) and 30k (32-2).', 
+ group=groupSweetSpot)
 
-lineWidth = input(2, 'Line Width', options=[1,2,3,4])
+wholeLevelOverride = input(0, 'Whole Level Override', minval=0, tooltip='Only active if greater than 0', group=groupSweetSpot)
 
-lineStyle = input(line.style_solid, 'Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted])
-lineExtendWhole = input(extend.none, 'Line Extend Whole', options=[extend.none, extend.left, extend.right, extend.both])
-lineExtendHalf = input(extend.none, 'Line Extend Half', options=[extend.none, extend.left, extend.right, extend.both])
-lineExtendQuarter = input(extend.none, 'Line Extend Quarter', options=[extend.none, extend.left, extend.right, extend.both])
-labelStyle = input(label.style_none, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
-labelTextColor = input(color.white, 'Label Text Color')
-labelSize = input(size.normal, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large])
-showLabels = input(true, 'Show Labels?')
+lineOffset = input(43, 'Line Offset (in bars)', group=groupSweetSpot)
+lineLength = input(20, 'Line Length (in bars)', group=groupSweetSpot)
+labelOffset = input(-4, 'Label Offset (in bars)', group=groupSweetSpot)
+
+lineWidth = input(2, 'Line Width', options=[1,2,3,4], group=groupSweetSpot)
+
+lineStyle = input(line.style_solid, 'Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupSweetSpot)
+lineExtendWhole = input(extend.none, 'Line Extend Whole', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
+lineExtendHalf = input(extend.none, 'Line Extend Half', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
+lineExtendQuarter = input(extend.none, 'Line Extend Quarter', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
+labelStyle = input(label.style_none, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle], group=groupSweetSpot)
+labelTextColor = input(color.white, 'Label Text Color', group=groupSweetSpot)
+labelSize = input(size.normal, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupSweetSpot)
+showLabels = input(true, 'Show Labels?', group=groupSweetSpot)
 
 COLOR_PEACH = #e57373
 
-wholeColor = input(color.new(COLOR_PEACH, 10), 'Whole Color')
-halfColor = input(color.new(COLOR_PEACH, 40), 'Half Color')
-quarterColor = input(color.new(COLOR_PEACH, 70), 'Quarter Color')
+wholeColor = input(color.new(COLOR_PEACH, 10), 'Whole Color', group=groupSweetSpot)
+halfColor = input(color.new(COLOR_PEACH, 40), 'Half Color', group=groupSweetSpot)
+quarterColor = input(color.new(COLOR_PEACH, 70), 'Quarter Color', group=groupSweetSpot)
 
 _getLevels() => 
     wholeLevel = 
@@ -308,24 +314,22 @@ if barstate.islast
 ///////////////////////
 // PVSRA Color
 ///////////////////////
-groupMeterLines = 'Meter Lines'
-groupColors = 'Colors'
+groupMeter = '---- Multi-Timeframe Candle Meter ----'
 
-usePvsraColor = input(true, 'Use PVSRA Color', group=groupMeterLines, tooltip='Show the PVSRA Color for the given resolution instead of Red/Green')
+meterLabelOffset = input(9, 'Meter Label Offset (in bars)', group=groupMeter)
+meterLabelWidthInBars = input(6, 'Meter Label Width (in bars)', group=groupMeter, minval=1, maxval=10, step=1)
+meterLabelSize = input(size.large, 'Meter Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupMeter)
+// meterMarginMultiple = input(0.15, 'Meter Margin Multiple', group=groupMeter, minval=-2, maxval=2, step=0.05, group=groupMeter)
 
-meterLabelOffset = input(10, 'Label Offset (in bars)', group=groupMeterLines)
-meterLabelWidthInBars = input(3, 'Meter Label Width (in bars)', group=groupMeterLines)
-meterLabelSize = input(size.large, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large])
-meterMarginMultiple = input(0.15, 'Meter Margin Multiple', group=groupMeterLines, minval=-2, maxval=2, step=0.05)
-
-climaxVolBullColor = input(color.lime, 'Climax Bull Color', group=groupMeterLines)
-climaxVolBearColor = input(color.red, 'Climax Bear Color', group=groupMeterLines)
-aboveAvgVolBullColor = input(color.blue, 'Above Average Volume Bull Color', group=groupMeterLines)
-aboveAvgVolBearColor = input(color.fuchsia, 'Above Average Volume Bear Color', group=groupMeterLines)
-standardVolBullColor = input(#999999, 'Standard Volume Bull Color', group=groupMeterLines)
-standardVolBearColor = input(#4d4d4d, 'Standard Volume Bear Color', group=groupMeterLines)
-disabledMeterColor = input(#434651, 'Disabled Color', group=groupMeterLines,
-     tooltip='Candle meters can only show for higher timeframes.  This will show if the meter is disabled on the current timeframe')
+usePvsraColor = input(true, 'Use PVSRA Color', group=groupMeter, tooltip='Show the PVSRA Color for the given resolution instead of Red/Green')
+climaxVolBullColor = input(color.lime, 'Climax Bull Color', group=groupMeter)
+climaxVolBearColor = input(color.red, 'Climax Bear Color', group=groupMeter)
+aboveAvgVolBullColor = input(color.blue, 'Above Average Volume Bull Color', group=groupMeter)
+aboveAvgVolBearColor = input(color.fuchsia, 'Above Average Volume Bear Color', group=groupMeter)
+standardVolBullColor = input(#999999, 'Standard Volume Bull Color', group=groupMeter)
+standardVolBearColor = input(#4d4d4d, 'Standard Volume Bear Color', group=groupMeter)
+disabledMeterColor = input(#434651, 'Disabled Color', group=groupMeter,
+     tooltip='Candle meters can only show for higher timeframes.  If you\'re or on a higher timeframe you will see n/a in this color.')
 
 _security(expression, _resolution) => 
      security(syminfo.tickerid, _resolution, expression, barmerge.gaps_off, barmerge.lookahead_on)

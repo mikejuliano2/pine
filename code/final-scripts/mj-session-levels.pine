@@ -321,7 +321,7 @@ asianPlotLow  = plot(
       join=sessionLevelsLinesJoined)
 fill(asianPlotHigh, asianPlotLow, asianFillColor)
 
-[londonHigh, londonLow, londonOpen, londonOpenLineColor, londonHighLowLineColor, londonFillColor] = _getValuesForSessionFillPlotting(
+[londonHigh, londonLow, londonOpen, londonOpenPlotColor, londonHLPlotColor, londonFillColor] = _getValuesForSessionFillPlotting(
      londonTimeRange, 
      londonMasterColor, 
      true, 
@@ -330,7 +330,7 @@ fill(asianPlotHigh, asianPlotLow, asianFillColor)
 londonPlotOpen  = plot(
       plotLondonOpenActive ? londonOpen : na,  
       "London Open",  
-      londonOpenLineColor,  
+      londonOpenPlotColor,  
       sessionLevelsLineWidth, 
       londonOpenPlotStyle, 
       join=sessionLevelsLinesJoined)
@@ -338,7 +338,7 @@ londonPlotOpen  = plot(
 londonPlotHigh = plot(
       fillLondonSession ? londonHigh : na, 
       "London Session High", 
-      londonHighLowLineColor, 
+      londonHLPlotColor, 
       sessionLevelsLineWidth, 
       sessionLevelsHighLowPlotStyle, 
       join=sessionLevelsLinesJoined)
@@ -346,7 +346,7 @@ londonPlotHigh = plot(
 londonPlotLow  = plot(
       fillLondonSession ? londonLow : na,  
       "London Low",  
-      londonHighLowLineColor,  
+      londonHLPlotColor,  
       sessionLevelsLineWidth, 
       sessionLevelsHighLowPlotStyle, 
       join=sessionLevelsLinesJoined)
@@ -453,12 +453,14 @@ var line londonHighLineId = na
 var line londonLowLineId = na
 var line mt4DailyOpenLineId = na
 
+_getLineColor(masterColor, opacity, isActive) => color.new(masterColor, isActive ? opacity : 100)
+
 _drawSessionLines() =>
     x1 = _getTimeNBarsFromNow(sessionLevelsLineOffsetInBars)
     x2 = _getTimeNBarsFromNow(sessionLevelsLineOffsetInBars + sessionLevelsLineLengthInBars)
     
-    nyHighLowLabelVisible = false
-    londonHighLowLabelVisible = false
+    nyHighLowLabelVisible = true
+    londonHighLowLabelVisible = true
     mt4DailyOpenHighLowLabelVisible = false
 
     asianLabelColor = color.new(asianMasterColor, sessionLabelOpacity)
@@ -536,7 +538,7 @@ _drawSessionLines() =>
          x1, 
          x2, 
          lineNyOpenActive ? nyOpen : na, 
-         lineNyOpenActive ? color.new(nyMasterColor, 0) : na, 
+         _getLineColor(nyMasterColor, sessionLevelsOpenLineOpacity, lineNyOpenActive),
          sessionLevelsLineWidth, 
          nyOpenLineStyle, 
          sessionLevelsLineExtend, 
@@ -555,7 +557,7 @@ _drawSessionLines() =>
          x1, 
          x2, 
          lineNyHighLowActive ? nyHigh : na, 
-         color.new(nyHighLowLineColor, nyHLLineOpacity), 
+         _getLineColor(nyMasterColor, sessionHighLowLineOpacity, lineNyHighLowActive),
          sessionLevelsLineWidth, 
          sessionLevelsHighLowLineStyle,
          sessionLevelsLineExtend, 
@@ -573,7 +575,7 @@ _drawSessionLines() =>
          x1, 
          x2, 
          lineNyHighLowActive ? nyLow : na, 
-         color.new(nyHighLowLineColor, nyHLLineOpacity),
+         _getLineColor(nyMasterColor, sessionHighLowLineOpacity, lineNyHighLowActive),
          sessionLevelsLineWidth, 
          sessionLevelsHighLowLineStyle,
          sessionLevelsLineExtend, 
@@ -595,7 +597,7 @@ _drawSessionLines() =>
          x1, 
          x2, 
          lineLondonOpenActive ? londonOpen : na, 
-         londonOpenLineColor, 
+         _getLineColor(londonMasterColor, sessionLevelsOpenLineOpacity, lineLondonOpenActive),
          sessionLevelsLineWidth, 
          londonOpenLineStyle, 
          sessionLevelsLineExtend, 
@@ -614,11 +616,11 @@ _drawSessionLines() =>
          x1, 
          x2, 
          lineLondonHighLowActive ? londonHigh : na, 
-         color.new(londonHighLowLineColor, londonHLLineOpacity), 
+         _getLineColor(londonMasterColor, sessionHighLowLineOpacity, lineLondonOpenActive),
          sessionLevelsLineWidth, 
          sessionLevelsHighLowLineStyle,
          sessionLevelsLineExtend, 
-         'London York High', 
+         'London High', 
          sessionLabelStyle, 
          londonLabelColor, 
          labelTextColor, 
@@ -626,24 +628,24 @@ _drawSessionLines() =>
          londonHighLowLabelVisible, 
          sessionLabelOffsetInBars, 
          sessionLabelShowPrice)
-
+         
     _londonLowLineId = _drawLabelledLine(
-         londonLowLineId, 
-         x1, 
-         x2, 
-         lineLondonHighLowActive ? londonLow : na, 
-         color.new(londonHighLowLineColor, londonHLLineOpacity), 
-         sessionLevelsLineWidth, 
-         sessionLevelsHighLowLineStyle,
-         sessionLevelsLineExtend, 
-         'London Low', 
-         sessionLabelStyle, 
-         londonLabelColor, 
-         labelTextColor, 
-         labelSize, 
-         londonHighLowLabelVisible, 
-         sessionLabelOffsetInBars, 
-         sessionLabelShowPrice)
+         lineId=londonLowLineId, 
+         x1=x1, 
+         x2=x2, 
+         y=lineLondonHighLowActive ? londonLow : na,
+         _color=_getLineColor(londonMasterColor, sessionHighLowLineOpacity, lineLondonOpenActive),
+         _width=sessionLevelsLineWidth, 
+         _style=sessionLevelsHighLowLineStyle,
+         _extend=sessionLevelsLineExtend, 
+         labelText='London Low', 
+         labelStyle=sessionLabelStyle, 
+         labelColor=londonLabelColor, 
+         labelTextColor=labelTextColor, 
+         labelSize=labelSize, 
+         showLabel=londonHighLowLabelVisible, 
+         labelOffsetInBars=sessionLabelOffsetInBars, 
+         showPrice=sessionLabelShowPrice)
     
     _mt4DailyOpenLineId = _drawLabelledLine(
          mt4DailyOpenLineId, 
