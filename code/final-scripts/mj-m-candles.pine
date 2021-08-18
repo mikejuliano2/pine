@@ -16,7 +16,7 @@ autoResolutionFor1MinTF = input('60', 'Auto Resolution - 1m', group=groupTime, o
 fixedResolution = input("60", 'Fixed Resolution', type=input.resolution, group=groupTime, tooltip='Only Relevant if auto-resolution is off')
 maxTimeframe = input(60, 'Max Timeframe', group=groupTime, minval=1, maxval=240)
 
-usePvsraColor = input(true, 'Use PVSRA Candle Color', group=groupStyle)
+usePvsraColor = input(false, 'Use PVSRA Candle Color', group=groupStyle)
 showBorder = input(true, 'Show Border', group=groupStyle)
 fillOpacity = input(70, 'Opacity - Fill', minval=0, maxval=100, group=groupStyle)
 borderOpacity = input(10, 'Opacity - Border', minval=0, maxval=100, group=groupStyle)
@@ -51,6 +51,8 @@ _getAutoResolution(_interval) =>
 
 _resolution = useAutoResolution ? _getAutoResolution(intervalValue) : fixedResolution     
 _interval = security(syminfo.tickerid, _resolution, intervalValue)
+
+
 
 _security(expression, _resolution) => 
      security(syminfo.tickerid, _resolution, expression, barmerge.gaps_off, barmerge.lookahead_on)
@@ -127,35 +129,71 @@ _getColorAtResolution(_resolution) =>
          _resolution
          )    
 
-_getColor() =>
-    if usePvsraColor
-        _getColorAtResolution(_resolution)
-    else
-        isBullish ? climaxVolBullColor : climaxVolBearColor
-
 //////////////////////////////////////////////////////////
 // 
 // === PLOT ===
 // 
 //////////////////////////////////////////////////////////
 
-_color = _getColor()
-borderColor = color.new(_color, borderOpacity)
-fillColor = color.new(_color, fillOpacity)
+_color = _getColorAtResolution(_resolution)
+
+_c = barstate.islast ? _color : _color[1]
+
+borderColor = color.new(_c, borderOpacity)
+fillColor = color.new(_c, fillOpacity)
 transparentColor = color.new(color.white, 100)
 
-topBorderPlot = plot(
-      isValidTimeframe ? topBorder : na, 
-      color=showBorder ? borderColor : transparentColor,
-      title="Top Border", 
-      style=borderPlotStyle
-      )
+// topBorderPlot = plot(
+//       isValidTimeframe ? topBorder : na, 
+//       color=showBorder ? borderColor : transparentColor,
+//       title="Top Border", 
+//       style=borderPlotStyle
+//       )
 
-bottomBorderPlot = plot(
-      isValidTimeframe ? bottomBorder : na, 
-      color=showBorder ? borderColor : transparentColor,
-      title="Bottom Border", 
-      style=borderPlotStyle
-      )      
+// bottomBorderPlot = plot(
+//       isValidTimeframe ? bottomBorder : na, 
+//       color=showBorder ? borderColor : transparentColor,
+//       title="Bottom Border", 
+//       style=borderPlotStyle
+//       )      
 
-fill(topBorderPlot, bottomBorderPlot, fillColor)
+// fill(topBorderPlot, bottomBorderPlot, fillColor)
+
+//////////////////////////////////////////////////////////
+// 
+// === BOX ===
+// 
+//////////////////////////////////////////////////////////
+
+draw_box(left, right, top, bottom) =>
+    drawed_box = box.new(left, top, right, bottom)
+    box.set_border_color(drawed_box, borderColor)
+    box.set_bgcolor(drawed_box, fillColor)
+    drawed_box
+
+var firstBarIndexOfHigherTF = bar_index
+var box prev_box = na
+
+right =  bar_index
+left = firstBarIndexOfHigherTF
+// top = bodyMax
+// bottom = bodyMin
+
+// right =  barstate.islast ? bar_index : bar_index[1]
+top = barstate.islast ? bodyMax : bodyMax[1] 
+bottom = barstate.islast ? bodyMin : bodyMin[1] 
+
+isNewPeriod = change(time(_resolution)) > 0
+
+if isNewPeriod 
+    firstBarIndexOfHigherTF := bar_index
+
+if isNewPeriod and not barstate.isrealtime
+    draw_box(left, right, top, bottom)
+
+if barstate.islast
+    if isNewPeriod
+        prev_box := na
+    else
+        box.delete(prev_box)
+        prev_box := draw_box(left, right, top, bottom)

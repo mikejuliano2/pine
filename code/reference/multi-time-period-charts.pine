@@ -42,17 +42,19 @@ select_auto_resolution() =>
      timeframe.isweekly ? 'M': 
      timeframe.ismonthly and timeframe.multiplier < 3 ? '3M': '12M'
 
+
 auto_resolution = input(DEFAULT_AUTO_RESOLUTION, title="AutoTimeframe", type=input.bool, tooltip=AUTO_TIMEFRAME_TOOLTIP)
 resolution_input = input(DEFAULT_RESOLUTION, title="Timeframe", type=input.resolution)
-resolution = auto_resolution == true ? select_auto_resolution() : resolution_input
-
-calculation_method = input(DEFAULT_CALCULATION_METHOD, "Calculation", options = [HLR, TR, HAR])
-
 color_growth = input(DEFAULT_COLOR_GROWTH, type=input.color, title="",inline="Body")
 color_fall = input(DEFAULT_COLOR_FALL, type=input.color, title="Body", inline="Body")
-
+calculation_method = input(DEFAULT_CALCULATION_METHOD, "Calculation", options = [HLR, TR, HAR])
 color_border_growth = color.rgb(color.r(color_growth), color.g(color_growth), color.b(color_growth), 0)
 color_border_fall = color.rgb(color.r(color_fall), color.g(color_fall), color.b(color_fall), 0)
+
+resolution = auto_resolution == true ? select_auto_resolution() : resolution_input
+
+
+
 
 [previous_high, previous_low, previous_close, previous_open, previous_prev_close] = security(syminfo.tickerid, resolution, [high[1], low[1], close[1], open[1], close[2]], lookahead=true)
 [current_high, current_low, current_close, current_open, prev_close] = security(syminfo.tickerid, resolution, [high, low, close, open, close[1]])
