@@ -4,13 +4,17 @@
 // 
 //////////////////////////////////////////////////////////////////
 
+MT4 multi timeframe candle meter
+Update the styling of M Candles to be like Multi-Time Period Charts
+
+
 make the pvsra average input (10) tweakable
 some way to indicate that we are in high/low volume time
 
-- L4 and H4 color and tooltip
-- L3 and H3 color and tooltip
-- color, line width, and isActive for each level 1-6
-- alert condition for level 4 breakout
+move brinks to session levels
+
+
+- camarilla alert condition for level 4 breakout
 
 
 

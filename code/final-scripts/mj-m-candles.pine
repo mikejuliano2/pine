@@ -18,7 +18,7 @@ maxTimeframe = input(60, 'Max Timeframe', group=groupTime, minval=1, maxval=240)
 
 usePvsraColor = input(true, 'Use PVSRA Candle Color', group=groupStyle)
 showBorder = input(true, 'Show Border', group=groupStyle)
-fillOpacity = input(85, 'Opacity - Fill', minval=0, maxval=100, group=groupStyle)
+fillOpacity = input(70, 'Opacity - Fill', minval=0, maxval=100, group=groupStyle)
 borderOpacity = input(100, 'Opacity - Border', minval=0, maxval=100, group=groupStyle)
 wickWidthInBars = input(2.0, title="Wick width in bars", step=0.1, group=groupStyle)
 

@@ -202,7 +202,7 @@ dailyOpenPlotMaxTimeframe = input(title='Max Timeframe', defval=60, maxval=240, 
 
 // colors
 
-asianMasterColor = input(#00897b, 'Asian Color', input.color, group=groupColors)
+asianMasterColor = input(#00897b, 'Asia Color', input.color, group=groupColors)
 londonMasterColor = input(#ff851a, 'London Color', input.color, group=groupColors)
 nyMasterColor = input(#fff176, 'New York Color', input.color, group=groupColors)
 dailyOpenColor = input(#2962ff, 'Daily Open Color', input.color, group=groupColors)
