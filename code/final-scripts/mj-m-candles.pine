@@ -19,7 +19,7 @@ maxTimeframe = input(60, 'Max Timeframe', group=groupTime, minval=1, maxval=240)
 usePvsraColor = input(true, 'Use PVSRA Candle Color', group=groupStyle)
 showBorder = input(true, 'Show Border', group=groupStyle)
 fillOpacity = input(70, 'Opacity - Fill', minval=0, maxval=100, group=groupStyle)
-borderOpacity = input(100, 'Opacity - Border', minval=0, maxval=100, group=groupStyle)
+borderOpacity = input(10, 'Opacity - Border', minval=0, maxval=100, group=groupStyle)
 wickWidthInBars = input(2.0, title="Wick width in bars", step=0.1, group=groupStyle)
 
 // COLORS
@@ -52,14 +52,10 @@ _getAutoResolution(_interval) =>
 _resolution = useAutoResolution ? _getAutoResolution(intervalValue) : fixedResolution     
 _interval = security(syminfo.tickerid, _resolution, intervalValue)
 
-_security(expression) => 
+_security(expression, _resolution) => 
      security(syminfo.tickerid, _resolution, expression, barmerge.gaps_off, barmerge.lookahead_on)
 
-_open = _security(open)
-_close = _security(close)
-_high = _security(high)
-_low = _security(low)
-_vol = _security(volume)
+[_open, _high, _low, _close, _vol] = security(syminfo.tickerid, _resolution, [open, high, low, close, volume], lookahead=true)
 
 isValidTimeframe = not timeframe.isseconds and timeframe.isintraday and timeframe.multiplier <= maxTimeframe
 
@@ -95,36 +91,45 @@ borderPlotStyle = plot.style_stepline
 //////////////////////////////////////////////////////////
 
 _getBarColorByVolWeight(volWeight, _open, _close) => 
-    if _close > _open
-        volWeight == 1 
-          ? climaxVolBullColor 
-          : volWeight == 2 
-              ? aboveAvgVolBullColor 
-              : standardVolBullColor
+    if usePvsraColor
+        if _close > _open
+            volWeight == 1 
+             ? climaxVolBullColor 
+             : volWeight == 2 
+               ? aboveAvgVolBullColor 
+               : standardVolBullColor
+        else
+            volWeight == 1 
+             ? climaxVolBearColor 
+             : volWeight == 2 
+               ? aboveAvgVolBearColor 
+               : standardVolBearColor
     else
-        volWeight == 1 
-          ? climaxVolBearColor 
-          : volWeight == 2 
-              ? aboveAvgVolBearColor 
-              : standardVolBearColor
-
-_volWeightedPriceSpread() => volume * (high - low)
-_highestVolWeightedPriceSpread() => highest(_volWeightedPriceSpread(), 10)
+        _close > _open ? climaxVolBullColor : climaxVolBearColor
 
 _getVolumeWeight(_open, _high, _low, _close, _vol) => 
     // The math below matches MT4 PVSRA indicator source
-    avgVol = _security(sma(volume, 10)) // average volume from last 10 candles
-    volWeightedPriceSpread = _security(_volWeightedPriceSpread()) //climax volume on the previous candle
-    highestVolWeightedPriceSpread = _security(_highestVolWeightedPriceSpread()) // highest climax volume of the last 10 candles
+    avgVol = sma(_vol, 10)
+    volWeightedPriceSpread = _vol * (_high - _low)
+    highestVolWeightedPriceSpread = highest(volWeightedPriceSpread, 10)
 
     isClimaxVolume = _vol >= (avgVol * 2) or volWeightedPriceSpread >= highestVolWeightedPriceSpread
     isAboveAvgVolume = _vol >= avgVol * 1.5 and not isClimaxVolume
     volWeight = isClimaxVolume ? 1 : isAboveAvgVolume ? 2 : 0
 
-_getColor(_open, _high, _low, _close, _vol) =>
+_getColorByValues(_open, _high, _low, _close, _volume) =>
+    volWeight = _getVolumeWeight(_open, _high, _low, _close, _volume)
+    barColor = _getBarColorByVolWeight(volWeight, _open, _close)
+
+_getColorAtResolution(_resolution) => 
+    _color = _security(
+         _getColorByValues(open, high, low, close, volume), 
+         _resolution
+         )    
+
+_getColor() =>
     if usePvsraColor
-        volWeight = _getVolumeWeight(_open, _high, _low, _close, _vol)
-        barColor = _getBarColorByVolWeight(volWeight, _open, _close)
+        _getColorAtResolution(_resolution)
     else
         isBullish ? climaxVolBullColor : climaxVolBearColor
 
@@ -134,7 +139,7 @@ _getColor(_open, _high, _low, _close, _vol) =>
 // 
 //////////////////////////////////////////////////////////
 
-_color = _getColor(_open, _high, _low, _close, _vol)
+_color = _getColor()
 borderColor = color.new(_color, borderOpacity)
 fillColor = color.new(_color, fillOpacity)
 transparentColor = color.new(color.white, 100)
@@ -154,45 +159,3 @@ bottomBorderPlot = plot(
       )      
 
 fill(topBorderPlot, bottomBorderPlot, fillColor)
-
-// --------------------------
-// Fill the wick
-// --------------------------
-
-// hiddenPlotStyle = plot.style_circles
-
-// wickTopHiddenPlot = plot(
-//       isValidTimeframe ? wickTopBorder : na, 
-//       title="Wick Top Hidden", 
-//       color=transparentColor, 
-//       style=hiddenPlotStyle
-//       )
-
-// wickBottomHiddenPlot = plot(
-//       isValidTimeframe ? wickBottomBorder : na, 
-//       title="Wick Bottom Hidden", 
-//       color=transparentColor, 
-//       style=hiddenPlotStyle
-//       )      
-
-// fill(wickTopHiddenPlot, wickBottomHiddenPlot, fillColor)
-
-// --------------------------------------------
-// Fill the body (that is not also the wick)
-// --------------------------------------------
-
-// bodyTopHiddenPlot = plot(
-//       isValidTimeframe ? bodyTopBorder : na, 
-//       title="Body Top Hidden", 
-//       color=transparentColor, 
-//       style=hiddenPlotStyle
-//       )
-
-// bodyBottomHiddenPlot = plot(
-//       isValidTimeframe ? bodyBottomBorder : na, 
-//       title="Body Bottom Hidden", 
-//       color=transparentColor, 
-//       style=hiddenPlotStyle
-//       )      
-
-// fill(bodyTopHiddenPlot, bodyBottomHiddenPlot, fillColor)
