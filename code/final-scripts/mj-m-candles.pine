@@ -116,7 +116,7 @@ isBullish = _close >= _open
 bodyMax = isBullish ? _close : _open
 bodyMin = isBullish ? _open : _close
 
-_color = isValidTimeframe ? _getColorAtResolution(_resolution) : na
+_color = _getColorAtResolution(_resolution)
 bodyBorderColor = color.new(_color, showBorder ? opacityBodyBorder : 100)
 bodyFillColor = color.new(_color, fillBody ? opacityBodyFill : 100)
 // transparentColor = color.new(color.white, 100)
@@ -129,13 +129,18 @@ wickColor = color.new(_color, opacityWick)
 //////////////////////////////////////////////////////////
 
 _drawBody(x1, x2, y1, y2) =>
-    drawed_box = box.new(x1, y2, x2, y1, xloc=xloc.bar_time, border_width=bodyBorderWidth)
-    box.set_border_color(drawed_box, bodyBorderColor)
-    box.set_bgcolor(drawed_box, bodyFillColor)
-    drawed_box
+    if isValidTimeframe
+        drawed_box = box.new(x1, y2, x2, y1, xloc=xloc.bar_time, border_width=bodyBorderWidth)
+        box.set_border_color(drawed_box, bodyBorderColor)
+        box.set_bgcolor(drawed_box, bodyFillColor)
+        drawed_box
+    else 
+        na
 
 _drawWick(x, y1, y2, _color) => 
-    line.new(x, y1, x, y2, xloc.bar_time, extend.none, _color, line.style_solid, width=wickWidth)
+    isValidTimeframe 
+     ? line.new(x, y1, x, y2, xloc.bar_time, extend.none, _color, line.style_solid, width=wickWidth)
+     : na
 
 _drawTopWick(x, _color) => 
     y1 = isBullish ? max(_close, _high) : max(_close, _high)

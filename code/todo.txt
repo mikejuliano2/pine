@@ -4,25 +4,24 @@
 // 
 //////////////////////////////////////////////////////////////////
 
-wire up "Show border" on m candles
-
-
-consolidate scripts to share
-wire up max TF on m candles
-meter should go just above the high for the current M Candle
 make the edge of the candle 1 bar less
-make the meter centered around the high of the wick
 distance between candles input
-alert conditions for asia high/low
+meter should go just above the high for the current M Candle
+
+make the meter centered around the high of the wick
+consolidate scripts to share
 list out alerts for all scripts
-make the pvsra average input (10) tweakable
-some way to indicate that we are in high/low volume time
+
 move brinks to session levels
 add brinks high/low to lines
+alert conditions for asia high/low
+
 camarilla alert condition for level 4 breakout
+some way to indicate that we are in high/low volume time
 SV marker
 pins marker
 RDH/RDL
+make the pvsra average input (10) tweakable
 
 
 NON-CODE
