@@ -40,7 +40,7 @@ standardVolBearColor = input(#4d4d4d, 'Standard Volume Bear Color', group=groupC
 wickWidth = wickWidthInBars * timeframe.multiplier /  2
 intervalValue = timeframe.isintraday ? timeframe.multiplier : timeframe.multiplier * 1440
 
-_getAutoResolution(_interval) => 
+_getAutoResolution(_interval) =>
     _interval == 1 
       ? autoResolutionFor1MinTF 
       : _interval <= 5  
@@ -52,39 +52,16 @@ _getAutoResolution(_interval) =>
 _resolution = useAutoResolution ? _getAutoResolution(intervalValue) : fixedResolution     
 _interval = security(syminfo.tickerid, _resolution, intervalValue)
 
-
-
 _security(expression, _resolution) => 
      security(syminfo.tickerid, _resolution, expression, barmerge.gaps_off, barmerge.lookahead_on)
 
 [_open, _high, _low, _close, _vol] = security(syminfo.tickerid, _resolution, [open, high, low, close, volume], lookahead=true)
+_time = time(_resolution)
+_timeClose = time_close(_resolution)
 
-isValidTimeframe = not timeframe.isseconds and timeframe.isintraday and timeframe.multiplier <= maxTimeframe
-
-minuteOfDay = (hour * 60) + minute
-midpoint = floor(_interval / 2)
-
-_isWickTime() => 
-    _remainder = minuteOfDay % _interval
-    wickCutoffHigh = midpoint + wickWidth
-    wickCutoffLow = midpoint - wickWidth
-    isWickTime = _remainder > wickCutoffLow and _remainder <= wickCutoffHigh
-
-
-isWickTime = _isWickTime()
 isBullish = _close >= _open
-
 bodyMax = isBullish ? _close : _open
 bodyMin = isBullish ? _open : _close
-
-bodyTopBorder = isWickTime ? na : bodyMax
-bodyBottomBorder = isWickTime ? na : bodyMin
-wickTopBorder = isWickTime ? _high : na
-wickBottomBorder = isWickTime ? _low : na
-
-topBorder = isWickTime ? wickTopBorder : bodyTopBorder
-bottomBorder = isWickTime ? wickBottomBorder : bodyBottomBorder
-borderPlotStyle = plot.style_stepline
 
 //////////////////////////////////////////////////////////
 // 
@@ -136,12 +113,163 @@ _getColorAtResolution(_resolution) =>
 //////////////////////////////////////////////////////////
 
 _color = _getColorAtResolution(_resolution)
-
-_c = barstate.islast ? _color : _color[1]
-
-borderColor = color.new(_c, borderOpacity)
-fillColor = color.new(_c, fillOpacity)
+borderColor = color.new(_color, borderOpacity)
+fillColor = color.new(_color, fillOpacity)
 transparentColor = color.new(color.white, 100)
+
+draw_box(left, right, top, bottom) =>
+    drawed_box = box.new(left, top, right, bottom, xloc=xloc.bar_time)
+    box.set_border_color(drawed_box, borderColor)
+    box.set_bgcolor(drawed_box, fillColor)
+    drawed_box
+
+var firstBarIndexOfHigherTF = bar_index
+var box prev_box = na
+
+right =  _timeClose
+left = _time
+top = bodyMax
+bottom = bodyMin
+
+isNewPeriod = change(_time) and change(_timeClose)
+
+if isNewPeriod 
+    firstBarIndexOfHigherTF := bar_index
+
+
+_isFirstBarForCurrentTimeframeAtResolution(Resolution) =>
+    // e.g. current timeframe: 1min, resolution: '60' => return true for the first minute of the hour
+    // e.g. current timeframe: 5min, resolution: '60' => return true for the first 5 minutes of the hour
+    t = time(Resolution)
+    previousBar = t[1]
+    currentBar = t
+    not na(currentBar) and ( na(previousBar) or currentBar > previousBar)
+
+
+
+if isNewPeriod and not barstate.isrealtime and not (_timeClose > timenow)
+    draw_box(left, right, top, bottom) // draw the boxes for every candle except the current
+
+if barstate.islast
+    if isNewPeriod
+        prev_box := na
+    else
+        box.delete(prev_box)
+        prev_box := draw_box(left, right, top, bottom)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// _color = _getColorAtResolution(_resolution)
+
+// _c = barstate.islast ? _color : _color[1]
+
+// borderColor = color.new(_c, borderOpacity)
+// fillColor = color.new(_c, fillOpacity)
+// transparentColor = color.new(color.white, 100)
+
+// draw_box(left, right, top, bottom) =>
+//     drawed_box = box.new(left, top, right, bottom)
+//     box.set_border_color(drawed_box, borderColor)
+//     box.set_bgcolor(drawed_box, fillColor)
+//     drawed_box
+
+// var firstBarIndexOfHigherTF = bar_index
+// var box prev_box = na
+
+// right =  bar_index
+// left = firstBarIndexOfHigherTF
+
+// top = barstate.islast ? bodyMax : bodyMax[1] 
+// bottom = barstate.islast ? bodyMin : bodyMin[1] 
+
+// isNewPeriod = change(time(_resolution)) > 0
+
+// if isNewPeriod 
+//     firstBarIndexOfHigherTF := bar_index
+
+// if isNewPeriod and not barstate.isrealtime
+//     draw_box(left, right, top, bottom) // draw the boxes for every candle except the current
+
+// if barstate.islast
+//     if isNewPeriod
+//         prev_box := na
+//     else
+//         box.delete(prev_box)
+//         prev_box := draw_box(left, right, top, bottom)
+
+
+
+
+
+
+
+
+
+
+
+
+
+// isValidTimeframe = not timeframe.isseconds and timeframe.isintraday and timeframe.multiplier <= maxTimeframe
+
+// minuteOfDay = (hour * 60) + minute
+// midpoint = floor(_interval / 2)
+
+// _isWickTime() => 
+//     _remainder = minuteOfDay % _interval
+//     wickCutoffHigh = midpoint + wickWidth
+//     wickCutoffLow = midpoint - wickWidth
+//     isWickTime = _remainder > wickCutoffLow and _remainder <= wickCutoffHigh
+
+
+// isWickTime = _isWickTime()
+
+
+// bodyTopBorder = isWickTime ? na : bodyMax
+// bodyBottomBorder = isWickTime ? na : bodyMin
+// wickTopBorder = isWickTime ? _high : na
+// wickBottomBorder = isWickTime ? _low : na
+
+// topBorder = isWickTime ? wickTopBorder : bodyTopBorder
+// bottomBorder = isWickTime ? wickBottomBorder : bodyBottomBorder
+// borderPlotStyle = plot.style_stepline
+
+
+
+
+
+
 
 // topBorderPlot = plot(
 //       isValidTimeframe ? topBorder : na, 
@@ -158,39 +286,3 @@ transparentColor = color.new(color.white, 100)
 //       )      
 
 // fill(topBorderPlot, bottomBorderPlot, fillColor)
-
-//////////////////////////////////////////////////////////
-// 
-// === BOX ===
-// 
-//////////////////////////////////////////////////////////
-
-draw_box(left, right, top, bottom) =>
-    drawed_box = box.new(left, top, right, bottom)
-    box.set_border_color(drawed_box, borderColor)
-    box.set_bgcolor(drawed_box, fillColor)
-    drawed_box
-
-var firstBarIndexOfHigherTF = bar_index
-var box prev_box = na
-
-right =  bar_index
-left = firstBarIndexOfHigherTF
-
-top = barstate.islast ? bodyMax : bodyMax[1] 
-bottom = barstate.islast ? bodyMin : bodyMin[1] 
-
-isNewPeriod = change(time(_resolution)) > 0
-
-if isNewPeriod 
-    firstBarIndexOfHigherTF := bar_index
-
-if isNewPeriod and not barstate.isrealtime
-    draw_box(left, right, top, bottom)
-
-if barstate.islast
-    if isNewPeriod
-        prev_box := na
-    else
-        box.delete(prev_box)
-        prev_box := draw_box(left, right, top, bottom)
