@@ -104,6 +104,7 @@ _interval = security(syminfo.tickerid, _resolution, intervalValue)
 [_open, _high, _low, _close, _vol] = security(syminfo.tickerid, _resolution, [open, high, low, close, volume], lookahead=true)
 _time = time(_resolution)
 _timeClose = time_close(_resolution)
+_wickTime = (_time + _timeClose) / 2
 
 isBullish = _close >= _open
 bodyMax = isBullish ? _close : _open
@@ -121,14 +122,17 @@ borderColor = color.new(_color, borderOpacity)
 fillColor = color.new(_color, fillOpacity)
 transparentColor = color.new(color.white, 100)
 
-draw_box(left, right, top, bottom) =>
+_drawBody(left, right, top, bottom) =>
     drawed_box = box.new(left, top, right, bottom, xloc=xloc.bar_time)
     box.set_border_color(drawed_box, borderColor)
     box.set_bgcolor(drawed_box, fillColor)
     drawed_box
 
-var firstBarIndexOfHigherTF = bar_index
+_drawWick(x, y1, y2, _color) => 
+    line.new(x, y1, x, y2, xloc.bar_time, extend.none, _color, line.style_solid, width=4)
+
 var box prev_box = na
+var line previousWickLine = na
 
 right =  _timeClose
 left = _time
@@ -137,15 +141,15 @@ bottom = bodyMin
 
 isNewPeriod = change(_time) and change(_timeClose)
 
-if isNewPeriod 
-    firstBarIndexOfHigherTF := bar_index
+isHistoricalBar = isNewPeriod and not barstate.isrealtime and not (_timeClose > timenow) // AKA any bar other than the current one
 
 //////////////////////////////////////////////////////
 
 // draw the boxes for every candle except the current
 
-if isNewPeriod and not barstate.isrealtime and not (_timeClose > timenow)
-    draw_box(left, right, top, bottom) 
+if isHistoricalBar
+    _drawBody(left, right, top, bottom) 
+    _drawWick(_wickTime, _low, _high, borderColor)
 
 //////////////////////////////////////////////////////
 
@@ -154,13 +158,14 @@ if isNewPeriod and not barstate.isrealtime and not (_timeClose > timenow)
 if barstate.islast
     if isNewPeriod
         prev_box := na
+        previousWickLine := na
     else
         box.delete(prev_box)
-        prev_box := draw_box(left, right, top, bottom)
+        line.delete(previousWickLine)
+        prev_box := _drawBody(left, right, top, bottom)
+        previousWickLine := _drawWick(_wickTime, _low, _high, borderColor)
 
-//////////////////////////////////////////////////////
-// draw the wick
-
+    
 
 
 
@@ -270,7 +275,7 @@ if barstate.islast
 // fillColor = color.new(_c, fillOpacity)
 // transparentColor = color.new(color.white, 100)
 
-// draw_box(left, right, top, bottom) =>
+// _drawBody(left, right, top, bottom) =>
 //     drawed_box = box.new(left, top, right, bottom)
 //     box.set_border_color(drawed_box, borderColor)
 //     box.set_bgcolor(drawed_box, fillColor)
@@ -291,14 +296,14 @@ if barstate.islast
 //     firstBarIndexOfHigherTF := bar_index
 
 // if isNewPeriod and not barstate.isrealtime
-//     draw_box(left, right, top, bottom) // draw the boxes for every candle except the current
+//     _drawBody(left, right, top, bottom) // draw the boxes for every candle except the current
 
 // if barstate.islast
 //     if isNewPeriod
 //         prev_box := na
 //     else
 //         box.delete(prev_box)
-//         prev_box := draw_box(left, right, top, bottom)
+//         prev_box := _drawBody(left, right, top, bottom)
 
 
 
