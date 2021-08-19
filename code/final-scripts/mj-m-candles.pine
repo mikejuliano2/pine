@@ -16,7 +16,7 @@ autoResolutionFor1MinTF = input('60', 'Auto Resolution - 1m', group=groupTime, o
 fixedResolution = input("60", 'Fixed Resolution', type=input.resolution, group=groupTime, tooltip='Only Relevant if auto-resolution is off')
 maxTimeframe = input(60, 'Max Timeframe', group=groupTime, minval=1, maxval=240)
 
-usePvsraColor = input(false, 'Use PVSRA Candle Color', group=groupStyle)
+usePvsraColor = input(true, 'Use PVSRA Candle Color', group=groupStyle)
 showBorder = input(true, 'Show Border', group=groupStyle)
 fillOpacity = input(70, 'Opacity - Fill', minval=0, maxval=100, group=groupStyle)
 borderOpacity = input(10, 'Opacity - Border', minval=0, maxval=100, group=groupStyle)
@@ -176,10 +176,7 @@ var box prev_box = na
 
 right =  bar_index
 left = firstBarIndexOfHigherTF
-// top = bodyMax
-// bottom = bodyMin
 
-// right =  barstate.islast ? bar_index : bar_index[1]
 top = barstate.islast ? bodyMax : bodyMax[1] 
 bottom = barstate.islast ? bodyMin : bodyMin[1] 
 
