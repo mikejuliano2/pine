@@ -31,37 +31,8 @@ aboveAvgVolBearColor = input(color.fuchsia, 'Above Average Volume Bear Color', g
 standardVolBullColor = input(#999999, 'Standard Volume Bull Color', group=groupColors)
 standardVolBearColor = input(#4d4d4d, 'Standard Volume Bear Color', group=groupColors)
 
-//////////////////////////////////////////////////////////
-// 
-// === CALCULATIONS ===
-// 
-//////////////////////////////////////////////////////////
-
-wickWidth = wickWidthInBars * timeframe.multiplier /  2
-intervalValue = timeframe.isintraday ? timeframe.multiplier : timeframe.multiplier * 1440
-
-_getAutoResolution(_interval) =>
-    _interval == 1 
-      ? autoResolutionFor1MinTF 
-      : _interval <= 5  
-         ? '60' 
-         : _interval <= 60 
-          ? '240' 
-          : '1D'
-
-_resolution = useAutoResolution ? _getAutoResolution(intervalValue) : fixedResolution     
-_interval = security(syminfo.tickerid, _resolution, intervalValue)
-
 _security(expression, _resolution) => 
      security(syminfo.tickerid, _resolution, expression, barmerge.gaps_off, barmerge.lookahead_on)
-
-[_open, _high, _low, _close, _vol] = security(syminfo.tickerid, _resolution, [open, high, low, close, volume], lookahead=true)
-_time = time(_resolution)
-_timeClose = time_close(_resolution)
-
-isBullish = _close >= _open
-bodyMax = isBullish ? _close : _open
-bodyMin = isBullish ? _open : _close
 
 //////////////////////////////////////////////////////////
 // 
@@ -106,6 +77,39 @@ _getColorAtResolution(_resolution) =>
          _resolution
          )    
 
+
+//////////////////////////////////////////////////////////
+// 
+// === CALCULATIONS ===
+// 
+//////////////////////////////////////////////////////////
+
+wickWidth = wickWidthInBars * timeframe.multiplier /  2
+intervalValue = timeframe.isintraday ? timeframe.multiplier : timeframe.multiplier * 1440
+
+_getAutoResolution(_interval) =>
+    _interval == 1 
+      ? autoResolutionFor1MinTF 
+      : _interval <= 5  
+         ? '60' 
+         : _interval <= 60 
+          ? '240' 
+          : '1D'
+
+_resolution = useAutoResolution ? _getAutoResolution(intervalValue) : fixedResolution     
+_interval = security(syminfo.tickerid, _resolution, intervalValue)
+
+
+
+[_open, _high, _low, _close, _vol] = security(syminfo.tickerid, _resolution, [open, high, low, close, volume], lookahead=true)
+_time = time(_resolution)
+_timeClose = time_close(_resolution)
+
+isBullish = _close >= _open
+bodyMax = isBullish ? _close : _open
+bodyMin = isBullish ? _open : _close
+
+
 //////////////////////////////////////////////////////////
 // 
 // === PLOT ===
@@ -136,19 +140,16 @@ isNewPeriod = change(_time) and change(_timeClose)
 if isNewPeriod 
     firstBarIndexOfHigherTF := bar_index
 
+//////////////////////////////////////////////////////
 
-_isFirstBarForCurrentTimeframeAtResolution(Resolution) =>
-    // e.g. current timeframe: 1min, resolution: '60' => return true for the first minute of the hour
-    // e.g. current timeframe: 5min, resolution: '60' => return true for the first 5 minutes of the hour
-    t = time(Resolution)
-    previousBar = t[1]
-    currentBar = t
-    not na(currentBar) and ( na(previousBar) or currentBar > previousBar)
-
-
+// draw the boxes for every candle except the current
 
 if isNewPeriod and not barstate.isrealtime and not (_timeClose > timenow)
-    draw_box(left, right, top, bottom) // draw the boxes for every candle except the current
+    draw_box(left, right, top, bottom) 
+
+//////////////////////////////////////////////////////
+
+// draw the box for the current candle
 
 if barstate.islast
     if isNewPeriod
@@ -157,9 +158,79 @@ if barstate.islast
         box.delete(prev_box)
         prev_box := draw_box(left, right, top, bottom)
 
+//////////////////////////////////////////////////////
+// draw the wick
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////
+
+// draw the wick (OLD)
+
+// isValidTimeframe = not timeframe.isseconds and timeframe.isintraday and timeframe.multiplier <= maxTimeframe
+
+// minuteOfDay = (hour * 60) + minute
+// midpoint = floor(_interval / 2)
+
+// _isWickTime() => 
+//     _remainder = minuteOfDay % _interval
+//     wickCutoffHigh = midpoint + wickWidth
+//     wickCutoffLow = midpoint - wickWidth
+//     isWickTime = _remainder > wickCutoffLow and _remainder <= wickCutoffHigh
+
+
+// isWickTime = _isWickTime()
+
+// bodyTopBorder = isWickTime ? na : bodyMax
+// bodyBottomBorder = isWickTime ? na : bodyMin
+// wickTopBorder = isWickTime ? _high : na
+// wickBottomBorder = isWickTime ? _low : na
+
+// borderPlotStyle = plot.style_stepline
+// topBorder = isWickTime ? wickTopBorder : bodyTopBorder
+// bottomBorder = isWickTime ? wickBottomBorder : bodyBottomBorder
+
+// topBorderPlot = plot(
+//       isValidTimeframe ? topBorder : na, 
+//       color=showBorder ? borderColor : transparentColor,
+//       title="Top Border", 
+//       style=borderPlotStyle
+//       )
+
+// bottomBorderPlot = plot(
+//       isValidTimeframe ? bottomBorder : na, 
+//       color=showBorder ? borderColor : transparentColor,
+//       title="Bottom Border", 
+//       style=borderPlotStyle
+//       )      
+
+// fill(topBorderPlot, bottomBorderPlot, fillColor)
+
+
+//////////////////////////////////////////////////////
 
 
 
@@ -241,48 +312,4 @@ if barstate.islast
 
 
 
-// isValidTimeframe = not timeframe.isseconds and timeframe.isintraday and timeframe.multiplier <= maxTimeframe
 
-// minuteOfDay = (hour * 60) + minute
-// midpoint = floor(_interval / 2)
-
-// _isWickTime() => 
-//     _remainder = minuteOfDay % _interval
-//     wickCutoffHigh = midpoint + wickWidth
-//     wickCutoffLow = midpoint - wickWidth
-//     isWickTime = _remainder > wickCutoffLow and _remainder <= wickCutoffHigh
-
-
-// isWickTime = _isWickTime()
-
-
-// bodyTopBorder = isWickTime ? na : bodyMax
-// bodyBottomBorder = isWickTime ? na : bodyMin
-// wickTopBorder = isWickTime ? _high : na
-// wickBottomBorder = isWickTime ? _low : na
-
-// topBorder = isWickTime ? wickTopBorder : bodyTopBorder
-// bottomBorder = isWickTime ? wickBottomBorder : bodyBottomBorder
-// borderPlotStyle = plot.style_stepline
-
-
-
-
-
-
-
-// topBorderPlot = plot(
-//       isValidTimeframe ? topBorder : na, 
-//       color=showBorder ? borderColor : transparentColor,
-//       title="Top Border", 
-//       style=borderPlotStyle
-//       )
-
-// bottomBorderPlot = plot(
-//       isValidTimeframe ? bottomBorder : na, 
-//       color=showBorder ? borderColor : transparentColor,
-//       title="Bottom Border", 
-//       style=borderPlotStyle
-//       )      
-
-// fill(topBorderPlot, bottomBorderPlot, fillColor)
