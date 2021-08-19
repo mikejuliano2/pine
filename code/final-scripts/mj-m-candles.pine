@@ -17,22 +17,23 @@ fixedResolution = input("60", 'Fixed Resolution', type=input.resolution, group=g
 maxTimeframe = input(60, 'Max Timeframe', group=groupTime, minval=1, maxval=240)
 
 usePvsraColor = input(true, 'Use PVSRA Candle Color', group=groupStyle)
+showGapBetweenBars = input(true, 'Show Gap Between Bars')
 showBorder = input(true, 'Show Border', group=groupStyle)
 fillBody = input(true, 'Fill Body', group=groupStyle)
 opacityBodyFill = input(70, 'Opacity - Body Fill', minval=0, maxval=100, group=groupStyle)
-opacityBodyBorder = input(10, 'Opacity - Body Border', minval=0, maxval=100, group=groupStyle)
+opacityBodyBorder = input(40, 'Opacity - Body Border', minval=0, maxval=100, group=groupStyle)
 opacityWick = input(10, 'Opacity - Wick', minval=0, maxval=100, group=groupStyle)
-bodyBorderWidth = input(2, 'Body Border Width', options=[1,2,3,4], group=groupStyle)
+bodyBorderWidth = input(4, 'Body Border Width', options=[1,2,3,4], group=groupStyle)
 wickWidth = input(4, 'Wick Width', options=[1,2,3,4], group=groupStyle)
 
 // wickWidthInBars = input(2.0, title="Wick width in bars", step=0.1, group=groupStyle)
 
 // COLORS
 
-climaxVolBullColor = input(color.lime, 'Climax Bull Color', group=groupColors)
-climaxVolBearColor = input(color.red, 'Climax Bear Color', group=groupColors)
-aboveAvgVolBullColor = input(color.blue, 'Above Average Volume Bull Color', group=groupColors)
-aboveAvgVolBearColor = input(color.fuchsia, 'Above Average Volume Bear Color', group=groupColors)
+climaxVolBullColor = input(#388e3c, 'Climax Bull Color', group=groupColors)
+climaxVolBearColor = input(#b71c1c, 'Climax Bear Color', group=groupColors)
+aboveAvgVolBullColor = input(#1848cc, 'Above Average Volume Bull Color', group=groupColors)
+aboveAvgVolBearColor = input(#9c27b0, 'Above Average Volume Bear Color', group=groupColors)
 standardVolBullColor = input(#999999, 'Standard Volume Bull Color', group=groupColors)
 standardVolBearColor = input(#4d4d4d, 'Standard Volume Bear Color', group=groupColors)
 
@@ -108,9 +109,11 @@ _interval = security(syminfo.tickerid, _resolution, intervalValue)
 
 
 [_open, _high, _low, _close, _vol] = security(syminfo.tickerid, _resolution, [open, high, low, close, volume], lookahead=true)
-_time = time(_resolution)
-_timeClose = time_close(_resolution)
-_wickTime = (_time + _timeClose) / 2
+_timeOpenHighTF = time(_resolution)
+_timeCloseHighTF = time_close(_resolution)
+_wickTime = (_timeOpenHighTF + _timeCloseHighTF) / 2
+_timePerBarLowTF = time[0] - time[1]
+
 
 isBullish = _close >= _open
 bodyMax = isBullish ? _close : _open
@@ -129,8 +132,11 @@ wickColor = color.new(_color, opacityWick)
 //////////////////////////////////////////////////////////
 
 _drawBody(x1, x2, y1, y2) =>
+
     if isValidTimeframe
-        drawed_box = box.new(x1, y2, x2, y1, xloc=xloc.bar_time, border_width=bodyBorderWidth)
+        adjuster = showGapBetweenBars ? 1 : 0
+        adjustedX2 = x2 - round(adjuster * _timePerBarLowTF)
+        drawed_box = box.new(x1, y2, adjustedX2, y1, xloc=xloc.bar_time, border_width=bodyBorderWidth)
         box.set_border_color(drawed_box, bodyBorderColor)
         box.set_bgcolor(drawed_box, bodyFillColor)
         drawed_box
@@ -156,15 +162,15 @@ var box bodyBox = na
 var line topWickLine = na
 var line bottomWickLine = na
 
-isNewPeriod = change(_time) and change(_timeClose)
-isHistoricalBar = isNewPeriod and not barstate.isrealtime and not (_timeClose > timenow) // AKA any bar other than the current one
+isNewPeriod = change(_timeOpenHighTF) and change(_timeCloseHighTF)
+isHistoricalBar = isNewPeriod and not barstate.isrealtime and not (_timeCloseHighTF > timenow) // AKA any bar other than the current one
 
 // -------------------------------------------------------------------------    
 
 // draw the body and wicks for every candle except the current
 
 if isHistoricalBar
-    _drawBody(_time, _timeClose, bodyMin, bodyMax) 
+    _drawBody(_timeOpenHighTF, _timeCloseHighTF, bodyMin, bodyMax) 
     _drawBottomWick(_wickTime, bodyBorderColor)
     _drawTopWick(_wickTime, wickColor)
 
@@ -181,7 +187,7 @@ if barstate.islast
         box.delete(bodyBox)
         line.delete(bottomWickLine)
         line.delete(topWickLine)
-        bodyBox := _drawBody(_time, _timeClose, bodyMin, bodyMax) 
+        bodyBox := _drawBody(_timeOpenHighTF, _timeCloseHighTF, bodyMin, bodyMax) 
         bottomWickLine := _drawBottomWick(_wickTime, wickColor)
         topWickLine := _drawTopWick(_wickTime, wickColor)
 
