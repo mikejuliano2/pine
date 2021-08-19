@@ -17,7 +17,7 @@ fixedResolution = input("60", 'Fixed Resolution', type=input.resolution, group=g
 maxTimeframe = input(60, 'Max Timeframe', group=groupTime, minval=1, maxval=240)
 
 usePvsraColor = input(true, 'Use PVSRA Candle Color', group=groupStyle)
-showGapBetweenBars = input(true, 'Show Gap Between Bars')
+showGapBetweenBars = input(true, 'Show Gap Between Bars', group=groupStyle)
 showBorder = input(true, 'Show Border', group=groupStyle)
 fillBody = input(true, 'Fill Body', group=groupStyle)
 opacityBodyFill = input(70, 'Opacity - Body Fill', minval=0, maxval=100, group=groupStyle)
