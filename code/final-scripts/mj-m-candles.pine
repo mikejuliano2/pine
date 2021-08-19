@@ -18,6 +18,7 @@ maxTimeframe = input(60, 'Max Timeframe', group=groupTime, minval=1, maxval=240)
 
 usePvsraColor = input(true, 'Use PVSRA Candle Color', group=groupStyle)
 showBorder = input(true, 'Show Border', group=groupStyle)
+fillBody = input(true, 'Fill Body', group=groupStyle)
 opacityBodyFill = input(70, 'Opacity - Body Fill', minval=0, maxval=100, group=groupStyle)
 opacityBodyBorder = input(10, 'Opacity - Body Border', minval=0, maxval=100, group=groupStyle)
 opacityWick = input(10, 'Opacity - Wick', minval=0, maxval=100, group=groupStyle)
@@ -37,6 +38,8 @@ standardVolBearColor = input(#4d4d4d, 'Standard Volume Bear Color', group=groupC
 
 _security(expression, _resolution) => 
      security(syminfo.tickerid, _resolution, expression, barmerge.gaps_off, barmerge.lookahead_on)
+
+isValidTimeframe = not timeframe.isseconds and timeframe.isintraday and timeframe.multiplier <= maxTimeframe
 
 //////////////////////////////////////////////////////////
 // 
@@ -113,9 +116,9 @@ isBullish = _close >= _open
 bodyMax = isBullish ? _close : _open
 bodyMin = isBullish ? _open : _close
 
-_color = _getColorAtResolution(_resolution)
-bodyBorderColor = color.new(_color, opacityBodyBorder)
-bodyFillColor = color.new(_color, opacityBodyFill)
+_color = isValidTimeframe ? _getColorAtResolution(_resolution) : na
+bodyBorderColor = color.new(_color, showBorder ? opacityBodyBorder : 100)
+bodyFillColor = color.new(_color, fillBody ? opacityBodyFill : 100)
 // transparentColor = color.new(color.white, 100)
 wickColor = color.new(_color, opacityWick)
 
