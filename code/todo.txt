@@ -21,6 +21,8 @@ pins marker
 RDH/RDL
 make the pvsra average input (10) tweakable
 
+*** Yesterday Daily Open
+
 
 NON-CODE
 - compile a bundle of entry signal screenshots based on the TDI. Use vertical line to mark entry/exit.  Use date/price range

@@ -29,11 +29,11 @@ wickWidth = input(4, 'Wick Width', options=[1,2,3,4], group=groupMCandles)
 // COLORS
 
 mCandleClimaxBullColor = input(#388e3c, 'Climax Bull Color', group=groupMCandles)
-mCandleClimaxBearColor = input(#b71c1c, 'Climax Bear Color', group=groupMCandles)
+mCandleClimaxBearColor = input(#8d1e1e, 'Climax Bear Color', group=groupMCandles)
 mCandleRisingBullColor = input(#1848cc, 'Above Average Volume Bull Color', group=groupMCandles)
 mCandleRisingBearColor = input(#9c27b0, 'Above Average Volume Bear Color', group=groupMCandles)
 mCandleStandardBullColor = input(#999999, 'Standard Volume Bull Color', group=groupMCandles)
-mCandleStandardBearColor = input(#4d4d4d, 'Standard Volume Bear Color', group=groupMCandles)
+mCandleStandardBearColor = input(#2a2e39, 'Standard Volume Bear Color', group=groupMCandles)
 
 _security(expression, _resolution) => 
      security(syminfo.tickerid, _resolution, expression, barmerge.gaps_off, barmerge.lookahead_on)
@@ -266,13 +266,13 @@ groupMeter = '---- Multi-Timeframe Candle Meter ----'
 
 meterActive = input(true, 'Meter Active', group=groupMeter)
 usePvsraColorForMeter = input(true, 'Use PVSRA Color (for meter)', group=groupMeter, tooltip='Show the PVSRA Color for the given resolution instead of Red/Green')
+meterVerticalMarginMultiple = input(0.15, 'Meter Vertical Margin Adjuster', 
+ group=groupMeter, minval=-2, maxval=2, step=0.05, 
+ tooltip='Use this to adjust the vertical positioning of the meter.  Positive values will place it above price. Negative values will place it below price.')
 meterLabelOffset = input(0, 'Meter Label Offset (in bars)', group=groupMeter)
 meterLabelWidthInBars = input(6, 'Meter Label Width (in bars)', group=groupMeter, minval=1, maxval=10, step=1)
 meterLabelSize = input(size.large, 'Meter Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupMeter)
 meterLabelStyle = input(label.style_none, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle], group=groupMeter)
-meterVerticalMarginMultiple = input(0.15, 'Meter Vertical Margin Multiple', 
- group=groupMeter, minval=-2, maxval=2, step=0.05, 
- tooltip='Use this to adjust the vertical positioning of the meter.  Positive values will place it above price. Negative values will place it below price.')
 
 meterClimaxBullColor = input(color.lime, 'Climax Bull Color', group=groupMeter)
 meterClimaxBearColor = input(color.red, 'Climax Bear Color', group=groupMeter)
@@ -364,7 +364,7 @@ _drawMeterLabel(_resolution, index, labelsArray, isNew) =>
     labelId = label.new(
          x=_labelTime,
          y=_y,
-         text=_isValidTF ? _resolution : 'n/a',
+         text=_isValidTF ? _resolution : 'X',
          textcolor=_meterTextColor,
          style=meterLabelStyle,
          size=meterLabelSize,

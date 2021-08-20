@@ -30,10 +30,10 @@ marketBaseLineWidth = input(2, 'Market Base Line Width', options=[1,2,3,4], grou
 marketSignalLineWidth = input(2, 'Market Signal Line Width', options=[1,2,3,4], group=groupTDI)
 rsiLineWidth = input(2, 'RSI Line Width', options=[1,2,3,4], group=groupTDI)
 
-bandLength = input(34, minval = 1, title = "Band Length", group=groupTDI)
+bandLength = input(34, minval = 1, title = "Volatility Bands MA Length", group=groupTDI)
 rsiPeriod = input(21, minval = 1, title = "RSI Period", group=groupTDI)
-fastMaLength = input(7, minval = 0, title = "Fast MA on RSI", group=groupTDI)
-slowMaLength = input(2, minval = 1, title = "Slow MA on RSI", group=groupTDI)
+marketSignalMaLength = input(7, minval = 0, title = "Market Signal MA Length (slow MA)", group=groupTDI)
+rsiMaLength = input(2, minval = 1, title = "RSI MA Length (fast MA)", group=groupTDI)
 
 //-------------------------
 // DIVERGENCE
@@ -79,20 +79,18 @@ sharkLowColor = input(_bullColor, 'Shark Low Color', group=groupShark)
 // 
 //////////////////////////////////////////////////////
 
-src = close
-rsiOfClose = rsi(src, rsiPeriod)
-slowMA = sma(rsiOfClose, slowMaLength) // Moving Average of RSI 2 bars back
-rsiMa = sma(rsiOfClose, bandLength) // Moving Average of RSI [current]
+rsiOfClose = rsi(close, rsiPeriod)
+_rsi = sma(rsiOfClose, rsiMaLength) // Moving Average of RSI 2 bars back
 
+
+volatilityBandMa = sma(rsiOfClose, bandLength) // Moving Average of RSI [current]
 offset = (1.6185 * stdev(rsiOfClose, bandLength))
-
-upperBand = rsiMa + offset
-lowerBand = rsiMa - offset
+upperBand = volatilityBandMa + offset
+lowerBand = volatilityBandMa - offset
 
 marketBase = (upperBand + lowerBand) / 2 // Average of Upper and Lower Bands
-marketSignal = sma(rsiOfClose, fastMaLength) // Moving Average of RSI 7 bars back
+marketSignal = sma(rsiOfClose, marketSignalMaLength) // Moving Average of RSI 7 bars back
 
-_rsi = slowMA
 
 //////////////////////////////////////////////////////
 // 
@@ -102,9 +100,9 @@ _rsi = slowMA
 
 bandUpperPlot = plot(upperBand, "Upper Band", color=bandsColor, linewidth=bandsLineWidth)              
 bandLowerPlot = plot(lowerBand, "Lower Band", color=bandsColor, linewidth=bandsLineWidth)              
-marketBasePlot = plot(marketBase, "Middle of Bands", color=marketBaseColor, linewidth=marketBaseLineWidth)
-rsiLine = plot(slowMA, "Slow MA", color=rsiColor, linewidth=rsiLineWidth)
-marketSignalLine = plot(marketSignal, "Fast MA", color=marketSignalColor, linewidth=marketSignalLineWidth)  
+marketBasePlot = plot(marketBase, "Market Base", color=marketBaseColor, linewidth=marketBaseLineWidth)
+rsiLine = plot(_rsi, "RSI", color=rsiColor, linewidth=rsiLineWidth)
+marketSignalLine = plot(marketSignal, "Market Signal", color=marketSignalColor, linewidth=marketSignalLineWidth)  
 
 // hline(50, title="Middle Line", linestyle=hline.style_dotted)
 // obLevel = hline(70, title="Overbought", linestyle=hline.style_dotted)
