@@ -314,6 +314,7 @@ if barstate.islast
 ///////////////////////
 // PVSRA Color
 ///////////////////////
+
 groupMeter = '---- Multi-Timeframe Candle Meter ----'
 
 meterLabelOffset = input(9, 'Meter Label Offset (in bars)', group=groupMeter)

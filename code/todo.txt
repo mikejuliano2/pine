@@ -4,8 +4,6 @@
 // 
 //////////////////////////////////////////////////////////////////
 
-make the edge of the candle 1 bar less
-distance between candles input
 meter should go just above the high for the current M Candle
 
 make the meter centered around the high of the wick
