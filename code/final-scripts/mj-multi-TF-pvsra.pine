@@ -1,0 +1,585 @@
+//@version=4
+study("MJ - Multi-TF PVSRA", overlay=true)
+
+//////////////////////////////////////////////////////////
+// 
+// === M CANDLES INPUTS ===
+// 
+//////////////////////////////////////////////////////////
+
+groupMCandles = '---- M Candles ----'
+
+mCandlesActive = input(true, 'M Candles Active', group=groupMCandles)
+usePvsraColorForMCandles = input(true, 'Use PVSRA Colors (for M Candles)', group=groupMCandles)
+showGapBetweenBars = input(true, 'Show Gap Between Bars', group=groupMCandles)
+showBorder = input(true, 'Show Border', group=groupMCandles)
+fillBody = input(true, 'Fill Body', group=groupMCandles)
+useAutoResolution = input(true, 'Use Auto Resolution?', group=groupMCandles, tooltip='Auto-adjust the higher timeframe resolution based on the current timeframe')
+
+autoResolutionFor1MinTF = input('60', 'Auto Resolution - 1m', group=groupMCandles, options=['15', '30', '60', '120', '240'], tooltip='Pick the M candles timeframe you want to see when on the 1m timeframe.  Only applicable if on 1m Timeframe and auto-resolution is ON')
+fixedResolution = input("60", 'Fixed Resolution', type=input.resolution, group=groupMCandles, tooltip='Only Relevant if auto-resolution is off')
+maxTimeframeForMCandles = input(60, 'Max Timeframe', group=groupMCandles, minval=1, maxval=240, tooltip='M Candles will be hidden when above this timeframe')
+
+opacityBodyFill = input(70, 'Opacity - Body Fill', minval=0, maxval=100, group=groupMCandles)
+opacityBodyBorder = input(40, 'Opacity - Body Border', minval=0, maxval=100, group=groupMCandles)
+opacityWick = input(10, 'Opacity - Wick', minval=0, maxval=100, group=groupMCandles)
+bodyBorderWidth = input(4, 'Body Border Width', options=[1,2,3,4], group=groupMCandles)
+wickWidth = input(4, 'Wick Width', options=[1,2,3,4], group=groupMCandles)
+
+// COLORS
+
+mCandleClimaxBullColor = input(#388e3c, 'Climax Bull Color', group=groupMCandles)
+mCandleClimaxBearColor = input(#b71c1c, 'Climax Bear Color', group=groupMCandles)
+mCandleRisingBullColor = input(#1848cc, 'Above Average Volume Bull Color', group=groupMCandles)
+mCandleRisingBearColor = input(#9c27b0, 'Above Average Volume Bear Color', group=groupMCandles)
+mCandleStandardBullColor = input(#999999, 'Standard Volume Bull Color', group=groupMCandles)
+mCandleStandardBearColor = input(#4d4d4d, 'Standard Volume Bear Color', group=groupMCandles)
+
+_security(expression, _resolution) => 
+     security(syminfo.tickerid, _resolution, expression, barmerge.gaps_off, barmerge.lookahead_on)
+
+isValidTimeframe = not timeframe.isseconds and timeframe.isintraday and timeframe.multiplier <= maxTimeframeForMCandles
+
+//////////////////////////////////////////////////////////
+// 
+// === PVSRA Calculation ===
+// 
+//////////////////////////////////////////////////////////
+
+CLIMAX_BULL_WEIGHT = 3
+CLIMAX_BEAR_WEIGHT = -3
+RISING_BULL_WEIGHT = 2
+RISING_BEAR_WEIGHT = -2
+STANDARD_BULL_WEIGHT = 1
+STANDARD_BEAR_WEIGHT = -1
+
+_getPvsraVolumeWeight(_open, _high, _low, _close, _vol) => 
+    // The math below matches MT4 PVSRA indicator source
+    avgVol = sma(_vol, 10)
+    volWeightedPriceSpread = _vol * (_high - _low)
+    highestVolWeightedPriceSpread = highest(volWeightedPriceSpread, 10)
+
+    isClimaxVolume = _vol >= (avgVol * 2) or volWeightedPriceSpread >= highestVolWeightedPriceSpread
+    isAboveAvgVolume = _vol >= avgVol * 1.5 and not isClimaxVolume
+    volWeight = (isClimaxVolume ? 3 : isAboveAvgVolume ? 2 : 1)
+    _return = _close > _open ? volWeight : volWeight * -1
+
+_getPvsraVolumeWeightAtResolution(_resolution) => 
+    _volWeight = _security(
+         _getPvsraVolumeWeight(open, high, low, close, volume),
+         _resolution)
+
+//////////////////////////////////////////////////////////////////
+// 
+// ==== DATE/TIME UTILS ==== 
+// 
+//////////////////////////////////////////////////////////////////
+
+_getFutureTimeNBarsFromNow(numBars) => time + ( ( time - time[1] ) * numBars )
+
+_getPastTimeNBarsBackFromNow(numBars) => time - ( ( time - time[1] ) * numBars )
+
+_getTimeNBarsFromNow(numBars) => numBars > 0 ? _getFutureTimeNBarsFromNow(numBars) : _getPastTimeNBarsBackFromNow(numBars * -1)
+
+_getTimeframeMultiplier() => 
+    _multiplier = timeframe.isseconds 
+     ? timeframe.multiplier / 60 
+     : timeframe.isdaily
+       ? timeframe.multiplier * 1440
+       : timeframe.isweekly
+         ? timeframe.multiplier * 1440 * 7
+         : timeframe.ismonthly 
+           ? timeframe.multiplier * 1440 * 30 
+           : timeframe.multiplier
+
+//////////////////////////////////////////////////////////////////
+// 
+// ==== PLOT UTILS ==== 
+// 
+//////////////////////////////////////////////////////////////////
+
+_drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText, labelStyle, labelColor, labelTextColor, labelSize, showLabel, labelOffsetInBars, showPrice) => 
+    // x1 and x2 are in time (not bars)
+
+    _lineId = lineId
+
+    if na(_lineId)
+        _lineId := line.new(x1, y, x2, y, xloc.bar_time, _extend)
+    
+    line.set_xy1(_lineId, x1, y)
+    line.set_xy2(_lineId, x2, y)
+    line.set_color(_lineId, _color)
+    line.set_width(_lineId, _width)
+    line.set_style(_lineId, _style)
+
+    if not na(_lineId[1])
+        line.delete(_lineId[1])
+
+    // ----------------
+    // draw the label
+    // ----------------
+
+    if showLabel
+        _labelText = showPrice ? labelText + ' (' + tostring(y) + ')' : labelText
+        timePerBar = time[0] - time[1]
+        labelTime = x2 + (labelOffsetInBars * timePerBar)
+        labelId = label.new(labelTime, y, _labelText, textcolor=labelTextColor, style=labelStyle, size=labelSize, xloc=xloc.bar_time, color=labelColor)
+        label.delete(labelId[1])
+
+    _lineId
+
+_print(_text) => var _label = label.new(bar_index, na, _text, xloc.bar_index, yloc.price, color(na), label.style_none, color.gray, size.large, text.align_left), label.set_xy(_label, bar_index, highest(10)[1]), label.set_text(_label, _text)
+_printNum(_num) => _print(tostring(_num))
+
+//////////////////////////////////////////////////////////
+// 
+// === M CANDLES CALCULATIONS ===
+// 
+//////////////////////////////////////////////////////////
+
+_getMCandleBarColorByVolWeight(volWeight) => 
+    if usePvsraColorForMCandles
+        if volWeight == CLIMAX_BEAR_WEIGHT
+            mCandleClimaxBearColor 
+        else if volWeight == RISING_BEAR_WEIGHT
+            mCandleRisingBearColor
+        else if volWeight == STANDARD_BEAR_WEIGHT
+            mCandleStandardBearColor
+        else if volWeight == CLIMAX_BULL_WEIGHT
+            mCandleClimaxBullColor
+        else if volWeight == RISING_BULL_WEIGHT
+            mCandleRisingBullColor
+        else if volWeight == STANDARD_BULL_WEIGHT
+            mCandleStandardBullColor
+        else
+            mCandleStandardBullColor
+    else 
+        volWeight > 0 ? mCandleClimaxBullColor : mCandleClimaxBearColor
+
+_getMCandleColorAtResolution(_resolution) => 
+    _volWeight = _getPvsraVolumeWeightAtResolution(_resolution)
+    _getMCandleBarColorByVolWeight(_volWeight)
+
+
+intervalValue = timeframe.isintraday ? timeframe.multiplier : timeframe.multiplier * 1440
+
+_getAutoResolution(_interval) =>
+    _interval == 1 
+      ? autoResolutionFor1MinTF 
+      : _interval <= 5  
+         ? '60' 
+         : _interval <= 60 
+          ? '240' 
+          : '1D'
+
+_mCandleResolution = useAutoResolution ? _getAutoResolution(intervalValue) : fixedResolution     
+_interval = security(syminfo.tickerid, _mCandleResolution, intervalValue)
+
+
+
+[_open, _high, _low, _close, _vol] = security(syminfo.tickerid, _mCandleResolution, [open, high, low, close, volume], lookahead=true)
+_timeOpenHighTF = time(_mCandleResolution)
+_timeCloseHighTF = time_close(_mCandleResolution)
+_wickTime = (_timeOpenHighTF + _timeCloseHighTF) / 2
+_timePerBarLowTF = time[0] - time[1]
+
+
+isBullish = _close >= _open
+bodyMax = isBullish ? _close : _open
+bodyMin = isBullish ? _open : _close
+
+mCandleColor = _getMCandleColorAtResolution(_mCandleResolution)
+bodyBorderColor = color.new(mCandleColor, showBorder ? opacityBodyBorder : 100)
+bodyFillColor = color.new(mCandleColor, fillBody ? opacityBodyFill : 100)
+wickColor = color.new(mCandleColor, opacityWick)
+
+//////////////////////////////////////////////////////////
+// 
+// === M CANDLES PLOT ===
+// 
+//////////////////////////////////////////////////////////
+
+_drawBody(x1, x2, y1, y2) =>
+
+    if isValidTimeframe
+        adjuster = showGapBetweenBars ? 1 : 0
+        adjustedX2 = x2 - round(adjuster * _timePerBarLowTF)
+        drawed_box = box.new(x1, y2, adjustedX2, y1, xloc=xloc.bar_time, border_width=bodyBorderWidth)
+        box.set_border_color(drawed_box, bodyBorderColor)
+        box.set_bgcolor(drawed_box, bodyFillColor)
+        drawed_box
+    else 
+        na
+
+_drawWick(x, y1, y2, _color) => 
+    isValidTimeframe 
+     ? line.new(x, y1, x, y2, xloc.bar_time, extend.none, _color, line.style_solid, width=wickWidth)
+     : na
+
+_drawTopWick(x, _color) => 
+    y1 = isBullish ? max(_close, _high) : max(_close, _high)
+    y2 = bodyMax
+    _drawWick(x, y1, y2, _color)    
+
+_drawBottomWick(x, _color) => 
+    y1 = isBullish ? min(_open, _low) : min(_close, _low)
+    y2 = bodyMin
+    _drawWick(x, y1, y2, _color)    
+
+var box bodyBox = na
+var line topWickLine = na
+var line bottomWickLine = na
+
+isNewPeriod = change(_timeOpenHighTF) and change(_timeCloseHighTF)
+isHistoricalBar = isNewPeriod and not barstate.isrealtime and not (_timeCloseHighTF > timenow) // AKA any bar other than the current one
+
+if mCandlesActive
+    // draw the body and wicks for every candle except the current
+
+    if isHistoricalBar
+        _drawBody(_timeOpenHighTF, _timeCloseHighTF, bodyMin, bodyMax) 
+        _drawBottomWick(_wickTime, bodyBorderColor)
+        _drawTopWick(_wickTime, wickColor)
+
+    // draw the body and wicks for the current candle
+
+    if barstate.islast
+        if isNewPeriod
+            bodyBox := na
+            topWickLine := na
+            bottomWickLine := na
+        else
+            box.delete(bodyBox)
+            line.delete(bottomWickLine)
+            line.delete(topWickLine)
+            bodyBox := _drawBody(_timeOpenHighTF, _timeCloseHighTF, bodyMin, bodyMax) 
+            bottomWickLine := _drawBottomWick(_wickTime, wickColor)
+            topWickLine := _drawTopWick(_wickTime, wickColor)
+
+//////////////////////////////////////////////////////////////////
+// 
+// ==== MULTI TF METER ==== 
+// 
+//////////////////////////////////////////////////////////////////
+
+groupMeter = '---- Multi-Timeframe Candle Meter ----'
+
+meterActive = input(true, 'Meter Active', group=groupMeter)
+usePvsraColorForMeter = input(true, 'Use PVSRA Color (for meter)', group=groupMeter, tooltip='Show the PVSRA Color for the given resolution instead of Red/Green')
+meterLabelOffset = input(0, 'Meter Label Offset (in bars)', group=groupMeter)
+meterLabelWidthInBars = input(6, 'Meter Label Width (in bars)', group=groupMeter, minval=1, maxval=10, step=1)
+meterLabelSize = input(size.large, 'Meter Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupMeter)
+meterLabelStyle = input(label.style_none, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle], group=groupMeter)
+meterVerticalMarginMultiple = input(0.15, 'Meter Vertical Margin Multiple', 
+ group=groupMeter, minval=-2, maxval=2, step=0.05, 
+ tooltip='Use this to adjust the vertical positioning of the meter.  Positive values will place it above price. Negative values will place it below price.')
+
+meterClimaxBullColor = input(color.lime, 'Climax Bull Color', group=groupMeter)
+meterClimaxBearColor = input(color.red, 'Climax Bear Color', group=groupMeter)
+meterRisingBullColor = input(color.blue, 'Above Average Volume Bull Color', group=groupMeter)
+meterRisingBearColor = input(color.fuchsia, 'Above Average Volume Bear Color', group=groupMeter)
+meterStandardBullColor = input(#999999, 'Standard Volume Bull Color', group=groupMeter)
+meterStandardBearColor = input(#4d4d4d, 'Standard Volume Bear Color', group=groupMeter)
+meterDisabledColor = input(#434651, 'Disabled Color', group=groupMeter,
+     tooltip='Candle meters can only show for higher timeframes.  If you\'re or on a higher timeframe, you will see \"X\" in this color for each meter label of a lower timeframe.')
+
+
+var line[] meterLines = array.new_line(0)
+var label[] meterLabels = array.new_label(0)
+
+_isValidTimeframeForMeterLabel(_resolution, _multiplier) => 
+    if _resolution == '1'
+        _multiplier <= 1
+    else if _resolution == '5'
+        _multiplier <= 5
+    else if _resolution == '15'
+        _multiplier <= 15
+    else if _resolution == '30'
+        _multiplier <= 30
+    else if _resolution == '60'
+        _multiplier <= 60
+    else if _resolution == '240'
+        _multiplier <= 240
+    else if _resolution == 'D'
+        _multiplier <= 1440
+    else if _resolution == 'W'
+        _multiplier <= (1440 * 7)
+    else if _resolution == 'M'
+        _multiplier <= (1440 * 7 * 30)
+
+_getMeterColorByVolWeight(volWeight) => 
+    if usePvsraColorForMeter
+        if volWeight == CLIMAX_BEAR_WEIGHT
+            meterClimaxBearColor 
+        else if volWeight == RISING_BEAR_WEIGHT
+            meterRisingBearColor
+        else if volWeight == STANDARD_BEAR_WEIGHT
+            meterStandardBearColor
+        else if volWeight == CLIMAX_BULL_WEIGHT
+            meterClimaxBullColor
+        else if volWeight == RISING_BULL_WEIGHT
+            meterRisingBullColor
+        else if volWeight == STANDARD_BULL_WEIGHT
+            meterStandardBullColor
+        else
+            meterStandardBullColor
+    else 
+        volWeight > 0 ? meterClimaxBullColor : meterClimaxBearColor
+
+_getMeterColorAtResolution(_resolution) => 
+    _volWeight = _getPvsraVolumeWeightAtResolution(_resolution)
+    _getMeterColorByVolWeight(_volWeight)
+
+_drawMeterLabel(_resolution, index, labelsArray, isNew) => 
+    _isValidTF = _isValidTimeframeForMeterLabel(_resolution, _getTimeframeMultiplier())
+    _meterTextColor = _isValidTF ? _getMeterColorAtResolution(_resolution) : meterDisabledColor
+    
+    // _initialOffest = meterLabelOffset
+    // _currentOffset = index * meterLabelWidthInBars
+    // _totalOffset = meterLabelOffset + _currentOffset
+    // _labelTime = _getTimeNBarsFromNow(_totalOffset)
+
+    _msPerBar = time[0] - time[1]
+
+    _initialTime = _wickTime
+    _fixedOffsetInMs = meterLabelOffset * _msPerBar
+    
+    _currentOffsetInBars = (index - 5) * meterLabelWidthInBars
+    _currentOffsetInMS = _currentOffsetInBars * _msPerBar
+
+    _labelTime = _initialTime + _currentOffsetInMS + _fixedOffsetInMs
+
+    _avgRangeOfHigherTFCandles = _security(sma(high - low, 50),_mCandleResolution)
+    _verticalMargin = abs(_avgRangeOfHigherTFCandles * meterVerticalMarginMultiple)
+    _y = meterVerticalMarginMultiple > 0 
+      ? _high + _verticalMargin 
+      : _low - _verticalMargin
+
+    // _avgRange = sma(high - low, 20)
+    // _verticalMargin = _avgRange * meterVerticalMarginMultiple
+    // _y = highest(high, 100) + _verticalMargin
+    
+    // _y = ema(close, 50)
+
+    labelId = label.new(
+         x=_labelTime,
+         y=_y,
+         text=_isValidTF ? _resolution : 'n/a',
+         textcolor=_meterTextColor,
+         style=meterLabelStyle,
+         size=meterLabelSize,
+         xloc=xloc.bar_time)
+
+    array.push(labelsArray, labelId)
+
+    // cleanup
+    if not isNew 
+        labelToDelete = array.shift(labelsArray)
+        label.delete(labelToDelete)
+
+_drawMeterLines() => 
+    isNew = array.size(meterLabels) == 0
+    
+    _drawMeterLabel('1', 1, meterLabels, isNew)
+    _drawMeterLabel('5', 2, meterLabels, isNew)
+    _drawMeterLabel('15', 3, meterLabels, isNew)
+    _drawMeterLabel('30', 4, meterLabels, isNew)
+    _drawMeterLabel('60', 5, meterLabels, isNew)
+    _drawMeterLabel('240', 6, meterLabels, isNew)
+    _drawMeterLabel('D', 7, meterLabels, isNew)
+    _drawMeterLabel('W', 8, meterLabels, isNew)
+    _drawMeterLabel('M', 9, meterLabels, isNew)
+
+if meterActive
+    _drawMeterLines()
+
+//////////////////////////////////////////////////////////////////
+// 
+// ==== SWEET SPOT ==== 
+// 
+//////////////////////////////////////////////////////////////////
+
+groupSweetSpot = '---- Sweet Spot ----'
+
+ssActive = input(true, 'Sweet Spot Active', group=groupSweetSpot)
+ssShowLabels = input(true, 'Show Labels?', group=groupSweetSpot)
+ssShowWhole = input(true, 'Show Whole', group=groupSweetSpot)
+ssShowHalf = input(true, 'Show Half', group=groupSweetSpot)
+ssShowQuarter = input(true, 'Show Quarter', group=groupSweetSpot)
+ssPlotRangeInMultiplesOfWhole = input(2, 'Plot Range (in multiples of the whole)', 
+ minval=0,
+ tooltip='Example:  plotRange=2.  open = 31,795.  This would plot a line at each whole level between 30k (32-2) and 34k (32+2).', 
+ group=groupSweetSpot)
+
+ssWholeLevelOverride = input(0, 'Whole Level Override', minval=0, tooltip='Only active if greater than 0.  You shouldn\'t need to use this, but just in case.', group=groupSweetSpot)
+
+ssLineOffset = input(43, 'Line Offset (in bars)', group=groupSweetSpot)
+ssLineLength = input(20, 'Line Length (in bars)', group=groupSweetSpot)
+ssLabelOffset = input(-4, 'Label Offset (in bars)', group=groupSweetSpot)
+
+ssLineWidth = input(2, 'Line Width', options=[1,2,3,4], group=groupSweetSpot)
+
+ssLineStyle = input(line.style_solid, 'Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupSweetSpot)
+ssLineExtendWhole = input(extend.none, 'Line Extend Whole', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
+ssLineExtendHalf = input(extend.none, 'Line Extend Half', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
+ssLineExtendQuarter = input(extend.none, 'Line Extend Quarter', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
+ssLabelStyle = input(label.style_none, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle], group=groupSweetSpot)
+ssLabelTextColor = input(color.white, 'Label Text Color', group=groupSweetSpot)
+ssLabelSize = input(size.normal, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupSweetSpot)
+
+COLOR_PEACH = #e57373
+
+wholeColor = input(color.new(COLOR_PEACH, 10), 'Whole Color', group=groupSweetSpot)
+halfColor = input(color.new(COLOR_PEACH, 40), 'Half Color', group=groupSweetSpot)
+quarterColor = input(color.new(COLOR_PEACH, 70), 'Quarter Color', group=groupSweetSpot)
+
+_getSweetSpotLevels() => 
+    wholeLevel = 
+         ssWholeLevelOverride > 0 ? ssWholeLevelOverride :
+         open > 5000 ? 1000 :
+         open > 500 ? 100 :
+         open > 50 ? 10 : 
+         open > 5 ? 1 : 
+         open > 0.5 ? 0.1 : 
+         open > 0.05 ? 0.01 :
+         0.001
+    halfLevel = wholeLevel / 2
+    quarterLevel = wholeLevel / 4
+    [wholeLevel, halfLevel, quarterLevel]
+
+_getNearestWhole(wholeLevel) => 
+    currentPrice = open[0]
+    wholeLevel == 0 ? currentPrice : currentPrice - (currentPrice % wholeLevel)
+
+_getRange(wholeLevel, nearestWhole) => 
+    _min = nearestWhole - (wholeLevel * ssPlotRangeInMultiplesOfWhole)
+    _max = nearestWhole + (wholeLevel * ssPlotRangeInMultiplesOfWhole)
+    [_min, _max]    
+
+ 
+_getItemAtIndex(arrayId, index) => 
+    array.size(arrayId) >= index + 1 ? array.get(arrayId, index) : na   
+
+[wholeLevel, halfLevel, quarterLevel] = _getSweetSpotLevels()
+nearestWhole = _getNearestWhole(wholeLevel)
+[_min, _max] = _getRange(wholeLevel[0], nearestWhole)
+
+var float[] wholeValues = array.new_float(0)
+var float[] halfValues = array.new_float(0)
+var float[] quarterValues = array.new_float(0)
+
+_buildSweetSpotArrays() => 
+    array.clear(wholeValues)
+    array.clear(halfValues)
+    array.clear(quarterValues)
+
+    wholeLoopSize = 1 + (2 * ssPlotRangeInMultiplesOfWhole * 1)
+    halfLoopSize = 1 + (2 * ssPlotRangeInMultiplesOfWhole * 2)
+    quarterLoopSize = 1 + (2 * ssPlotRangeInMultiplesOfWhole * 4)
+
+    for _i = 1 to wholeLoopSize
+        valueToPush = _min + (_i * wholeLevel)
+        isValid = true
+        if isValid
+            array.push(wholeValues, valueToPush)
+
+    for _i = 1 to halfLoopSize
+        valueToPush = _min + (_i * halfLevel)
+        isValid = not array.includes(wholeValues, valueToPush)
+        if isValid
+            array.push(halfValues, valueToPush)
+
+    for _i = 1 to quarterLoopSize
+        valueToPush = _min + (_i * quarterLevel)
+        isValid = not array.includes(wholeValues, valueToPush) and not array.includes(halfValues, valueToPush)
+        if isValid
+            array.push(quarterValues, valueToPush)
+
+
+_buildSweetSpotArrays()
+
+_getSweetSpotLinePlotValues(ssLineOffset, ssLineLength, ssLabelOffset) => 
+    x1 = _getTimeNBarsFromNow(ssLineOffset)
+    x2 = _getTimeNBarsFromNow(ssLineOffset + ssLineLength)
+    timePerBar = time[0] - time[1]
+    labelTime = x2 + (ssLabelOffset * timePerBar)
+    [x1, x2, labelTime]
+
+var line[] wholeLines = array.new_line(0)
+var line[] halfLines = array.new_line(0)
+var line[] quarterLines = array.new_line(0)
+var label[] wholeLabels = array.new_label(0)
+var label[] halfLabels = array.new_label(0)
+var label[] quarterLabels = array.new_label(0)
+
+[x1, x2, labelTime] = _getSweetSpotLinePlotValues(ssLineOffset, ssLineLength, ssLabelOffset)
+
+_drawSweetSpotLinesAndLabels(linesArray, labelsArray, valuesArray, _color, lineExtend) => 
+    isNew = array.size(linesArray) == 0
+    size = array.size(valuesArray)
+
+    for _i = 0 to (size -1)
+        _price = array.get(valuesArray, _i)
+        
+        line lineId = line.new(
+             x1=x1, 
+             y1=_price, 
+             x2=x2, 
+             y2=_price, 
+             xloc=xloc.bar_time, 
+             extend=lineExtend, 
+             color=_color, 
+             style=ssLineStyle, 
+             width=ssLineWidth)
+        line.set_xy1(lineId, x1, _price)
+        line.set_xy2(lineId, x2, _price)
+        array.push(linesArray, lineId)
+        
+        // create a label on the last bar (aka the current bar)
+        // the `var` keyword will make it only create once
+        // set_xy, and set_text will update the label
+        labelId = label.new(
+             x=labelTime,
+             y=_price,
+             text=tostring(_price),
+             textcolor=ssLabelTextColor,
+             style=ssLabelStyle,
+             size=ssLabelSize,
+             xloc=xloc.bar_time,
+             color=_color)
+
+        // label.set_xy(labelId, x1, _price)
+        // label.set_text(labelId, tostring(_price))
+        array.push(labelsArray, labelId)
+
+        // cleanup
+        if not isNew 
+            lineToDelete = array.shift(linesArray)
+            line.delete(lineToDelete)
+            labelToDelete = array.shift(labelsArray)
+            label.delete(labelToDelete)
+
+if barstate.islast and ssActive
+    _drawSweetSpotLinesAndLabels(
+         wholeLines, 
+         wholeLabels, 
+         wholeValues, 
+         wholeColor, 
+         ssLineExtendWhole
+         )
+    
+    _drawSweetSpotLinesAndLabels(
+         halfLines, 
+         halfLabels, 
+         halfValues, 
+         halfColor, 
+         ssLineExtendHalf
+         )
+    
+    _drawSweetSpotLinesAndLabels(
+         quarterLines, 
+         quarterLabels, 
+         quarterValues, 
+         quarterColor, 
+         ssLineExtendQuarter
+         )
