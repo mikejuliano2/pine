@@ -18,9 +18,9 @@ useAutoResolution = input(true, 'Use Auto Resolution?', group=groupMCandles, too
 
 autoResolutionFor1MinTF = input('60', 'Auto Resolution - 1m', group=groupMCandles, options=['15', '30', '60', '120', '240'], tooltip='Pick the M candles timeframe you want to see when on the 1m timeframe.  Only applicable if on 1m Timeframe and auto-resolution is ON')
 fixedResolution = input("60", 'Fixed Resolution', type=input.resolution, group=groupMCandles, tooltip='Only Relevant if auto-resolution is off')
-maxTimeframeForMCandles = input(60, 'Max Timeframe', group=groupMCandles, minval=1, maxval=240, tooltip='M Candles will be hidden when above this timeframe')
+maxTimeframeForMCandles = input(1, 'Max Timeframe', group=groupMCandles, minval=1, maxval=240, tooltip='M Candles will be hidden when above this timeframe')
 
-opacityBodyFill = input(70, 'Opacity - Body Fill', minval=0, maxval=100, group=groupMCandles)
+opacityBodyFill = input(90, 'Opacity - Body Fill', minval=0, maxval=100, group=groupMCandles)
 opacityBodyBorder = input(40, 'Opacity - Body Border', minval=0, maxval=100, group=groupMCandles)
 opacityWick = input(10, 'Opacity - Wick', minval=0, maxval=100, group=groupMCandles)
 bodyBorderWidth = input(4, 'Body Border Width', options=[1,2,3,4], group=groupMCandles)
@@ -425,7 +425,7 @@ ssLineExtendHalf = input(extend.none, 'Line Extend Half', options=[extend.none, 
 ssLineExtendQuarter = input(extend.none, 'Line Extend Quarter', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
 ssLabelStyle = input(label.style_none, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle], group=groupSweetSpot)
 ssLabelTextColor = input(color.white, 'Label Text Color', group=groupSweetSpot)
-ssLabelSize = input(size.normal, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupSweetSpot)
+ssLabelSize = input(size.large, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupSweetSpot)
 
 COLOR_PEACH = #e57373
 

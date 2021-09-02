@@ -61,8 +61,8 @@ showConditionalEma30mLabel = input(true, 'Show Conditional 30m label?', group=gr
 // LINES
 // --------------------------
 
-lineWidth = input(1, 'EMA Line Width', options=[1,2,3,4], group=groupLines)
-lineOpacity = input(0, 'Line Opacity', maxval=100, minval=0, group=groupLines)
+lineWidth = input(2, 'EMA Line Width', options=[1,2,3,4], group=groupLines)
+lineOpacity = input(30, 'Line Opacity', maxval=100, minval=0, group=groupLines)
 
 // --------------------------
 // Labels

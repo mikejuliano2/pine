@@ -4,11 +4,18 @@
 // 
 //////////////////////////////////////////////////////////////////
 
-meter should go just above the high for the current M Candle
+ADR colors
+plot ADR Hi/Low
+marker for end of week/month
+label for the current candle date/time (good for backtesting)
 
 make the meter centered around the high of the wick
 consolidate scripts to share
 list out alerts for all scripts
+
+Some status line that says which session you are in, time of day, time remaining in session
+
+optionally add day of week/month to hour label
 
 move brinks to session levels
 add brinks high/low to lines
@@ -22,6 +29,20 @@ RDH/RDL
 make the pvsra average input (10) tweakable
 
 *** Yesterday Daily Open
+
+
+
+IDEA: Entry Condition Builder
+- Toggle a list of conditions from settings
+- For each active setting, draw a label - grey if condition is met, green if not
+- use security to grab all conditions in one script
+- 5 below 13, price below 50, price above pivot, etc.
+- price above/below some adjustable value defined in settings (e.g. the psych high, or local low)
+- alertcondition when all short conditions met
+- alertcondition when all long conditions met
+
+
+
 
 
 NON-CODE

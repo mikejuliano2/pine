@@ -186,7 +186,7 @@ sharedLabelVisible = input(true, 'Label Visible?', group=groupShared)
 sharedLabelSize = input(size.normal, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupShared)
 sharedLineExtend = input(extend.none, 'Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupShared)
 sharedLabelShowPrice = input(false, 'Show Price in Label?', group=groupShared)
-sharedLineWidth = input(1, 'Line Width', options=[1,2,3,4], group=groupShared)
+sharedLineWidth = input(2, 'Line Width', options=[1,2,3,4], group=groupShared)
 
 onlyShowYesterdayHighLowForCurrentDay = input(true, 'Only show yesterday H/L on current day?', group=groupShared)
 onlyShowLastWeekHighLowForCurrentDay = input(true, 'Only show last week H/L on current day?', group=groupShared)
@@ -199,7 +199,7 @@ yhlLineStyle = input(line.style_solid, 'Line Style', options=[line.style_solid, 
 lwhlColor = input(color.new(#9c27b0, 0), 'Color', group=groupLastWeek)
 lwhlLineStyle = input(line.style_solid, 'Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLastWeek)
 
-adrColor = input(color.new(COLOR_TEAL, 0), 'ADR Color', group=groupAdr)
+adrColor = input(color.new(COLOR_PEACH, 0), 'ADR Color', group=groupAdr)
 awrColor = input(color.new(COLOR_GREEN, 0), 'AWR Color', group=groupAdr)
 amrColor = input(color.new(COLOR_ROYAL_BLUE, 0), 'AMR Color', group=groupAdr)
 adrLineStyle = input(line.style_solid, 'Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupAdr)

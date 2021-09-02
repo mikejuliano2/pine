@@ -209,7 +209,7 @@ camarillaPlotActive = input(false, 'Camarilla Plot', group=groupSwitches)
 showStandardLines = input(true, 'Standard Lines', group=groupSwitches)
 showCamarillaLines = input(true, 'Camarilla Lines', group=groupSwitches)
 fixedToPriceLinesStandard = input(false, 'Fix Standard Pivots to Current Price', group=groupSwitches)
-fixedToPriceLinesCamarilla = input(true, 'Fix Camarilla Pivots to Current Price', group=groupSwitches)
+fixedToPriceLinesCamarilla = input(false, 'Fix Camarilla Pivots to Current Price', group=groupSwitches)
 
 lineOffset = input(15, 'Line Offset (in bars)', tooltip='How many bars away from current price to shift x1', group=groupPositioning)
 lineLength = input(20, 'Line Length (in bars)', minval=0, group=groupPositioning)

@@ -189,7 +189,7 @@ sessionLevelsHighLowPlotStyle = input(plot.style_stepline, 'Plot Style - H/L', g
 sessionHighLowLineOpacity = input(30, 'Opacity - Session H/L', minval=0, maxval=100, group=groupFill)
 sessionFillOpacity = input(85, 'Opacity - Session Fill', minval=0, maxval=100, group=groupFill)
 sessionLevelsOpenLineOpacity = input(10, 'Opacity - Open Line', minval=0, maxval=100, group=groupFill)
-sessionLevelsLookbackHours = input(180, 'Lookback Hours', input.integer, minval=0, maxval=24, tooltip=TT_LB, group=groupFill)
+sessionLevelsLookbackHours = input(0, 'Lookback Hours', input.integer, minval=0, maxval=24, tooltip=TT_LB, group=groupFill)
 sessionFillMaxTimeframe = input(title='Max Timeframe - Session Fill', defval=60, maxval=240, minval=1, group=groupFill)
 
 // daily open plot
@@ -254,8 +254,11 @@ _captureSessionLevels(timeRange) =>
 
 _isWithinSessionLevelsLookbackPeriod() => 
     // the session start time must be after the lookback time
-    lookbackTimeInMs = MS_PER_HOUR * sessionLevelsLookbackHours
-    _currentBarTime() > (timenow - lookbackTimeInMs)
+    if sessionLevelsLookbackHours > 0
+        lookbackTimeInMs = MS_PER_HOUR * sessionLevelsLookbackHours
+        _currentBarTime() > (timenow - lookbackTimeInMs)
+    else 
+        true
     
     // lookbackHours = (24 * sessionLevelsLookbackDays) + hour
     // timeOfSessionBeginning = _getTimeAtStartOfHourNHoursAgo(lookbackHours)
@@ -628,7 +631,6 @@ _drawSessionLines() =>
          londonHighLowLabelVisible, 
          sessionLabelOffsetInBars, 
          sessionLabelShowPrice)
-         
     _londonLowLineId = _drawLabelledLine(
          lineId=londonLowLineId, 
          x1=x1, 
