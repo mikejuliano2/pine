@@ -86,7 +86,7 @@ _isFirstBarForCurrentTimeframeAtResolution(Resolution) =>
 groupBrinks = 'Brinks Box'
 
 // ---- toggles ----
-onlyShowBrinksForCurrentDay = input(true, 'Only show Brinks for current day?', group=groupBrinks)
+onlyShowBrinksForCurrentDay = input(false, 'Only show Brinks for current day?', group=groupBrinks)
 brinksExtendVertically = input(false, 'Extend Brinks Shading Vertically?', group=groupBrinks)
 dailyLast15MinExtendVertically = input(true, 'Extend Daily Last 15min Shading Vertically?', group=groupBrinks)
 nyBrinksActive = input(true, 'New York Brinks Active', group=groupBrinks)
@@ -110,7 +110,7 @@ dailyLast15MinTimeRange = input('2345-0001:1234567', 'Last 15min Time', group=gr
 // FUNCTIONS
 // ---------------
 
-_isValidBrinksTimeframe() => timeframe.multiplier <= maxTimeFrameToShowBrinks
+_isValidBrinksTimeframe() => timeframe.multiplier <= maxTimeFrameToShowBrinks and timeframe.isintraday
 
 _passesBrinksDayRestriction() => onlyShowBrinksForCurrentDay ? _isCurrentDay() : true
 

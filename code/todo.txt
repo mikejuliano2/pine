@@ -3,33 +3,32 @@
 // ==== TODOS ==== 
 // 
 //////////////////////////////////////////////////////////////////
+DAD WIFI e7500dc77b
 
-ADR colors
-plot ADR Hi/Low
-marker for end of week/month
-label for the current candle date/time (good for backtesting)
-
-make the meter centered around the high of the wick
-consolidate scripts to share
-list out alerts for all scripts
-
-Some status line that says which session you are in, time of day, time remaining in session
-
+label for the current candle date/time/day of week (good for backtesting)
+OR plotchar on each day
 optionally add day of week/month to hour label
+fix the session fill shading problem.  reproducible on 60
+
+plot ADR Hi/Low
+*** Yesterday Daily Open
+RDH/RDL
+marker for end of week/month
 
 move brinks to session levels
 add brinks high/low to lines
+
+list out alerts for all scripts
+Some status line that says which session you are in, time of day, time remaining in session
+
+
 alert conditions for asia high/low
 
 camarilla alert condition for level 4 breakout
 some way to indicate that we are in high/low volume time
 SV marker
 pins marker
-RDH/RDL
 make the pvsra average input (10) tweakable
-
-*** Yesterday Daily Open
-
 
 
 IDEA: Entry Condition Builder

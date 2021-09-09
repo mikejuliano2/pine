@@ -108,6 +108,7 @@ COLOR_BLACK = #000000
 groupShared = 'Shared'
 groupLines = 'Lines'
 groupLabels = 'Labels'
+groupDateTimeLabel = 'Date/Time Label'
 
 // SHARED
 maxTimeframe = input(title='Max timeframe', defval=5, maxval=60, minval=1, group=groupShared)
@@ -126,6 +127,13 @@ labelColor = input(color.new(COLOR_BLACK, 25), 'Label Color', group=groupLabels)
 labelTextColor = input(COLOR_VOLT, 'Label Text Color', group=groupLabels)
 labelStyle = input(label.style_label_up, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle], group=groupLabels)
 labelLocation = input(yloc.belowbar, 'Label Location', options=[yloc.price, yloc.abovebar, yloc.belowbar], group=groupLabels)
+
+// DATE/TIME LABEL
+dateTimeLabelMarginMultiple = input(0.4, 'Date/Time Label Margin Multiple', 
+ group=groupDateTimeLabel, minval=-2, maxval=2, step=0.05, 
+ tooltip='Use this to adjust the vertical positioning of the date/time label.  Positive values will place it above price. Negative values will place it below price.')
+dateTimeLabelOffset = input(-25, 'Date/Time Label Offset (in bars)', group=groupDateTimeLabel)
+dateTimeLabelOpacity = input(30, 'Opacity', minval=0, maxval=100)
 
 // var label[] labels = array.new_label(0)
 // var line[] lines = array.new_line(0)
@@ -180,3 +188,71 @@ _plotHourLines() =>
 _plotHourLines()
 _drawLabel()
 
+_getAdjustedHour() => hour < 4 ? hour + 20 : hour - 4
+_getAdjustedDay() => 
+    adjustedDay = dayofweek == 1 and hour < 4 ? 7
+      : hour < 4 ? dayofweek - 1
+      : dayofweek
+_getMinute() => minute < 10 ? '0' + tostring(minute) : tostring(minute)
+
+_dateDisplay() => '(' + tostring(month) + '/' + tostring(dayofmonth) + ') '
+
+_getDayOfWeekLabel() =>
+    adjustedHour = _getAdjustedHour()
+    adjustedDay = _getAdjustedDay()
+
+    if adjustedDay == 1
+        'Sun'
+    else if adjustedDay == 2
+        'Mon'
+    else if adjustedDay == 3
+        'Tues'
+    else if adjustedDay == 4
+        'Wed'
+    else if adjustedDay == 5
+        'Thur'
+    else if adjustedDay == 6
+        'Fri'
+    else
+        'Sat'
+
+_getAdjustedTimeDisplay() => tostring(_getAdjustedHour()) + ':' + _getMinute()
+// _debugDisplay() => 'D' + tostring(dayofweek) + ' h' + tostring(hour) + ' m' + tostring(minute) + ' | '
+
+_getDateTimeDisplay() => 
+    _display = _dateDisplay() + _getDayOfWeekLabel() + ' - ' + _getAdjustedTimeDisplay()
+    timeframe.isintraday ? _display : na
+
+
+_getColorByDay() => 
+    adjustedDay = _getAdjustedDay() 
+    if adjustedDay == 1
+        color.white
+    else if adjustedDay == 2
+        color.red
+    else if adjustedDay == 3
+        color.orange
+    else if adjustedDay == 4
+        color.yellow
+    else if adjustedDay == 5
+        color.green
+    else if adjustedDay == 6
+        color.blue
+    else
+        color.purple
+
+
+
+_getLabelHeight() => 
+    vm = abs(sma(high - low, 50))
+    y = dateTimeLabelMarginMultiple > 0 ? high + vm : low - vm
+
+
+_print(_text, _color) => 
+    var _label = label.new(bar_index, na, _text, xloc.bar_index, yloc.price, color(na), label.style_none, color.new(_color, dateTimeLabelOpacity), size.large, text.align_left)
+    label.set_xy(_label, bar_index + dateTimeLabelOffset, _getLabelHeight())
+    label.set_text(_label, _text)
+    label.set_textcolor(_label, _color)
+
+
+_print(_getDateTimeDisplay(), _getColorByDay())
