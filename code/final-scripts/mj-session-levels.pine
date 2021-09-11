@@ -187,7 +187,7 @@ nyOpenPlotStyle = input(plot.style_cross, 'Plot Style - NY Open', group=groupFil
 
 sessionLevelsHighLowPlotStyle = input(plot.style_stepline, 'Plot Style - H/L', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
 sessionHighLowLineOpacity = input(70, 'Opacity - Session H/L', minval=0, maxval=100, group=groupFill)
-sessionFillOpacity = input(95, 'Opacity - Session Fill', minval=0, maxval=100, group=groupFill)
+sessionFillOpacity = input(90, 'Opacity - Session Fill', minval=0, maxval=100, group=groupFill)
 sessionLevelsOpenLineOpacity = input(10, 'Opacity - Open Line', minval=0, maxval=100, group=groupFill)
 sessionLevelsLookbackHours = input(0, 'Lookback Hours', input.integer, minval=0, maxval=24, tooltip=TT_LB, group=groupFill)
 sessionFillMaxTimeframe = input(title='Max Timeframe - Session Fill', defval=60, maxval=240, minval=1, group=groupFill)
@@ -272,7 +272,7 @@ _getLevelsColors(masterColor, inSession, openPlotActive, highLowPlotActive) =>
               inSession ? color.new(masterColor, sessionHighLowLineOpacity ) : na
             
     fillColor = not highLowPlotActive ? na : 
-              inSession ? color.new(masterColor, sessionFillOpacity ) : na
+              inSession and inSession[1] ? color.new(masterColor, sessionFillOpacity ) : na
 
     [openLineColor, highLowLineColor, fillColor]    
 
@@ -790,3 +790,52 @@ alertcondition(didCrossMT4DailyOpen, title='Price x MT4 Daily Open', message='{{
 alertcondition(didCrossDailyOpen, title='Price x Daily Open', message='{{ticker}} Price x Daily Open')
 alertcondition(didCrossNyOpen, title='Price x NY Open', message='{{ticker}} Price x NY Open')
 alertcondition(didCrossLondonOpen, title='Price x London Open', message='{{ticker}} Price x London Open')     
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////
+// 
+// --- Session Levels using box ---
+// 
+/////////////////////////////////////////////////////////
+
+// showGapBetweenBars = true
+
+// _drawSessionBox(timeRange, masterColor, boxId) => 
+//     timePerBar = time[0] - time[1]
+
+//     isInSession = _isInSession(timeRange)
+//     isFirstBarInSession = not na(isInSession[0]) and na(isInSession[1])
+//     isFirstBarOutOfSession = na(isInSession[0]) and not na(isInSession[1])
+
+//     [sessionHigh, sessionLow, sessionOpen, sessionOpenLineColor, sessionBorderColor, sessionFillColor] = _getValuesForSessionFillPlotting(
+//          timeRange,
+//          masterColor,
+//          false,
+//          true)
+
+//     x2 = bar_index
+
+//     if isFirstBarInSession
+//         // create a new box
+//         x1 = bar_index
+//         box.new(x1, sessionHigh, x2, sessionLow, xloc=xloc.bar_index, border_width=sessionLevelsLineWidth, bgcolor=sessionFillColor)
+//     else if isInSession
+//         // update existing box
+//         box.set_top(boxId, sessionHigh)
+//         box.set_bottom(boxId, sessionLow)
+//         box.set_right(boxId, x2)
+//         boxId
+//     else
+//         box.delete(boxId)
+//         na
+
+// var box asiaBox = na
+// _drawSessionBox(asiaTimeRange, asiaMasterColor, asiaBox)
