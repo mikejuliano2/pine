@@ -202,7 +202,7 @@ dailyOpenPlotMaxTimeframe = input(title='Max Timeframe', defval=60, maxval=240, 
 
 // colors
 
-asianMasterColor = input(#00897b, 'Asia Color', input.color, group=groupColors)
+asiaMasterColor = input(#00897b, 'Asia Color', input.color, group=groupColors)
 londonMasterColor = input(#ff851a, 'London Color', input.color, group=groupColors)
 nyMasterColor = input(#fff176, 'New York Color', input.color, group=groupColors)
 dailyOpenColor = input(#2962ff, 'Daily Open Color', input.color, group=groupColors)
@@ -217,7 +217,7 @@ sessionLabelShowPrice = input(false, 'Show Price in Label?', group=groupLabels)
 
 // time ranges
 
-asianTimeRange = input('0000-0600:1234567', 'Asian Session Time', group=groupTimeRanges, type=input.session)
+asiaTimeRange = input('0000-0600:1234567', 'Asian Session Time', group=groupTimeRanges, type=input.session)
 londonTimeRange = input('0800-1600:1234567', 'London Session Time', group=groupTimeRanges, type=input.session)
 nyTimeRange = input('1330-2000:1234567', 'New York Session Time', group=groupTimeRanges, type=input.session)
 dailyOpenTimeRange = input('0000-0015:1234567', 'Daily Open Time', group=groupTimeRanges, type=input.session)
@@ -301,28 +301,28 @@ _getValuesForSessionFillPlotting(timeRange, masterColor, openPlotActive, highLow
 // Plot + Fill
 // -------------
 
-[asianHigh, asianLow, asianOpen, asianOpenLineColor, asianHighLowLineColor, asianFillColor] = _getValuesForSessionFillPlotting(
-     asianTimeRange, 
-     asianMasterColor, 
+[asiaHigh, asiaLow, asiaOpen, asiaOpenLineColor, asiaHighLowLineColor, asiaFillColor] = _getValuesForSessionFillPlotting(
+     asiaTimeRange, 
+     asiaMasterColor, 
      true, 
      true)
 
-asianPlotHigh = plot(
-      fillAsianSession ? asianHigh : na, 
+asiaPlotHigh = plot(
+      fillAsianSession ? asiaHigh : na, 
       "Asia High", 
-      asianHighLowLineColor, 
+      asiaHighLowLineColor, 
       sessionLevelsLineWidth, 
       sessionLevelsHighLowPlotStyle, 
       join=sessionLevelsLinesJoined)
 
-asianPlotLow  = plot(
-      fillAsianSession ? asianLow : na, 
+asiaPlotLow  = plot(
+      fillAsianSession ? asiaLow : na, 
       "Asia Low",  
-      asianHighLowLineColor,  
+      asiaHighLowLineColor,  
       sessionLevelsLineWidth, 
       sessionLevelsHighLowPlotStyle, 
       join=sessionLevelsLinesJoined)
-fill(asianPlotHigh, asianPlotLow, asianFillColor)
+fill(asiaPlotHigh, asiaPlotLow, asiaFillColor)
 
 [londonHigh, londonLow, londonOpen, londonOpenPlotColor, londonHLPlotColor, londonFillColor] = _getValuesForSessionFillPlotting(
      londonTimeRange, 
@@ -424,13 +424,13 @@ mt4DailyOpenPlot  = plot(
 
 // sessionLabelX2 = _getTimeNBarsFromNow(sessionLabelOffsetInBars)
 
-// asianHighlabelId = _drawSessionnLabel(sessionLabelX2, asianHigh, 'Asia High', sessionLabelStyle, size.normal, asianMasterColor, color.white)
+// asianHighlabelId = _drawSessionnLabel(sessionLabelX2, asiaHigh, 'Asia High', sessionLabelStyle, size.normal, asiaMasterColor, color.white)
 // label.delete(asianHighlabelId[1])
 
-// asianLowlabelId = _drawSessionnLabel(sessionLabelX2, asianLow, 'Asia Low', sessionLabelStyle, size.normal, asianMasterColor, color.white)
+// asianLowlabelId = _drawSessionnLabel(sessionLabelX2, asiaLow, 'Asia Low', sessionLabelStyle, size.normal, asiaMasterColor, color.white)
 // label.delete(asianLowlabelId[1])
 
-// asianOpenLabelId = _drawSessionnLabel(sessionLabelX2, asianOpen, 'Daily Open', sessionLabelStyle, size.normal, asianMasterColor, color.white)
+// asianOpenLabelId = _drawSessionnLabel(sessionLabelX2, asiaOpen, 'Daily Open', sessionLabelStyle, size.normal, asiaMasterColor, color.white)
 // label.delete(asianOpenLabelId[1])
 
 // londonOpenLabelId = _drawSessionnLabel(sessionLabelX2, londonOpen, 'London Open', sessionLabelStyle, size.normal, londonMasterColor, color.white)
@@ -466,7 +466,7 @@ _drawSessionLines() =>
     londonHighLowLabelVisible = true
     mt4DailyOpenHighLowLabelVisible = false
 
-    asianLabelColor = color.new(asianMasterColor, sessionLabelOpacity)
+    asianLabelColor = color.new(asiaMasterColor, sessionLabelOpacity)
     londonLabelColor = color.new(londonMasterColor, sessionLabelOpacity)
     nyLabelColor = color.new(nyMasterColor, sessionLabelOpacity)
     
@@ -482,7 +482,7 @@ _drawSessionLines() =>
          asianOpenLineId, 
          x1, 
          x2, 
-         asianOpen, 
+         asiaOpen, 
          mt4DailyOpenColor, 
          sessionLevelsLineWidth, 
          asianOpenLineStyle, 
@@ -500,8 +500,8 @@ _drawSessionLines() =>
          asianHighLineId, 
          x1, 
          x2, 
-         asianHigh, 
-         asianMasterColor,
+         asiaHigh, 
+         asiaMasterColor,
          sessionLevelsLineWidth, 
          sessionLevelsHighLowLineStyle, 
          sessionLevelsLineExtend, 
@@ -518,8 +518,8 @@ _drawSessionLines() =>
          asianLowLineId, 
          x1, 
          x2, 
-         asianLow, 
-         asianMasterColor, 
+         asiaLow, 
+         asiaMasterColor, 
          sessionLevelsLineWidth, 
          sessionLevelsHighLowLineStyle, 
          sessionLevelsLineExtend, 
@@ -712,7 +712,7 @@ if na(_mt4DailyOpenLineId)
 /////////////////////////////////////////////////////////////
 
 didCrossMT4DailyOpen = cross(close, mt4Open)
-didCrossDailyOpen = cross(close, asianOpen)
+didCrossDailyOpen = cross(close, asiaOpen)
 didCrossNyOpen = cross(close, nyOpen)
 didCrossLondonOpen = cross(close, londonOpen)
 
