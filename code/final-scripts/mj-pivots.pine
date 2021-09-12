@@ -438,7 +438,7 @@ _drawPivots(_lines)
 // 
 //////////////////////////////////////////////////////////////////
 
-plotStyle = input(plot.style_line, 'Plot Style', group=groupPlot, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+plotStyle = input(plot.style_stepline, 'Plot Style', group=groupPlot, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
 
 isFirstPointOfDay = _open != _open[1]
 
@@ -449,9 +449,8 @@ sPlotColor = isFirstPointOfDay ? na : sLineColor
 mPlotColor = isFirstPointOfDay ? na : mLineColor
 ppPlotColor = isFirstPointOfDay ? na : ppLineColor
 
-
 plotH1 = plot(
-      camarillaPlotActive ? h1 : na, 
+      camarillaPlotActive and not isFirstPointOfDay ? h1 : na, 
       "H1 Plot", 
       color.new(hPlotColor, opacityCamarillaOne),
       lineWidth, 
@@ -459,7 +458,7 @@ plotH1 = plot(
       )
 
 plotH2 = plot(
-      camarillaPlotActive ? h2 : na, 
+      camarillaPlotActive and not isFirstPointOfDay ? h2 : na, 
       "H2 Plot", 
       color.new(hPlotColor, opacityCamarillaTwo),
       lineWidth, 
@@ -467,7 +466,7 @@ plotH2 = plot(
       )
 
 plotH3 = plot(
-      camarillaPlotActive ? h3 : na, 
+      camarillaPlotActive and not isFirstPointOfDay ? h3 : na, 
       "H3 Plot", 
       color.new(hPlotColor, opacityCamarillaThree),
       lineWidth, 
@@ -475,7 +474,7 @@ plotH3 = plot(
       )
 
 plotH4 = plot(
-      camarillaPlotActive ? h4 : na, 
+      camarillaPlotActive and not isFirstPointOfDay ? h4 : na, 
       "H4 Plot", 
       color.new(hPlotColor, opacityCamarillaFour),
       lineWidth, 
@@ -483,7 +482,7 @@ plotH4 = plot(
       )
 
 plotH5 = plot(
-      camarillaPlotActive ? h5 : na, 
+      camarillaPlotActive and not isFirstPointOfDay ? h5 : na, 
       "H5 Plot", 
       color.new(hPlotColor, opacityCamarillaFive),
       lineWidth, 
@@ -491,7 +490,7 @@ plotH5 = plot(
       )
 
 plotL1 = plot(
-      camarillaPlotActive ? l1 : na, 
+      camarillaPlotActive and not isFirstPointOfDay ? l1 : na, 
       "L1 Plot", 
       color.new(lPlotColor, opacityCamarillaOne), 
       lineWidth, 
@@ -499,7 +498,7 @@ plotL1 = plot(
       )
 
 plotL2 = plot(
-      camarillaPlotActive ? l2 : na, 
+      camarillaPlotActive and not isFirstPointOfDay ? l2 : na, 
       "L2 Plot", 
       color.new(lPlotColor, opacityCamarillaTwo), 
       lineWidth, 
@@ -507,7 +506,7 @@ plotL2 = plot(
       )
 
 plotL3 = plot(
-      camarillaPlotActive ? l3 : na, 
+      camarillaPlotActive and not isFirstPointOfDay ? l3 : na, 
       "L3 Plot",
       color.new(lPlotColor, opacityCamarillaThree),
       lineWidth, 
@@ -515,7 +514,7 @@ plotL3 = plot(
       )
 
 plotL4 = plot(
-      camarillaPlotActive ? l4 : na, 
+      camarillaPlotActive and not isFirstPointOfDay ? l4 : na, 
       "L4 Plot", 
       color.new(lPlotColor, opacityCamarillaFour),
       lineWidth, 
@@ -523,7 +522,7 @@ plotL4 = plot(
       )
 
 plotL5 = plot(
-      camarillaPlotActive ? l5 : na, 
+      camarillaPlotActive and not isFirstPointOfDay ? l5 : na, 
       "L5 Plot", 
       color.new(lPlotColor, opacityCamarillaFive),
       lineWidth, 
@@ -531,66 +530,66 @@ plotL5 = plot(
       )
 
 plotM0 = plot(
-      standardPlotActive ? m0 : na, 
+      standardPlotActive and not isFirstPointOfDay ? m0 : na, 
       "M0 Plot", 
       mPlotColor, lineWidth, plotStyle)
 
 plotM1 = plot(
-      standardPlotActive ? m1 : na, 
+      standardPlotActive and not isFirstPointOfDay ? m1 : na, 
       "M1 Plot", 
       mPlotColor, lineWidth, plotStyle)
 
 plotM2 = plot(
-      standardPlotActive ? m2 : na, 
+      standardPlotActive and not isFirstPointOfDay ? m2 : na, 
       "M2 Plot", 
       mPlotColor, lineWidth, plotStyle)
 
 plotM3 = plot(
-      standardPlotActive ? m3 : na, 
+      standardPlotActive and not isFirstPointOfDay ? m3 : na, 
       "M3 Plot", 
       mPlotColor, lineWidth, plotStyle)
 
 plotM4 = plot(
-      standardPlotActive ? m4 : na, 
+      standardPlotActive and not isFirstPointOfDay ? m4 : na, 
       "M4 Plot", 
       mPlotColor, lineWidth, plotStyle)
 
 plotM5 = plot(
-      standardPlotActive ? m5 : na, 
+      standardPlotActive and not isFirstPointOfDay ? m5 : na, 
       "M5 Plot", 
       mPlotColor, lineWidth, plotStyle)
 
 plotS1 = plot(
-      standardPlotActive ? s1 : na, 
+      standardPlotActive and not isFirstPointOfDay ? s1 : na, 
       "S1 Plot", 
       sPlotColor, lineWidth, plotStyle)
 
 plotS2 = plot(
-      standardPlotActive ? s2 : na, 
+      standardPlotActive and not isFirstPointOfDay ? s2 : na, 
       "S2 Plot", 
       sPlotColor, lineWidth, plotStyle)
 
 plotS3 = plot(
-      standardPlotActive ? s3 : na, 
+      standardPlotActive and not isFirstPointOfDay ? s3 : na, 
       "S3 Plot", 
       sPlotColor, lineWidth, plotStyle)
 
 plotR1 = plot(
-      standardPlotActive ? r1 : na, 
+      standardPlotActive and not isFirstPointOfDay ? r1 : na, 
       "R1 Plot", 
       rPlotColor, lineWidth, plotStyle)
 
 plotR2 = plot(
-      standardPlotActive ? r2 : na, 
+      standardPlotActive and not isFirstPointOfDay ? r2 : na, 
       "R2 Plot", 
       rPlotColor, lineWidth, plotStyle)
 
 plotR3 = plot(
-      standardPlotActive ? r3 : na, 
+      standardPlotActive and not isFirstPointOfDay ? r3 : na, 
       "R3 Plot", 
       rPlotColor, lineWidth, plotStyle)
 
 plotPP = plot(
-      standardPlotActive or camarillaPlotActive ? pp : na, 
+      (standardPlotActive or camarillaPlotActive) and not isFirstPointOfDay? pp : na, 
       "PP Plot", 
       ppPlotColor, lineWidth, plotStyle)
