@@ -96,7 +96,7 @@ brinksPlotJoined = input(false, 'Join Brinks Plot Points?', group=groupBrinks)
 // ---- dropdowns ----
 maxTimeFrameToShowBrinks = input(title='Max timeframe to show Brinks', defval=15, maxval=60, minval=1, group=groupBrinks)
 brinksLineColor = input(color.new(color.white, 10), 'Brinks Line Color', group=groupBrinks)
-brinksBgColor = input(color.new(color.white, 0), 'Brinks BG Color', group=groupBrinks)
+brinksBgColor = input(color.new(color.white, 30), 'Brinks BG Color', group=groupBrinks)
 dailyLast15MinLineColor = input(color.new(color.orange, 30), 'Daily Last 15min Line Color', group=groupBrinks)
 dailyLast15MinBgColor = input(color.new(color.orange, 80), 'Daily Last 15min BG Color', group=groupBrinks)
 brinksPlotStyle = input(plot.style_linebr, 'Brinks Plot Style', group=groupBrinks, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
@@ -187,20 +187,21 @@ _captureSessionHighLow(timeRange, isActive) =>
 // --------------
 // londonBrinksLabel = _getBrinksLabel(londonBrinksTimeRange, londonBrinksActive, 'London Brinks Box')
 isValidTF = _isValidBrinksTimeframe()
-_brinksBgColor = _isValidBrinksTimeframe() ? brinksBgColor : na
+_brinksBgColor = isValidTF ? brinksBgColor : na
+_brinksLineColor = isValidTF ? brinksLineColor : na
 
 // London Brinks
 bgcolor(_getBrinksBgColorForTimeRange(londonBrinksTimeRange, londonBrinksActive and brinksExtendVertically, _brinksBgColor))
 [londonBrinksHigh, londonBrinksLow, londonBrinksOpen] = _captureSessionHighLow(londonBrinksTimeRange, londonBrinksActive and not brinksExtendVertically)
-londonBrinksPlotHigh = plot(londonBrinksHigh, 'London Brinks High', brinksLineColor, brinksLineWidth, brinksPlotStyle, join=brinksPlotJoined)
-londonBrinksPlotLow = plot(londonBrinksLow, 'London Brinks Low', brinksLineColor, brinksLineWidth, brinksPlotStyle, join=brinksPlotJoined)
+londonBrinksPlotHigh = plot(londonBrinksHigh, 'London Brinks High', _brinksLineColor, brinksLineWidth, brinksPlotStyle, join=brinksPlotJoined)
+londonBrinksPlotLow = plot(londonBrinksLow, 'London Brinks Low', _brinksLineColor, brinksLineWidth, brinksPlotStyle, join=brinksPlotJoined)
 fill(londonBrinksPlotHigh, londonBrinksPlotLow, _brinksBgColor)
 
 // New York Brinks
 bgcolor(_getBrinksBgColorForTimeRange(nyBrinksTimeRange, nyBrinksActive and brinksExtendVertically, _brinksBgColor))
 [nyBrinksHigh, nyBrinksLow, nyBrinksOpen] = _captureSessionHighLow(nyBrinksTimeRange, nyBrinksActive and not brinksExtendVertically)
-nyBrinksPlotHigh = plot(nyBrinksHigh, 'Ny Brinks High', brinksLineColor, brinksLineWidth, brinksPlotStyle, join=brinksPlotJoined)
-nyBrinksPlotLow = plot(nyBrinksLow, 'Ny Brinks Low', brinksLineColor, brinksLineWidth, brinksPlotStyle, join=brinksPlotJoined)
+nyBrinksPlotHigh = plot(nyBrinksHigh, 'Ny Brinks High', _brinksLineColor, brinksLineWidth, brinksPlotStyle, join=brinksPlotJoined)
+nyBrinksPlotLow = plot(nyBrinksLow, 'Ny Brinks Low', _brinksLineColor, brinksLineWidth, brinksPlotStyle, join=brinksPlotJoined)
 fill(nyBrinksPlotHigh, nyBrinksPlotLow, _brinksBgColor)
 
 // Daily Last 15min
