@@ -187,10 +187,10 @@ nyOpenPlotStyle = input(plot.style_cross, 'Plot Style - NY Open', group=groupFil
 
 sessionLevelsHighLowPlotStyle = input(plot.style_stepline, 'Plot Style - H/L', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
 sessionHighLowLineOpacity = input(70, 'Opacity - Session H/L', minval=0, maxval=100, group=groupFill)
-sessionFillOpacity = input(90, 'Opacity - Session Fill', minval=0, maxval=100, group=groupFill)
+sessionFillOpacity = input(10, 'Opacity - Session Fill', minval=0, maxval=100, group=groupFill)
 sessionLevelsOpenLineOpacity = input(10, 'Opacity - Open Line', minval=0, maxval=100, group=groupFill)
 sessionLevelsLookbackHours = input(0, 'Lookback Hours', input.integer, minval=0, maxval=24, tooltip=TT_LB, group=groupFill)
-sessionFillMaxTimeframe = input(title='Max Timeframe - Session Fill', defval=60, maxval=240, minval=1, group=groupFill)
+sessionFillMaxTimeframe = input(title='Max Timeframe - Session Fill', defval=15, maxval=240, minval=1, group=groupFill)
 
 // daily open plot
 
@@ -202,9 +202,9 @@ dailyOpenPlotMaxTimeframe = input(title='Max Timeframe', defval=60, maxval=240, 
 
 // colors
 
-asiaMasterColor = input(#00897b, 'Asia Color', input.color, group=groupColors)
+asiaMasterColor = input(#0b3d37, 'Asia Color', input.color, group=groupColors)
 londonMasterColor = input(#ff851a, 'London Color', input.color, group=groupColors)
-nyMasterColor = input(#fff176, 'New York Color', input.color, group=groupColors)
+nyMasterColor = input(#470b2b, 'New York Color', input.color, group=groupColors)
 dailyOpenColor = input(#2962ff, 'Daily Open Color', input.color, group=groupColors)
 mt4DailyOpenColor = input(#2962ff, 'MT4 Daily Open Color', input.color, group=groupColors)
 
