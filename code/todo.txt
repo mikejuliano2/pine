@@ -7,10 +7,10 @@ DAD WIFI e7500dc77b
 
 
 fill the dead gap time + weekend time instead of NY/London sessions
-have a flag overrideFillOpacity, when checked, use that for all session, otherwise use the one set in the input
 separate session fill color and session line color
 session levels - max timeframe is applying to lines, should just be fills
-pivots - plot label if first bar of change
+
+it would be nice to have sidebar lines all in one place and separate from plotting
 
 optionally add day of week/month to hour label
 fix the session fill shading problem.  reproducible on 60
