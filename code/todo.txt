@@ -5,8 +5,13 @@
 //////////////////////////////////////////////////////////////////
 DAD WIFI e7500dc77b
 
-label for the current candle date/time/day of week (good for backtesting)
-OR plotchar on each day
+
+fill the dead gap time + weekend time instead of NY/London sessions
+have a flag overrideFillOpacity, when checked, use that for all session, otherwise use the one set in the input
+separate session fill color and session line color
+session levels - max timeframe is applying to lines, should just be fills
+pivots - plot label if first bar of change
+
 optionally add day of week/month to hour label
 fix the session fill shading problem.  reproducible on 60
 

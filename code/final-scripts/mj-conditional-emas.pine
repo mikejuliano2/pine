@@ -38,7 +38,7 @@ ema13Color = input(color.new(#b71c1c, 20), '13 EMA Color', group=groupColors)
 ema50Color = input(color.new(COLOR_TEAL, 20), '50 EMA Color', group=groupColors)
 ema200Color = input(color.new(COLOR_WHITE, 20), '200 EMA Color', group=groupColors)
 ema800Color = input(color.new(COLOR_PURPLE, 20), '800 EMA Color', group=groupColors)
-ema50CloudColor = input(color.new(#26c6da, 85), '50 EMA Cloud Color', group=groupColors)
+ema50CloudColor = input(color.new(#00bcd4, 80), '50 EMA Cloud Color', group=groupColors)
 emaConditional1hColor = input(color.new(COLOR_ORANGE, 15), 'EMA Conditional 1h Color', group=groupColors)
 emaConditional15mColor = input(color.new(COLOR_MAGENTA, 40), 'EMA Conditional 15m Color', group=groupColors)
 emaConditional5mColor = input(color.new(COLOR_LIME, 40), 'EMA Conditional 5m Color', group=groupColors)
@@ -62,7 +62,7 @@ showConditionalEma30mLabel = input(true, 'Show Conditional 30m label?', group=gr
 // --------------------------
 
 lineWidth = input(2, 'EMA Line Width', options=[1,2,3,4], group=groupLines)
-lineOpacity = input(30, 'Line Opacity', maxval=100, minval=0, group=groupLines)
+lineOpacity = input(20, 'Line Opacity', maxval=100, minval=0, group=groupLines)
 
 // --------------------------
 // Labels
@@ -139,6 +139,15 @@ emaConditional5m = _getEmaVal(_5mVal)
 
 [emaConditional1hText, emaConditional15mText, emaConditional5mText, emaConditional30mText] = _getConditionalLabels()
 
+// ----------------------------
+// Plot 50 EMA Cloud (make sure this is before plotting the lines so it's behind the lines... meaning the z-index)
+// ----------------------------
+
+cloudSize = stdev(close, 50 * 2) / 4 // 50 because it's for the 50 EMA
+cloudPlotUpper = plot(ema50 + cloudSize, '50 EMA Upper Cloud', color=ema50CloudColor, offset=0)
+cloudPlotLower = plot(ema50 - cloudSize, '50 EMA Lower Cloud', color=ema50CloudColor, offset=0)
+fill(cloudPlotUpper, cloudPlotLower, title='50 EMA Cloud', color=ema50CloudColor)
+
 // -----------------
 // Plot EMAs
 // -----------------
@@ -176,15 +185,6 @@ plot(
 //      color=emaConditional30mColor, 
 //      linewidth=lineWidth, 
 //      title='EMA Conditional 30m')
-
-// ----------------------------
-// Plot 50 EMA Cloud
-// ----------------------------
-
-cloudSize = stdev(close, 50 * 2) / 4 // 50 because it's for the 50 EMA
-cloudPlotUpper = plot(ema50 + cloudSize, '50 EMA Upper Cloud', color=ema50CloudColor, offset=0)
-cloudPlotLower = plot(ema50 - cloudSize, '50 EMA Lower Cloud', color=ema50CloudColor, offset=0)
-fill(cloudPlotUpper, cloudPlotLower, title='50 EMA Cloud', color=ema50CloudColor)
 
 // ---------------------------
 // Draw Labels

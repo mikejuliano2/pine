@@ -207,7 +207,7 @@ groupCamarillaOpacity = 'Camarilla Opacity'
 standardPlotActive = input(false, 'Standard Plot', group=groupSwitches)
 camarillaPlotActive = input(false, 'Camarilla Plot', group=groupSwitches)
 showStandardLines = input(true, 'Standard Lines', group=groupSwitches)
-showCamarillaLines = input(true, 'Camarilla Lines', group=groupSwitches)
+showCamarillaLines = input(false, 'Camarilla Lines', group=groupSwitches)
 fixedToPriceLinesStandard = input(false, 'Fix Standard Pivots to Current Price', group=groupSwitches)
 fixedToPriceLinesCamarilla = input(false, 'Fix Camarilla Pivots to Current Price', group=groupSwitches)
 
@@ -593,3 +593,41 @@ plotPP = plot(
       (standardPlotActive or camarillaPlotActive) and not isFirstPointOfDay? pp : na, 
       "PP Plot", 
       ppPlotColor, lineWidth, plotStyle)
+
+
+// _drawPlotLabel(_text, _color, _textColor, _y, _isActive) => 
+//     label.new(
+//          isFirstPointOfDay ? bar_index : na,
+//          _y, 
+//          _text, 
+//          textcolor=_textColor, 
+//          style=labelStyle, 
+//          size=labelSize, 
+//          xloc=xloc.bar_index, 
+//          color=_color)
+
+// _drawPlotLabel('M0', mLabelColor, mLabelTextColor, m0, standardPlotActive)
+// _drawPlotLabel('M1', mLabelColor, mLabelTextColor, m1, standardPlotActive)
+// _drawPlotLabel('M2', mLabelColor, mLabelTextColor, m2, standardPlotActive)
+// _drawPlotLabel('M3', mLabelColor, mLabelTextColor, m3, standardPlotActive)
+// _drawPlotLabel('M4', mLabelColor, mLabelTextColor, m4, standardPlotActive)
+// _drawPlotLabel('M5', mLabelColor, mLabelTextColor, m5, standardPlotActive)
+// _drawPlotLabel('S1', sLabelColor, sLabelTextColor, s1, standardPlotActive)
+// _drawPlotLabel('S2', sLabelColor, sLabelTextColor, s2, standardPlotActive)
+// _drawPlotLabel('S3', sLabelColor, sLabelTextColor, s3, standardPlotActive)
+// _drawPlotLabel('R1', rLabelColor, rLabelTextColor, r1, standardPlotActive)
+// _drawPlotLabel('R2', rLabelColor, rLabelTextColor, r2, standardPlotActive)
+// _drawPlotLabel('R3', rLabelColor, rLabelTextColor, r3, standardPlotActive)
+
+// _drawPlotLabel('PP', ppLabelColor, ppLabelTextColor, pp, standardPlotActive or camarillaPlotActive)
+
+// _drawPlotLabel('H1', hLabelColor, hLabelTextColor, h1, camarillaPlotActive)
+// _drawPlotLabel('H2', hLabelColor, hLabelTextColor, h2, camarillaPlotActive)
+// _drawPlotLabel('H3', hLabelColor, hLabelTextColor, h3, camarillaPlotActive)
+// _drawPlotLabel('H4', hLabelColor, hLabelTextColor, h4, camarillaPlotActive)
+// _drawPlotLabel('H5', hLabelColor, hLabelTextColor, h5, camarillaPlotActive)
+// _drawPlotLabel('L1', lLabelColor, lLabelTextColor, l1, camarillaPlotActive)
+// _drawPlotLabel('L2', lLabelColor, lLabelTextColor, l2, camarillaPlotActive)
+// _drawPlotLabel('L3', lLabelColor, lLabelTextColor, l3, camarillaPlotActive)
+// _drawPlotLabel('L4', lLabelColor, lLabelTextColor, l4, camarillaPlotActive)
+// _drawPlotLabel('L5', lLabelColor, lLabelTextColor, l5, camarillaPlotActive)
