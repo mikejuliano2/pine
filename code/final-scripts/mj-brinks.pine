@@ -95,8 +95,8 @@ dailyLast15minActive = input(true, 'Last 15min of Day Active', group=groupBrinks
 brinksPlotJoined = input(false, 'Join Brinks Plot Points?', group=groupBrinks)
 // ---- dropdowns ----
 maxTimeFrameToShowBrinks = input(title='Max timeframe to show Brinks', defval=15, maxval=60, minval=1, group=groupBrinks)
-brinksLineColor = input(color.new(color.white, 100), 'Brinks Line Color', group=groupBrinks)
-brinksBgColor = input(color.new(color.white, 30), 'Brinks BG Color', group=groupBrinks)
+brinksLineColor = input(color.new(#434651, 100), 'Brinks Line Color', group=groupBrinks)
+brinksBgColor = input(color.new(#434651, 30), 'Brinks BG Color', group=groupBrinks)
 dailyLast15MinLineColor = input(color.new(#f57f17, 100), 'Daily Last 15min Line Color', group=groupBrinks)
 dailyLast15MinBgColor = input(color.new(#f57f17, 60), 'Daily Last 15min BG Color', group=groupBrinks)
 brinksPlotStyle = input(plot.style_linebr, 'Brinks Plot Style', group=groupBrinks, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
