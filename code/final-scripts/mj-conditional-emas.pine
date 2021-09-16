@@ -244,7 +244,7 @@ label.delete(labelConditional5m[1])
 // Cross Markers
 // -----------------
 // Active
-allMarkersActive = input(true, 'Markers Active?', group=groupMarkers)
+allMarkersActive = input(false, 'Markers Active?', group=groupMarkers)
 marker5x13Active = input(true, 'Plot 5/13 Cross?', group=groupMarkers)
 marker5x50Active = input(false, 'Plot 5/50 Cross?', group=groupMarkers)
 marker13x50Active = input(true, 'Plot 13/50 Cross?', group=groupMarkers)

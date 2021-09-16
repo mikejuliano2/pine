@@ -768,7 +768,7 @@ markerShapeSize = size.small // must be constant or compiler will complain
 
 markerTextColorSameAsMarkerColor = input(false, 'Text Color Same As Marker Color?', group=groupMarkers)
 showCrossMarkerMt4Open = input(false, 'Show Cross Marker - MT4 Daily Open', group=groupMarkers)
-showCrossMarkerDailyOpen = input(true, 'Show Cross Marker - Daily Open', group=groupMarkers)
+showCrossMarkerDailyOpen = input(false, 'Show Cross Marker - Daily Open', group=groupMarkers)
 showCrossMarkerNyOpen = input(false, 'Show Cross Marker - NY Open', group=groupMarkers)
 showCrossMarkerLondonOpen = input(false, 'Show Cross Marker - London Open', group=groupMarkers)
 
