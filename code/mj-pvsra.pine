@@ -34,7 +34,7 @@ groupColors = 'Colors'
 groupSymbol = 'Symbol'
 
 // OVERLAY
-overlayEnabled = input(true, 'Enabled', group=groupOverlay)
+overlayEnabled = input(false, 'Enabled', group=groupOverlay)
 overlayScreenPercentage = input(8, 'Screen %', minval=1, maxval=100, group=groupOverlay)
 overlayOpacity = input(30, 'Opacity', minval=0, maxval=100, group=groupOverlay)
 overlayStyle = input(plot.style_histogram, 'Plot Style', group=groupOverlay, options=[plot.style_columns, plot.style_histogram, plot.style_area, plot.style_areabr, plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
@@ -138,7 +138,10 @@ maxVolOfLastNCandles = max(_vol, 100)
 scaledVolume = _vol * overlayScreenPercentage / 100
 
 // plot the max vol (transparent)
-plot(maxVolOfLastNCandles, color=color.new(color.blue, 100))
+plot(
+     overlayEnabled ? maxVolOfLastNCandles : na, 
+     color=color.new(color.blue, 100)
+     )
 
 // plot the volume overlay
 plot(
