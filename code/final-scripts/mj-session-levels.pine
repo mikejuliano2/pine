@@ -171,7 +171,7 @@ plotDailyOpenActive = input(false, 'Plot - Daily Open', group=groupPlotSwitches)
 plotMt4DailyOpenActive = input(false, 'Plot - MT4 Daily Open', group=groupPlotSwitches)
 fillAsianSession = input(true, 'Fill - Asian Session', group=groupPlotSwitches)
 fillLondonSession = input(false, 'Fill - London Session', group=groupPlotSwitches)
-fillNySession = input(false, 'Fill - NY Session', group=groupPlotSwitches)
+fillNySession = input(true, 'Fill - NY Session', group=groupPlotSwitches)
 
 lineLondonOpenActive = input(true, 'Line - London Open', group=groupLineSwitches)
 lineNyOpenActive = input(true, 'Line - NY Open', group=groupLineSwitches)
