@@ -875,7 +875,7 @@ alertcondition(didCrossLondonOpen, title='Price x London Open', message='{{ticke
 // _drawSessionBox(asiaTimeRange, asiaMasterColor, asiaBox)
 
 
-_print(_text) => var _label = label.new(bar_index, na, _text, xloc.bar_index, yloc.price, color(na), label.style_none, color.gray, size.large, text.align_left), label.set_xy(_label, bar_index, highest(10)[1]), label.set_text(_label, _text)
-_printNum(_num) => _print(tostring(_num))
+// _print(_text) => var _label = label.new(bar_index, na, _text, xloc.bar_index, yloc.price, color(na), label.style_none, color.gray, size.large, text.align_left), label.set_xy(_label, bar_index, highest(10)[1]), label.set_text(_label, _text)
+// _printNum(_num) => _print(tostring(_num))
 
-_printNum(time_close('30', '1330-2200:23456'))
+// _printNum(time_close('30', '1330-2200:23456'))
