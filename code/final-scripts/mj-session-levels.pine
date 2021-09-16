@@ -195,7 +195,7 @@ londonLineColor = input(COLOR_ORANGE, 'Line - London', input.color, group=groupC
 
 asiaFillColor = input(color.new(#043c36, 20), 'Fill - Asia', input.color, group=groupFill)
 londonFillColor = input(color.new(#1a1736, 20), 'Fill - London', input.color, group=groupFill)
-nyFillColor = input(color.new(#000000, 20), 'Fill - New York', input.color, group=groupFill)
+nyFillColor = input(color.new(#4e092e, 60), 'Fill - New York', input.color, group=groupFill)
 
 sessionFillOpacity = input(60, 'Opacity - Session Fill', minval=0, maxval=100, group=groupFill)
 overrideFillOpacity = input(false, 'Override Fill Opacity', group=groupFill, tooltip='If true, use a consistent opacity for all session fills.')
@@ -207,18 +207,18 @@ nyOpenPlotStyle = input(plot.style_cross, 'Plot Style - NY Open', group=groupFil
 
 sessionLevelsHighLowPlotStyle = input(plot.style_stepline, 'Plot Style - H/L', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
 
-sessionHighLowLineOpacity = input(100, 'Opacity - Session H/L', minval=0, maxval=100, group=groupFill)
-sessionLevelsOpenLineOpacity = input(10, 'Opacity - Open Line', minval=0, maxval=100, group=groupFill)
+sessionHighLowLineOpacity = input(50, 'Opacity - Session H/L', minval=0, maxval=100, group=groupFill) // TODO this applies to line and fill
+sessionLevelsOpenLineOpacity = input(10, 'Opacity - Open Line', minval=0, maxval=100, group=groupFill) // TODO this applies to line and fill
 sessionLevelsLookbackHours = input(0, 'Lookback Hours', input.integer, minval=0, maxval=24, tooltip=TT_LB, group=groupFill)
 sessionFillMaxTimeframe = input(title='Max Timeframe - Session Fill', defval=15, maxval=240, minval=1, group=groupFill)
 
 // daily open plot
 
-dailyOpenPlotStyle = input(plot.style_circles, 'Plot Style - Daily Open', group=groupDailyOpenPlot, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+dailyOpenPlotStyle = input(plot.style_stepline, 'Plot Style - Daily Open', group=groupDailyOpenPlot, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
 mt4DailyOpenPlotStyle = input(plot.style_circles, 'Plot Style - MT4 Daily Open', group=groupDailyOpenPlot, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
 dailyOpenPlotOpacity = input(0, 'Plot Opacity - Daily Open', group=groupDailyOpenPlot, minval=0, maxval=100)
 mt4DailyOpenPlotOpacity = input(50, 'Plot Opacity - MT4 Daily Open', group=groupDailyOpenPlot, minval=0, maxval=100)
-dailyOpenPlotMaxTimeframe = input(title='Max Timeframe', defval=60, maxval=240, minval=1, group=groupDailyOpenPlot)
+dailyOpenPlotMaxTimeframe = input(title='Max Timeframe', defval=15, maxval=240, minval=1, group=groupDailyOpenPlot)
 
 // line style
 
@@ -266,8 +266,8 @@ _captureSessionLevels(timeRange) =>
             _sessionLow  := low
             _sessionOpen := open
         else //  otherwise we are checking for higher highs and lower lows to update with and remembering the new levels
-            _sessionHigh := high > _sessionHigh ? high : _sessionHigh
-            _sessionLow  := low  < _sessionLow  ? low  : _sessionLow
+            _sessionHigh := max(high, _sessionHigh)
+            _sessionLow  := min(low, _sessionLow)
 
     else if _inHolding //  else if we're in holding state... just reference self to maintain the same levels
         _sessionHigh := _sessionHigh
@@ -873,3 +873,9 @@ alertcondition(didCrossLondonOpen, title='Price x London Open', message='{{ticke
 
 // var box asiaBox = na
 // _drawSessionBox(asiaTimeRange, asiaMasterColor, asiaBox)
+
+
+_print(_text) => var _label = label.new(bar_index, na, _text, xloc.bar_index, yloc.price, color(na), label.style_none, color.gray, size.large, text.align_left), label.set_xy(_label, bar_index, highest(10)[1]), label.set_text(_label, _text)
+_printNum(_num) => _print(tostring(_num))
+
+_printNum(time_close('30', '1330-2200:23456'))

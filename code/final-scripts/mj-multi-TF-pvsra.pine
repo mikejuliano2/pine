@@ -20,10 +20,11 @@ autoResolutionFor1MinTF = input('60', 'Auto Resolution - 1m', group=groupMCandle
 fixedResolution = input("60", 'Fixed Resolution', type=input.resolution, group=groupMCandles, tooltip='Only Relevant if auto-resolution is off')
 maxTimeframeForMCandles = input(1, 'Max Timeframe', group=groupMCandles, minval=1, maxval=240, tooltip='M Candles will be hidden when above this timeframe')
 
-opacityBodyFill = input(90, 'Opacity - Body Fill', minval=0, maxval=100, group=groupMCandles)
+borderStyle = input(line.style_dashed, 'Border Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupMCandles)
+bodyBorderWidth = input(2, 'Body Border Width', options=[1,2,3,4], group=groupMCandles)
 opacityBodyBorder = input(40, 'Opacity - Body Border', minval=0, maxval=100, group=groupMCandles)
+opacityBodyFill = input(90, 'Opacity - Body Fill', minval=0, maxval=100, group=groupMCandles)
 opacityWick = input(10, 'Opacity - Wick', minval=0, maxval=100, group=groupMCandles)
-bodyBorderWidth = input(4, 'Body Border Width', options=[1,2,3,4], group=groupMCandles)
 wickWidth = input(4, 'Wick Width', options=[1,2,3,4], group=groupMCandles)
 
 // COLORS
@@ -204,7 +205,7 @@ _drawBody(x1, x2, y1, y2) =>
     if isValidTimeframe
         adjuster = showGapBetweenBars ? 1 : 0
         adjustedX2 = x2 - round(adjuster * _timePerBarLowTF)
-        drawed_box = box.new(x1, y2, adjustedX2, y1, xloc=xloc.bar_time, border_width=bodyBorderWidth)
+        drawed_box = box.new(x1, y2, adjustedX2, y1, xloc=xloc.bar_time, border_width=bodyBorderWidth, border_style=borderStyle)
         box.set_border_color(drawed_box, bodyBorderColor)
         box.set_bgcolor(drawed_box, bodyFillColor)
         drawed_box

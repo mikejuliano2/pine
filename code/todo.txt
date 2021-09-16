@@ -6,14 +6,21 @@
 DAD WIFI e7500dc77b
 
 
+Need to get clean boxes for brinks and session levels
+*** get the start time and end time of session ***
+if not barstate.islast, plot a clean box
+if barstate.islast, maybe draw a box? if you can get the start and end time of the session, can even extend the box into the future
+
+
+
+
+
+
+
 fill the dead gap time + weekend time instead of NY/London sessions
-separate session fill color and session line color
 session levels - max timeframe is applying to lines, should just be fills
 
 it would be nice to have sidebar lines all in one place and separate from plotting
-
-optionally add day of week/month to hour label
-fix the session fill shading problem.  reproducible on 60
 
 plot ADR Hi/Low
 *** Yesterday Daily Open
@@ -24,7 +31,6 @@ move brinks to session levels
 add brinks high/low to lines
 
 list out alerts for all scripts
-Some status line that says which session you are in, time of day, time remaining in session
 
 
 alert conditions for asia high/low

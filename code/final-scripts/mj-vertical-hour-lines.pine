@@ -111,7 +111,7 @@ groupLabels = 'Labels'
 groupDateTimeLabel = 'Date/Time Label'
 
 // SHARED
-maxTimeframe = input(title='Max timeframe', defval=5, maxval=60, minval=1, group=groupShared)
+maxTimeframe = input(title='Max timeframe', defval=1, maxval=60, minval=1, group=groupShared)
 numHoursToShow = input(24, 'Number of hours to show', group=groupShared, minval=0, maxval=100)
 
 // LINES
