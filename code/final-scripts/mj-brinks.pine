@@ -175,7 +175,7 @@ _captureSessionHighLow(timeRange, isActive) =>
     //     _sessionLow  := na
     //     _sessionOpen := na
 
-    if not isActive or not _passesBrinksDayRestriction()
+    if not isActive or not _passesBrinksDayRestriction() or not _isValidBrinksTimeframe()
         [na, na, na]
     else 
         [_sessionHigh, _sessionLow, _sessionOpen]
