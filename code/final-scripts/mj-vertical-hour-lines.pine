@@ -11,6 +11,7 @@ study("MJ - Vertical Hour Lines", overlay=true)
 int MS_PER_MINUTE = 1000 * 60
 int MS_PER_HOUR = MS_PER_MINUTE * 60
 int MS_PER_DAY = MS_PER_HOUR * 24
+int MS_PER_WEEK = MS_PER_DAY * 7
 
 _getFutureTimeNBarsFromNow(numBars) => time + ( ( time - time[1] ) * numBars )
 
@@ -24,11 +25,15 @@ _calcBarsPerHour() =>
     int barsPerHour = 60 / barLengthInMinutes
 
 _calcBarsPerDay() => _calcBarsPerHour() * 24
+_calcBarsPerWeek() => _calcBarsPerDay() * 7
 
-_timeElapsedTodayInMs() => (MS_PER_HOUR * hour) - (MS_PER_MINUTE * minute) - (1000 * second)
 _timeElapsedThisHourInMs() => (MS_PER_MINUTE * minute) + (1000 * second)
+_timeElapsedTodayInMs() => (MS_PER_HOUR * hour) - (MS_PER_MINUTE * minute) - (1000 * second)
+_timeElapsedThisWeekInMs() => ((dayofweek - 1) * MS_PER_DAY) + _timeElapsedTodayInMs()
 
 _getTimeAtBeginningOfToday() => timenow - _timeElapsedTodayInMs()
+_getTimeAtBeginningOfWeek() => timenow - _timeElapsedThisWeekInMs()
+_getTimeAtBeginningOfNextWeek() => _getTimeAtBeginningOfWeek() + MS_PER_WEEK
     
 _getTimeAtStartOfHourNHoursAgo(numHours) => 
     timeElapsedSinceStartInMs = _timeElapsedThisHourInMs() + (numHours * MS_PER_HOUR)
@@ -278,14 +283,65 @@ _isFirstBarOfWeek() =>
     currentBar = t
     not na(currentBar) and (na(previousBar) or currentBar > previousBar)
 
+
 groupWeekStart = 'Week Start'
-weekStartPlotColor = input(color.new(#4db6ac, 50), 'Week Start Plot Color', group=groupWeekStart)
-weekStartPlotWidth = input(2, 'Week Start Plot Width', options=[1,2,3,4], group=groupWeekStart)
+weekStartLineActive = input(true, 'Is Active', group=groupWeekStart)
+weekStartMaxTimeframe = input(60, 'Max Timeframe', minval=15, maxval=240, group=groupWeekStart)
+weekStartPlotWidth = input(2, 'Plot Width', options=[1,2,3,4], group=groupWeekStart)
+weekStartPlotColor = input(color.new(#4db6ac, 50), 'Plot Color', group=groupWeekStart)
+
+_weekStartLineVisible() => 
+    _isFirstBarOfWeek() and weekStartLineActive and 
+     timeframe.isintraday and not timeframe.isseconds
+      and timeframe.multiplier <= weekStartMaxTimeframe 
+
+barsPerWeek = _calcBarsPerWeek()
+weekMarkerY = low - (high - low)
 
 plot(
-     _isFirstBarOfWeek() ? low - (high-low) : na, 
+     _weekStartLineVisible() ? weekMarkerY : na, 
      style=plot.style_histogram, 
      linewidth=weekStartPlotWidth, 
      color=weekStartPlotColor,
-     title='Start of Week'
+     title='Start of Week',
+     offset=0
      )
+
+plot(
+     _weekStartLineVisible() and _isCurrentDay() ? weekMarkerY : na, 
+     style=plot.style_histogram, 
+     linewidth=weekStartPlotWidth, 
+     color=weekStartPlotColor,
+     title='Start of Next Week',
+     offset=barsPerWeek
+     )
+
+
+
+// plot next week start line
+
+// var line nextWeekLine = na
+
+// _plotVerticalLineAtTime(x, Color, LineStyle, LineWidth) => // Verticle Line Function, ≈50-54 lines maximum allowable per indicator
+//     line.new(
+//          x1=x, 
+//          y1=low, 
+//          x2=x, 
+//          y2=low, 
+//          xloc=xloc.bar_time, 
+//          extend=extend.both, 
+//          color=Color, 
+//          style=LineStyle, 
+//          width=LineWidth
+//          )
+
+// nextWeekStartLineVisible = _weekStartLineVisible()
+// nextWeekStartTime = _getTimeAtBeginningOfNextWeek()
+
+// nextWeekLine := nextWeekStartLineVisible 
+//  ? _plotVerticalLineAtTime(nextWeekStartTime, weekStartPlotColor, line.style_solid, weekStartPlotWidth) 
+//   : na
+
+// if not na(nextWeekLine[1])
+//     line.delete(nextWeekLine[1])
+
