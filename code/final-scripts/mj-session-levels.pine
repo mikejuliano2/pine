@@ -202,8 +202,8 @@ overrideFillOpacity = input(false, 'Override Fill Opacity', group=groupFill, too
 
 sessionLevelsLinesJoined = input(false, 'Join points?', group=groupFill)
 asianOpenPlotStyle = input(plot.style_stepline, 'Plot Style - Asia Open', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-londonOpenPlotStyle = input(plot.style_circles, 'Plot Style - London Open', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-nyOpenPlotStyle = input(plot.style_cross, 'Plot Style - NY Open', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+londonOpenPlotStyle = input(plot.style_stepline, 'Plot Style - London Open', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+nyOpenPlotStyle = input(plot.style_stepline, 'Plot Style - NY Open', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
 
 sessionLevelsHighLowPlotStyle = input(plot.style_stepline, 'Plot Style - H/L', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
 

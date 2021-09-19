@@ -73,7 +73,7 @@ _isFirstBarForCurrentTimeframeAtResolution(Resolution) =>
     t = time(Resolution)
     previousBar = t[1]
     currentBar = t
-    not na(currentBar) and ( na(previousBar) or currentBar > previousBar)
+    not na(currentBar) and (na(previousBar) or currentBar > previousBar)
 
 COLOR_LIME = #1cd206
 COLOR_VOLT = #affd00
@@ -248,6 +248,12 @@ _getLabelHeight() =>
     y = dateTimeLabelMarginMultiple > 0 ? high + vm : low - vm
 
 
+//////////////////////////////////////////////////////////////////
+// 
+// ==== PRINT CURRENT DATE/TIME ==== 
+// 
+//////////////////////////////////////////////////////////////////
+
 _print(_text, _color) => 
     var _label = label.new(bar_index, na, _text, xloc.bar_index, yloc.price, color(na), label.style_none, color.new(_color, dateTimeLabelOpacity), size.large, text.align_left)
     label.set_xy(_label, bar_index + dateTimeLabelOffset, _getLabelHeight())
@@ -256,3 +262,30 @@ _print(_text, _color) =>
 
 
 _print(_getDateTimeDisplay(), _getColorByDay())
+
+
+//////////////////////////////////////////////////////////////////
+// 
+// ==== WEEK START LINES ==== 
+// 
+//////////////////////////////////////////////////////////////////
+
+_isFirstBarOfWeek() =>
+    // e.g. current timeframe: 1min, resolution: '60' => return true for the first minute of the hour
+    // e.g. current timeframe: 5min, resolution: '60' => return true for the first 5 minutes of the hour
+    t = time('1D', '0000-0000:1')
+    previousBar = t[1]
+    currentBar = t
+    not na(currentBar) and (na(previousBar) or currentBar > previousBar)
+
+groupWeekStart = 'Week Start'
+weekStartPlotColor = input(color.new(#4db6ac, 50), 'Week Start Plot Color', group=groupWeekStart)
+weekStartPlotWidth = input(2, 'Week Start Plot Width', options=[1,2,3,4], group=groupWeekStart)
+
+plot(
+     _isFirstBarOfWeek() ? low - (high-low) : na, 
+     style=plot.style_histogram, 
+     linewidth=weekStartPlotWidth, 
+     color=weekStartPlotColor,
+     title='Start of Week'
+     )
