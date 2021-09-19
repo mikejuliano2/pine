@@ -11,7 +11,7 @@ Need to get clean boxes for brinks and session levels
 if not barstate.islast, plot a clean box
 if barstate.islast, maybe draw a box? if you can get the start and end time of the session, can even extend the box into the future
 
-
+daily open lines are wrong on weekends
 
 
 

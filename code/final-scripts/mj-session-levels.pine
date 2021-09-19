@@ -167,7 +167,7 @@ string TT_LB = "The number of days back to plot the session levels"
 
 plotLondonOpenActive = input(true, 'Plot - London Open', group=groupPlotSwitches)
 plotNyOpenActive = input(false, 'Plot - NY Open', group=groupPlotSwitches)
-plotDailyOpenActive = input(false, 'Plot - Daily Open', group=groupPlotSwitches)
+plotDailyOpenActive = input(true, 'Plot - Daily Open', group=groupPlotSwitches)
 plotMt4DailyOpenActive = input(false, 'Plot - MT4 Daily Open', group=groupPlotSwitches)
 fillAsianSession = input(true, 'Fill - Asian Session', group=groupPlotSwitches)
 fillLondonSession = input(false, 'Fill - London Session', group=groupPlotSwitches)
@@ -516,7 +516,7 @@ _drawSessionLines() =>
          asianOpenLineId, 
          x1, 
          x2, 
-         asiaOpen, 
+         dailyOpen, 
          mt4DailyOpenColor, 
          sessionLevelsLineWidth, 
          asianOpenLineStyle, 
