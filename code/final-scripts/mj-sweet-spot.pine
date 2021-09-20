@@ -10,6 +10,8 @@ study("MJ - Sweet Spot", overlay=true)
 groupSweetSpot = '---- Sweet Spot ----'
 
 ssMaxTimeframe = input(240, 'Max Timeframe', group=groupSweetSpot, minval=1, maxval=240, tooltip='Hidden if above this timeframe')
+
+
 ssActive = input(true, 'Sweet Spot Active', group=groupSweetSpot)
 ssShowLabels = input(true, 'Show Labels?', group=groupSweetSpot)
 ssShowWhole = input(true, 'Show Whole', group=groupSweetSpot)
@@ -20,6 +22,10 @@ ssPlotRangeInMultiplesOfWhole = input(2, 'Plot Range (in multiples of the whole)
  tooltip='Example:  plotRange=2.  open = 31,795.  This would plot a line at each whole level between 30k (32-2) and 34k (32+2).', 
  group=groupSweetSpot)
 
+ssLineExtendWhole = input(extend.none, 'Line Extend Whole', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
+ssLineExtendHalf = input(extend.none, 'Line Extend Half', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
+ssLineExtendQuarter = input(extend.none, 'Line Extend Quarter', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
+
 ssWholeLevelOverride = input(0, 'Whole Level Override', minval=0, tooltip='Only active if greater than 0.  You shouldn\'t need to use this, but just in case.', group=groupSweetSpot)
 
 ssLineOffset = input(43, 'Line Offset (in bars)', group=groupSweetSpot)
@@ -27,11 +33,8 @@ ssLineLength = input(20, 'Line Length (in bars)', group=groupSweetSpot)
 ssLabelOffset = input(-4, 'Label Offset (in bars)', group=groupSweetSpot)
 
 ssLineWidth = input(2, 'Line Width', options=[1,2,3,4], group=groupSweetSpot)
-
 ssLineStyle = input(line.style_solid, 'Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupSweetSpot)
-ssLineExtendWhole = input(extend.none, 'Line Extend Whole', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
-ssLineExtendHalf = input(extend.none, 'Line Extend Half', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
-ssLineExtendQuarter = input(extend.none, 'Line Extend Quarter', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
+
 ssLabelStyle = input(label.style_none, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle], group=groupSweetSpot)
 ssLabelTextColor = input(color.white, 'Label Text Color', group=groupSweetSpot)
 ssLabelSize = input(size.large, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupSweetSpot)
@@ -175,26 +178,29 @@ _drawSweetSpotLinesAndLabels(linesArray, labelsArray, valuesArray, _color, lineE
             label.delete(labelToDelete)
 
 if barstate.islast and ssActive and timeframe.isintraday and timeframe.multiplier <= ssMaxTimeframe
-    _drawSweetSpotLinesAndLabels(
-         wholeLines, 
-         wholeLabels, 
-         wholeValues, 
-         wholeColor, 
-         ssLineExtendWhole
-         )
+    if ssShowWhole
+        _drawSweetSpotLinesAndLabels(
+             wholeLines, 
+             wholeLabels, 
+             wholeValues, 
+             wholeColor, 
+             ssLineExtendWhole
+             )
     
-    _drawSweetSpotLinesAndLabels(
-         halfLines, 
-         halfLabels, 
-         halfValues, 
-         halfColor, 
-         ssLineExtendHalf
-         )
+    if ssShowHalf
+        _drawSweetSpotLinesAndLabels(
+             halfLines, 
+             halfLabels, 
+             halfValues, 
+             halfColor, 
+             ssLineExtendHalf
+             )
     
-    _drawSweetSpotLinesAndLabels(
-         quarterLines, 
-         quarterLabels, 
-         quarterValues, 
-         quarterColor, 
-         ssLineExtendQuarter
-         )
+    if ssShowQuarter
+        _drawSweetSpotLinesAndLabels(
+             quarterLines, 
+             quarterLabels, 
+             quarterValues, 
+             quarterColor, 
+             ssLineExtendQuarter
+             )

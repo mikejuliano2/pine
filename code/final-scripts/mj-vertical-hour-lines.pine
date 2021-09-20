@@ -31,6 +31,8 @@ _timeElapsedThisHourInMs() => (MS_PER_MINUTE * minute) + (1000 * second)
 _timeElapsedTodayInMs() => (MS_PER_HOUR * hour) - (MS_PER_MINUTE * minute) - (1000 * second)
 _timeElapsedThisWeekInMs() => ((dayofweek - 1) * MS_PER_DAY) + _timeElapsedTodayInMs()
 
+// _barsElapsedThisWeek() => 
+
 _getTimeAtBeginningOfToday() => timenow - _timeElapsedTodayInMs()
 _getTimeAtBeginningOfWeek() => timenow - _timeElapsedThisWeekInMs()
 _getTimeAtBeginningOfNextWeek() => _getTimeAtBeginningOfWeek() + MS_PER_WEEK
@@ -61,6 +63,10 @@ _getStartTimeNDaysBack(numDays) =>
 _isCurrentDay() => 
     currentBarTime = time(timeframe.period)
     currentBarTime > (timenow - MS_PER_DAY)   
+
+_isCurrentWeek() => 
+    currentBarTime = time(timeframe.period)
+    currentBarTime > (timenow - MS_PER_WEEK)   
 
 _isInSession(timeRange) =>
     not na(time(timeframe.period, timeRange))
@@ -308,7 +314,7 @@ plot(
      )
 
 plot(
-     _weekStartLineVisible() and _isCurrentDay() ? weekMarkerY : na, 
+     _weekStartLineVisible() and _isCurrentWeek() ? weekMarkerY : na, 
      style=plot.style_histogram, 
      linewidth=weekStartPlotWidth, 
      color=weekStartPlotColor,
