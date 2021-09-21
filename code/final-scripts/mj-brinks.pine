@@ -88,7 +88,7 @@ groupBrinks = 'Brinks Box'
 // ---- toggles ----
 onlyShowBrinksForCurrentDay = input(false, 'Only show Brinks for current day?', group=groupBrinks)
 brinksExtendVertically = input(false, 'Extend Brinks Shading Vertically?', group=groupBrinks)
-dailyLast15MinExtendVertically = input(false, 'Extend Daily Last 15min Shading Vertically?', group=groupBrinks)
+dailyLast15MinExtendVertically = input(true, 'Extend Daily Last 15min Shading Vertically?', group=groupBrinks)
 nyBrinksActive = input(true, 'New York Brinks Active', group=groupBrinks)
 londonBrinksActive = input(true, 'London Brinks Active', group=groupBrinks)
 dailyLast15minActive = input(true, 'Last 15min of Day Active', group=groupBrinks)
@@ -98,7 +98,7 @@ maxTimeFrameToShowBrinks = input(title='Max timeframe to show Brinks', defval=15
 brinksLineColor = input(color.new(#b2b5be, 100), 'Brinks Line Color', group=groupBrinks)
 brinksBgColor = input(color.new(#b2b5be, 66), 'Brinks BG Color', group=groupBrinks)
 dailyLast15MinLineColor = input(color.new(#f57f17, 100), 'Daily Last 15min Line Color', group=groupBrinks)
-dailyLast15MinBgColor = input(color.new(#f57f17, 60), 'Daily Last 15min BG Color', group=groupBrinks)
+dailyLast15MinBgColor = input(color.new(#f57f17, 90), 'Daily Last 15min BG Color', group=groupBrinks)
 brinksPlotStyle = input(plot.style_linebr, 'Brinks Plot Style', group=groupBrinks, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
 brinksLineWidth = input(2, 'Brinks Line Width', group=groupBrinks, options=[1,2,3,4])
 // ----- time ranges -----

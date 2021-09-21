@@ -175,7 +175,7 @@ fillNySession = input(true, 'Fill - NY Session', group=groupPlotSwitches)
 
 lineLondonOpenActive = input(true, 'Line - London Open', group=groupLineSwitches)
 lineNyOpenActive = input(true, 'Line - NY Open', group=groupLineSwitches)
-lineNyHighLowActive = input(false, 'Line - NY HL', group=groupLineSwitches)
+lineNyHighLowActive = input(true, 'Line - NY HL', group=groupLineSwitches)
 lineLondonHighLowActive = input(false, 'Line - London HL', group=groupLineSwitches)
 lineMt4DailyOpenActive = input(true, 'Line - MT4 Daily Open', group=groupLineSwitches)
 

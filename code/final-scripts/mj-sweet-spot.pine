@@ -16,13 +16,13 @@ ssActive = input(true, 'Sweet Spot Active', group=groupSweetSpot)
 ssShowLabels = input(true, 'Show Labels?', group=groupSweetSpot)
 ssShowWhole = input(true, 'Show Whole', group=groupSweetSpot)
 ssShowHalf = input(true, 'Show Half', group=groupSweetSpot)
-ssShowQuarter = input(true, 'Show Quarter', group=groupSweetSpot)
+ssShowQuarter = input(false, 'Show Quarter', group=groupSweetSpot)
 ssPlotRangeInMultiplesOfWhole = input(2, 'Plot Range (in multiples of the whole)', 
  minval=0,
  tooltip='Example:  plotRange=2.  open = 31,795.  This would plot a line at each whole level between 30k (32-2) and 34k (32+2).', 
  group=groupSweetSpot)
 
-ssLineExtendWhole = input(extend.none, 'Line Extend Whole', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
+ssLineExtendWhole = input(extend.both, 'Line Extend Whole', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
 ssLineExtendHalf = input(extend.none, 'Line Extend Half', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
 ssLineExtendQuarter = input(extend.none, 'Line Extend Quarter', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
 
@@ -41,8 +41,10 @@ ssLabelSize = input(size.large, 'Label Size', options=[size.auto, size.tiny, siz
 
 COLOR_PEACH = #e57373
 
-wholeColor = input(color.new(COLOR_PEACH, 10), 'Whole Color', group=groupSweetSpot)
-halfColor = input(color.new(COLOR_PEACH, 40), 'Half Color', group=groupSweetSpot)
+ssUseSingleColor = input(true, 'Use Single Color?', group=groupSweetSpot)
+masterColor = input(color.new(color.yellow, 30), 'Master Color', group=groupSweetSpot, tooltip='This is the color that will be used if Use Single Color is checked.')
+wholeColor = input(color.new(COLOR_PEACH, 30), 'Whole Color', group=groupSweetSpot)
+halfColor = input(color.new(COLOR_PEACH, 50), 'Half Color', group=groupSweetSpot)
 quarterColor = input(color.new(COLOR_PEACH, 70), 'Quarter Color', group=groupSweetSpot)
 
 _getFutureTimeNBarsFromNow(numBars) => time + ( ( time - time[1] ) * numBars )
@@ -183,7 +185,7 @@ if barstate.islast and ssActive and timeframe.isintraday and timeframe.multiplie
              wholeLines, 
              wholeLabels, 
              wholeValues, 
-             wholeColor, 
+             ssUseSingleColor ? masterColor : wholeColor, 
              ssLineExtendWhole
              )
     
@@ -192,7 +194,7 @@ if barstate.islast and ssActive and timeframe.isintraday and timeframe.multiplie
              halfLines, 
              halfLabels, 
              halfValues, 
-             halfColor, 
+             ssUseSingleColor ? masterColor : halfColor, 
              ssLineExtendHalf
              )
     
@@ -201,6 +203,6 @@ if barstate.islast and ssActive and timeframe.isintraday and timeframe.multiplie
              quarterLines, 
              quarterLabels, 
              quarterValues, 
-             quarterColor, 
+             ssUseSingleColor ? masterColor : quarterColor, 
              ssLineExtendQuarter
              )
