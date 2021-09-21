@@ -26,7 +26,7 @@ ssLineExtendWhole = input(extend.both, 'Line Extend Whole', options=[extend.none
 ssLineExtendHalf = input(extend.none, 'Line Extend Half', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
 ssLineExtendQuarter = input(extend.none, 'Line Extend Quarter', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
 
-ssWholeLevelOverride = input(0, 'Whole Level Override', minval=0, tooltip='Only active if greater than 0.  You shouldn\'t need to use this, but just in case.', group=groupSweetSpot)
+ssWholeLevelOverride = input(0, 'Whole Level Override', minval=0, tooltip='Only active if greater than 0.  You shouldn\'t need to use this, but just in case.', group=groupSweetSpot, step=0.01)
 
 ssLineOffset = input(43, 'Line Offset (in bars)', group=groupSweetSpot)
 ssLineLength = input(20, 'Line Length (in bars)', group=groupSweetSpot)
