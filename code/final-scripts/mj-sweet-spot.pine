@@ -17,7 +17,7 @@ ssShowLabels = input(true, 'Show Labels?', group=groupSweetSpot)
 ssShowWhole = input(true, 'Show Whole', group=groupSweetSpot)
 ssShowHalf = input(true, 'Show Half', group=groupSweetSpot)
 ssShowQuarter = input(false, 'Show Quarter', group=groupSweetSpot)
-ssPlotRangeInMultiplesOfWhole = input(2, 'Plot Range (in multiples of the whole)', 
+ssPlotRangeInMultiplesOfWhole = input(6, 'Plot Range (in multiples of the whole)', 
  minval=0,
  tooltip='Example:  plotRange=2.  open = 31,795.  This would plot a line at each whole level between 30k (32-2) and 34k (32+2).', 
  group=groupSweetSpot)
