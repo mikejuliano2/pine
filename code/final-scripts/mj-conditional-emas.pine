@@ -35,7 +35,7 @@ groupSwitches = 'Switches'
 
 ema5Color = input(color.new(COLOR_GOLD, 20), '5 EMA Color', group=groupColors)
 ema13Color = input(color.new(#b71c1c, 20), '13 EMA Color', group=groupColors)
-ema50Color = input(color.new(#066673, 20), '50 EMA Color', group=groupColors)
+ema50Color = input(color.new(COLOR_TEAL, 0), '50 EMA Color', group=groupColors)
 ema200Color = input(color.new(COLOR_WHITE, 20), '200 EMA Color', group=groupColors)
 ema800Color = input(color.new(COLOR_PURPLE, 20), '800 EMA Color', group=groupColors)
 ema50CloudColor = input(color.new(#00bcd4, 80), '50 EMA Cloud Color', group=groupColors)
