@@ -49,8 +49,8 @@ emaConditional30mColor = input(color.new(COLOR_LIGHT_BLUE, 40), 'EMA Conditional
 // --------------------------
 
 showConditionalEma1hLine = input(true, 'Show Conditional 1h line?', group=groupSwitches)
-showConditionalEma15mLine = input(true, 'Show Conditional 15m line?', group=groupSwitches)
-showConditionalEma5mLine = input(true, 'Show Conditional 5m line?', group=groupSwitches)
+showConditionalEma15mLine = input(false, 'Show Conditional 15m line?', group=groupSwitches)
+showConditionalEma5mLine = input(false, 'Show Conditional 5m line?', group=groupSwitches)
 // showConditionalEma30mLine = input(false, 'Show Conditional 30m line?', group=groupSwitches)
 showConditionalEma1hLabel = input(true, 'Show Conditional 1h label?', group=groupSwitches)
 showConditionalEma15mLabel = input(true, 'Show Conditional 15m label?', group=groupSwitches)
