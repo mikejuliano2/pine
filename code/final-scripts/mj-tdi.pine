@@ -24,24 +24,26 @@ bandsColor = input(color.new(#2962ff, 40), 'Bands Color', group=groupTDI)
 marketBaseColor = input(color.new(#ffb74d, 50), 'Market Base Color', group=groupTDI)
 marketSignalColor = input(color.new(#ff5252, 20), 'Market Signal Color', group=groupTDI)
 rsiColor = input(color.new(#006064, 0), 'RSI Color', group=groupTDI)
+hLineColor = input(color.new(#5d606b, 0), "Horizontal Line Color", group=groupTDI)
+trendFillOpacity = input(70, 'Trend Fill Opacity', minval=0, maxval=100, group=groupTDI)
 
 bandsLineWidth = input(2, 'Bands Line Width', options=[1,2,3,4], group=groupTDI)
 marketBaseLineWidth = input(2, 'Market Base Line Width', options=[1,2,3,4], group=groupTDI)
 marketSignalLineWidth = input(2, 'Market Signal Line Width', options=[1,2,3,4], group=groupTDI)
 rsiLineWidth = input(2, 'RSI Line Width', options=[1,2,3,4], group=groupTDI)
 
-bandLength = input(34, minval = 1, title = "Volatility Bands MA Length", group=groupTDI)
-rsiPeriod = input(21, minval = 1, title = "RSI Period", group=groupTDI)
-marketSignalMaLength = input(7, minval = 0, title = "Market Signal MA Length (slow MA)", group=groupTDI)
-rsiMaLength = input(2, minval = 1, title = "RSI MA Length (fast MA)", group=groupTDI)
+bandLength = input(34, minval=1, title="Volatility Bands MA Length", group=groupTDI)
+rsiPeriod = input(21, minval=1, title="RSI Period", group=groupTDI)
+marketSignalMaLength = input(7, minval=0, title = "Market Signal MA Length (slow MA)", group=groupTDI)
+rsiMaLength = input(2, minval=1, title="RSI MA Length (fast MA)", group=groupTDI)
 
 //-------------------------
 // DIVERGENCE
 //-------------------------
 
-plotBull = input(title="Plot Bullish", defval=true, group=groupDivergence)
+plotRegularBull = input(title="Plot Bullish", defval=true, group=groupDivergence)
 plotHiddenBull = input(title="Plot Hidden Bullish", defval=false, group=groupDivergence)
-plotBear = input(title="Plot Bearish", defval=true, group=groupDivergence)
+plotRegularBear = input(title="Plot Bearish", defval=true, group=groupDivergence)
 plotHiddenBear = input(title="Plot Hidden Bearish", defval=false, group=groupDivergence)
 
 _bullColor = color.new(#1cd206, 0)
@@ -50,9 +52,9 @@ bullColor = input(_bullColor, 'Bull Color', group=groupDivergence)
 bearColor = input(_bearColor, 'Bear Color', group=groupDivergence)
 hiddenBullColor = input(color.new(color.green, 80), 'Hidden Bull Color', group=groupDivergence)
 hiddenBearColor = input(color.new(color.red, 80), 'Hidden Bear Color', group=groupDivergence)
-textColor = input(color.new(color.black, 0), 'Divergence Label Text Color', group=groupDivergence)
+textColor = input(color.new(#000000, 0), 'Divergence Label Text Color', group=groupDivergence)
 
-divergenceLineWidth = input(4, 'Divergence Line Width', options=[1,2,3,4], group=groupDivergence)
+divergenceLineWidth = input(2, 'Divergence Line Width', options=[1,2,3,4], group=groupDivergence)
 divergenceLineTransparency = input(20, 'Divergence Line Opacity', maxval=100, minval=0, group=groupDivergence)
 rangeUpper = input(title="Max of Lookback Range", defval=60, group=groupDivergence)
 rangeLower = input(title="Min of Lookback Range", defval=5, group=groupDivergence)
@@ -70,8 +72,9 @@ sharkAlertsEnabled = input(true, 'Shark Alerts Enabled')
 sharkPivotRange = input(title="Shark Pivot Range", defval=3, group=groupShark)
 coloredBgWhenOutsideBands = input(true, title='Colored BG when outside bands?', group=groupShark)
 bgColorTransparency = input(94, title='BG color transparency', group=groupShark, minval=0, maxval=100)
-sharkHighColor = input(_bearColor, 'Shark High Color', group=groupShark)
-sharkLowColor = input(_bullColor, 'Shark Low Color', group=groupShark)
+sharkHighColor = input(color.new(COLOR_GOLD, 25), 'Shark High Color', group=groupShark)
+sharkLowColor = input(color.new(COLOR_GOLD, 25), 'Shark Low Color', group=groupShark)
+sharkPlotWidth = input(2, 'Shark Plot Width', minval=1, maxval=4)
 
 //////////////////////////////////////////////////////
 // 
@@ -104,10 +107,14 @@ marketBasePlot = plot(marketBase, "Market Base", color=marketBaseColor, linewidt
 rsiLine = plot(_rsi, "RSI", color=rsiColor, linewidth=rsiLineWidth)
 marketSignalLine = plot(marketSignal, "Market Signal", color=marketSignalColor, linewidth=marketSignalLineWidth)  
 
-// hline(50, title="Middle Line", linestyle=hline.style_dotted)
-// obLevel = hline(70, title="Overbought", linestyle=hline.style_dotted)
-// osLevel = hline(30, title="Oversold", linestyle=hline.style_dotted)
-// fill(obLevel, osLevel, title="Background", color=color.new(#9915FF, 2))
+trendFillColor = _rsi > marketSignal ? rsiColor : marketSignalColor
+// trendFillColor = _rsi > marketSignal ? bullColor : bearColor
+fill(rsiLine, marketSignalLine, color.new(trendFillColor, trendFillOpacity))
+
+oversoldLine = hline(30, color=hLineColor, linewidth=1, linestyle=hline.style_dotted, title='Oversold Line')
+middleLine = hline(50, color=hLineColor, linewidth=1, linestyle=hline.style_dotted, title='Middle Line')
+overboughtLine = hline(70, color=hLineColor, linewidth=1, linestyle=hline.style_dotted, title='Overbought Line')
+
 
 //////////////////////////////////////////////////////
 // 
@@ -144,10 +151,11 @@ priceHadHigherLow = prevLow > valuewhen(rsiPivotLowFound, prevLow, 1)
 priceHadHigherHigh = prevHigh > valuewhen(rsiPivotHighFound, prevHigh, 1)
 priceHadLowerHigh = prevHigh < valuewhen(rsiPivotHighFound, prevHigh, 1)
 
-hasBullishDiv = plotBull and priceHadLowerLow and rsiHadHigherLow and rsiPivotLowFound
+hasBullishDiv = plotRegularBull and priceHadLowerLow and rsiHadHigherLow and rsiPivotLowFound
 hasHiddenBullishDiv = plotHiddenBull and priceHadHigherLow and rsiHadLowerLow and rsiPivotLowFound
-hasBearishDiv = plotBear and priceHadHigherHigh and rsiHadLowerHigh and rsiPivotHighFound
+hasBearishDiv = plotRegularBear and priceHadHigherHigh and rsiHadLowerHigh and rsiPivotHighFound
 hasHiddenBearishDiv = plotHiddenBear and priceHadLowerHigh and rsiHadHigherHigh and rsiPivotHighFound
+
 
 //////////////////////////////////////////////////////
 // 
@@ -197,7 +205,7 @@ plotshape(
 	 text="H",
 	 location=location.absolute,
 	 style=shape.labelup,
-	 color=color.new(bearColor, 0),
+	 color=color.new(bullColor, 0),
 	 textcolor=textColor
 	 )
 
@@ -263,8 +271,8 @@ highSharkValue = aboveUpperBand[sharkPivotRange] ? sharkPivotHigh : na
 lowSharkValue = belowLowerBand[sharkPivotRange] ? sharkPivotLow : na
 
 // plot(rsiPivotLow, style=plot.style_cross, linewidth=2, color=color.green, offset=-lbR)
-plot(highSharkValue, style=plot.style_circles, linewidth=3, color=sharkHighColor, offset=-sharkPivotRange, title='Shark Plot High')
-plot(lowSharkValue, style=plot.style_circles, linewidth=3, color=sharkLowColor, offset=-sharkPivotRange, title='Shark Plot Low')
+plot(highSharkValue, style=plot.style_circles, linewidth=sharkPlotWidth, color=sharkHighColor, offset=-sharkPivotRange, title='Shark Plot High')
+plot(lowSharkValue, style=plot.style_circles, linewidth=sharkPlotWidth, color=sharkLowColor, offset=-sharkPivotRange, title='Shark Plot Low')
 
 hasHighSharkFin = not na(highSharkValue)
 hasLowSharkFin = not na (lowSharkValue)
@@ -285,3 +293,21 @@ bgColor = color.new(
 	  )
 
 bgcolor(bgColor)
+
+//////////////////////////////////////////////////////
+// 
+// --- LONG/SHORT SIGNALS ---
+// 
+//////////////////////////////////////////////////////
+
+longConditionMet = crossover(_rsi, marketSignal) and _rsi > marketBase and _rsi > 50
+shortConditionMet = crossunder(_rsi, marketSignal) and _rsi < marketBase and _rsi < 50
+
+plotshape(longConditionMet, style=shape.labelup, location=location.bottom, color=bullColor, size=size.tiny, editable=true)
+plotshape(shortConditionMet, style=shape.labeldown, location=location.top, color=bearColor, size=size.tiny, editable=true)
+
+alertcondition(longConditionMet, title='Long Signal', message='{{ticker}} TDI Long Signal on the {{interval}}')
+alertcondition(shortConditionMet, title='Short Signal', message='{{ticker}} TDI Long Signal on the {{interval}}')
+
+// best_setup = crossover(mab, mid) 
+// alertcondition(best_setup, title="RSI Crosses Market Base", message="{{ticker}} RSI crossed market base on the {{interval}}")
