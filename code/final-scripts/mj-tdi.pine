@@ -300,11 +300,15 @@ bgcolor(bgColor)
 // 
 //////////////////////////////////////////////////////
 
-longConditionMet = crossover(_rsi, marketSignal) and _rsi > marketBase and _rsi > 50
-shortConditionMet = crossunder(_rsi, marketSignal) and _rsi < marketBase and _rsi < 50
+// longConditionMet = crossover(_rsi, marketSignal) and _rsi > marketBase and _rsi > 50
 
-plotshape(longConditionMet, style=shape.labelup, location=location.bottom, color=bullColor, size=size.tiny, editable=true)
-plotshape(shortConditionMet, style=shape.labeldown, location=location.top, color=bearColor, size=size.tiny, editable=true)
+signalShapesActive = input(true, 'Signal Shapes Active', group=groupTDI)
+
+longConditionMet = crossover(_rsi, marketSignal) and _rsi > marketBase and _rsi > 50 and signalShapesActive
+shortConditionMet = crossunder(_rsi, marketSignal) and _rsi < marketBase and _rsi < 50 and signalShapesActive
+
+plotshape(longConditionMet, style=shape.triangleup, location=location.bottom, color=bullColor, size=size.tiny, editable=true, title='Long Signal')
+plotshape(shortConditionMet, style=shape.triangledown, location=location.top, color=bearColor, size=size.tiny, editable=true, title='Short Signal')
 
 alertcondition(longConditionMet, title='Long Signal', message='{{ticker}} TDI Long Signal on the {{interval}}')
 alertcondition(shortConditionMet, title='Short Signal', message='{{ticker}} TDI Long Signal on the {{interval}}')
