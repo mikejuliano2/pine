@@ -6,6 +6,9 @@
 DAD WIFI e7500dc77b
 
 
+*** print the % difference between the 50 and the 200. Color Code it.  Consider doing it on all timeframes like the candle meter
+
+
 *** mark the london close in the future 12:30pm
 
 fill the dead gap time + weekend time instead of NY/London sessions

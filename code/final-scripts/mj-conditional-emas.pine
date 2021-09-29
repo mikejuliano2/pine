@@ -38,7 +38,7 @@ ema13Color = input(color.new(#b71c1c, 20), '13 EMA Color', group=groupColors)
 ema50Color = input(color.new(COLOR_TEAL, 0), '50 EMA Color', group=groupColors)
 ema200Color = input(color.new(COLOR_WHITE, 20), '200 EMA Color', group=groupColors)
 ema800Color = input(color.new(COLOR_PURPLE, 20), '800 EMA Color', group=groupColors)
-ema50CloudColor = input(color.new(#0b215e, 80), '50 EMA Cloud Color', group=groupColors)
+ema50CloudColor = input(color.new(#0b215e, 50), '50 EMA Cloud Color', group=groupColors)
 emaConditional1hColor = input(color.new(COLOR_ORANGE, 15), 'EMA Conditional 1h Color', group=groupColors)
 emaConditional15mColor = input(color.new(COLOR_MAGENTA, 40), 'EMA Conditional 15m Color', group=groupColors)
 emaConditional5mColor = input(color.new(COLOR_LIME, 40), 'EMA Conditional 5m Color', group=groupColors)
@@ -75,6 +75,7 @@ labelOffsetConditional = input(
      title='Offset - Conditional (in bars)', 
      tooltip='Only applicable when showLabelText is true.  If showLabelText is false, this will be set to labelOffsetStandard.', 
      group=groupLabels)
+
 labelOpacity = input(30, 'Label Opacity', group=groupLabels)
 labelStyle = input(label.style_circle, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle], group=groupLabels)
 labelSize = input(size.auto, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupLabels)
@@ -197,6 +198,43 @@ label13 = _drawLabel(ema13, '13', ema13Color, color.white, labelOffsetStandard)
 label50 = _drawLabel(ema50, '50', ema50Color, color.white, labelOffsetStandard)
 label200 = _drawLabel(ema200, '200', ema200Color, color.white, labelOffsetStandard)
 label800 = _drawLabel(ema800, '800', ema800Color, color.white, labelOffsetStandard)
+
+// ---------------------------
+// Fan Percentage Label
+// ---------------------------
+groupFanPercentage = 'Fan Percentage'
+showFanPercentageLabel = input(true, 'Show Fan Percentage Label', group=groupFanPercentage, tooltip='The % difference between the 50 and 200 EMA.  To determine if there is enough volatility to trade')
+labelOffsetFanPercentage = input(11, 'Offset - Fan Percentage', group=groupFanPercentage)
+
+_toDecimalPlaces(numDecimals, value) =>
+    // truncates a given number to a certain number of decimals
+    factor = pow(10, numDecimals)
+    int(value * factor) / factor
+
+_drawFanPercentageLabel() => 
+    x = _getFutureTimeNBarsFromNow(labelOffsetFanPercentage)
+    y = showFanPercentageLabel ? ema200 : na
+    
+    fanPercentage = _toDecimalPlaces(2, abs((ema50 - ema200) / ema50) * 100)
+    fanPercentageDisplay = tostring(fanPercentage) + '%'
+    text = tostring(fanPercentage) + '%'
+
+    if barstate.islast
+        y ? label.new(
+             x=x, 
+             y=y, 
+             text=text, 
+             style=label.style_none, 
+             textcolor=color.new(COLOR_TEAL, 0), 
+             color=color.red, 
+             size=size.large, 
+             tooltip=text,
+             xloc=xloc.bar_time) : na
+
+
+fanPercentageLabel = _drawFanPercentageLabel()
+if not na(fanPercentageLabel[1])
+    label.delete(fanPercentageLabel[1])
 
 // conditional
 
