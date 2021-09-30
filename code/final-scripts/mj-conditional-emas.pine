@@ -56,6 +56,7 @@ showConditionalEma1hLabel = input(true, 'Show Conditional 1h label?', group=grou
 showConditionalEma15mLabel = input(true, 'Show Conditional 15m label?', group=groupSwitches)
 showConditionalEma5mLabel = input(true, 'Show Conditional 5m label?', group=groupSwitches)
 showConditionalEma30mLabel = input(true, 'Show Conditional 30m label?', group=groupSwitches)
+show50EmaCloud = input(false, 'Show 50 EMA Cloud?', group=groupSwitches)
 
 // --------------------------
 // LINES
@@ -145,8 +146,8 @@ emaConditional5m = _getEmaVal(_5mVal)
 // ----------------------------
 
 cloudSize = stdev(close, 50 * 2) / 4 // 50 because it's for the 50 EMA
-cloudPlotUpper = plot(ema50 + cloudSize, '50 EMA Upper Cloud', color=ema50CloudColor, offset=0)
-cloudPlotLower = plot(ema50 - cloudSize, '50 EMA Lower Cloud', color=ema50CloudColor, offset=0)
+cloudPlotUpper = plot(show50EmaCloud ? ema50 + cloudSize : na, '50 EMA Upper Cloud', color=ema50CloudColor, offset=0)
+cloudPlotLower = plot(show50EmaCloud ? ema50 - cloudSize : na, '50 EMA Lower Cloud', color=ema50CloudColor, offset=0)
 fill(cloudPlotUpper, cloudPlotLower, title='50 EMA Cloud', color=ema50CloudColor)
 
 // -----------------
