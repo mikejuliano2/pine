@@ -20,7 +20,7 @@ autoResolutionFor1MinTF = input('60', 'Auto Resolution - 1m', group=groupMCandle
 fixedResolution = input("60", 'Fixed Resolution', type=input.resolution, group=groupMCandles, tooltip='Only Relevant if auto-resolution is off')
 maxTimeframeForMCandles = input(1, 'Max Timeframe', group=groupMCandles, minval=1, maxval=240, tooltip='M Candles will be hidden when above this timeframe')
 
-borderStyle = input(line.style_dashed, 'Border Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupMCandles)
+borderStyle = input(line.style_dotted, 'Border Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupMCandles)
 bodyBorderWidth = input(2, 'Body Border Width', options=[1,2,3,4], group=groupMCandles)
 opacityBodyBorder = input(40, 'Opacity - Body Border', minval=0, maxval=100, group=groupMCandles)
 opacityBodyFill = input(90, 'Opacity - Body Fill', minval=0, maxval=100, group=groupMCandles)
@@ -33,8 +33,8 @@ mCandleClimaxBullColor = input(#388e3c, 'Climax Bull Color', group=groupMCandles
 mCandleClimaxBearColor = input(#8d1e1e, 'Climax Bear Color', group=groupMCandles)
 mCandleRisingBullColor = input(#1848cc, 'Above Average Volume Bull Color', group=groupMCandles)
 mCandleRisingBearColor = input(#9c27b0, 'Above Average Volume Bear Color', group=groupMCandles)
-mCandleStandardBullColor = input(#999999, 'Standard Volume Bull Color', group=groupMCandles)
-mCandleStandardBearColor = input(#2a2e39, 'Standard Volume Bear Color', group=groupMCandles)
+mCandleStandardBullColor = input(#d1d4dc, 'Standard Volume Bull Color', group=groupMCandles)
+mCandleStandardBearColor = input(#5d606b, 'Standard Volume Bear Color', group=groupMCandles)
 
 _security(expression, _resolution) => 
      security(syminfo.tickerid, _resolution, expression, barmerge.gaps_off, barmerge.lookahead_on)
