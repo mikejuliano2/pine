@@ -9,7 +9,7 @@ study("MJ - Sweet Spot", overlay=true)
 
 groupSweetSpot = '---- Sweet Spot ----'
 
-ssMaxTimeframe = input(240, 'Max Timeframe', group=groupSweetSpot, minval=1, maxval=240, tooltip='Hidden if above this timeframe')
+ssMaxTimeframe = input(15, 'Max Timeframe', group=groupSweetSpot, minval=1, maxval=240, tooltip='Hidden if above this timeframe')
 
 
 ssActive = input(true, 'Sweet Spot Active', group=groupSweetSpot)
