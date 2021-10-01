@@ -10,6 +10,8 @@ DAD WIFI e7500dc77b
 
 plot TDI divergence on price panel
 
+*** move all plots in front of brinks, sessions, m candles
+
 
 *** mark the london close in the future 12:30pm
 

@@ -169,9 +169,11 @@ plotLondonOpenActive = input(true, 'Plot - London Open', group=groupPlotSwitches
 plotNyOpenActive = input(false, 'Plot - NY Open', group=groupPlotSwitches)
 plotDailyOpenActive = input(true, 'Plot - Daily Open', group=groupPlotSwitches)
 plotMt4DailyOpenActive = input(false, 'Plot - MT4 Daily Open', group=groupPlotSwitches)
+
+fillsActive = input(true, 'Fills Active', group=groupPlotSwitches)
 fillAsianSession = input(true, 'Fill - Asian Session', group=groupPlotSwitches)
 fillLondonSession = input(false, 'Fill - London Session', group=groupPlotSwitches)
-fillNySession = input(true, 'Fill - NY Session', group=groupPlotSwitches)
+fillNySession = input(false, 'Fill - NY Session', group=groupPlotSwitches)
 
 lineLondonOpenActive = input(true, 'Line - London Open', group=groupLineSwitches)
 lineNyOpenActive = input(true, 'Line - NY Open', group=groupLineSwitches)
@@ -340,7 +342,7 @@ _getValuesForSessionFillPlotting(timeRange, masterColor, openPlotActive, highLow
      asiaFillColor)
 
 asiaPlotHigh = plot(
-      fillAsianSession ? asiaHigh : na, 
+      fillsActive and fillAsianSession ? asiaHigh : na, 
       "Asia High", 
       asiaHighLowLineColor, 
       sessionLevelsLineWidth, 
@@ -348,7 +350,7 @@ asiaPlotHigh = plot(
       join=sessionLevelsLinesJoined)
 
 asiaPlotLow  = plot(
-      fillAsianSession ? asiaLow : na, 
+      fillsActive and fillAsianSession ? asiaLow : na, 
       "Asia Low",  
       asiaHighLowLineColor,  
       sessionLevelsLineWidth, 
@@ -372,7 +374,7 @@ londonPlotOpen  = plot(
       join=sessionLevelsLinesJoined)
 
 londonPlotHigh = plot(
-      fillLondonSession ? londonHigh : na, 
+      fillsActive and fillLondonSession ? londonHigh : na, 
       "London Session High", 
       londonHLPlotColor, 
       sessionLevelsLineWidth, 
@@ -380,7 +382,7 @@ londonPlotHigh = plot(
       join=sessionLevelsLinesJoined)
       
 londonPlotLow  = plot(
-      fillLondonSession ? londonLow : na,  
+      fillsActive and fillLondonSession ? londonLow : na,  
       "London Low",  
       londonHLPlotColor,  
       sessionLevelsLineWidth, 
@@ -405,7 +407,7 @@ nyPlotOpen  = plot(
       join=sessionLevelsLinesJoined)
 
 nyPlotHigh = plot(
-      fillNySession ? nyHigh : na, 
+      fillsActive and fillNySession ? nyHigh : na, 
       "New York Session High", 
       nyHighLowLineColor, 
       sessionLevelsLineWidth, 
@@ -413,7 +415,7 @@ nyPlotHigh = plot(
       join=sessionLevelsLinesJoined)
 
 nyPlotLow  = plot(
-      fillNySession ? nyLow : na,  
+      fillsActive and fillNySession ? nyLow : na,  
       "New York Session Low",  
       nyHighLowLineColor,  
       sessionLevelsLineWidth, 
