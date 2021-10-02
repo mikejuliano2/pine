@@ -69,8 +69,7 @@ groupOffset = 'Offset'
 groupFill = 'Fill'
 groupPlotSwitches = 'Plot Switches'
 groupLineSwitches = 'Line Switches'
-groupColors = 'Colors'
-groupFillColors = 'Fill Colors'
+groupBorders = 'Colors'
 groupTimeRanges = 'Time Ranges'
 groupLineStyle = 'Line Style'
 groupLabels = 'Labels'
@@ -104,29 +103,27 @@ extendLondon = input(false, 'Extend - London', group=groupExtend)
 extendBrinks = input(false, 'Extend - Brinks', group=groupExtend)
 extendLast15 = input(true, 'Extend - Last 15 min', group=groupExtend)
 
-// border colors
-
-asiaBorderColor = input(color.new(#0b3d37, 90), 'Border - Asia', input.color, group=groupColors)
-londonBorderColor = input(color.new(#1a1736, 90), 'Border - London', input.color, group=groupColors)
-nyBorderColor = input(color.new(#880e4f, 90), 'Border - New York', input.color, group=groupColors)
-brinksBorderColor = input(color.new(#b2b5be, 90), 'Border - Brinks', group=groupColors)
-last15BorderColor = input(color.new(#f57f17, 90), 'Border - Last 15 min of day', group=groupColors)
-
 // fill colors
 
-asiaFillColor = input(color.new(#043c36, 60), 'Fill - Asia', input.color, group=groupFillColors)
-londonFillColor = input(color.new(#1a1736, 30), 'Fill - London', input.color, group=groupFillColors)
-nyFillColor = input(color.new(#4e092e, 55), 'Fill - New York', input.color, group=groupFillColors)
-brinksFillColor = input(color.new(#b2b5be, 80), 'Fill - Brinks', group=groupFillColors)
-last15FillColor = input(color.new(#f57f17, 90), 'Fill - Last 15 min of day', group=groupFillColors)
+asiaFillColor = input(color.new(#043c36, 60), 'Fill - Asia', input.color, group=groupFill)
+londonFillColor = input(color.new(#1a1736, 30), 'Fill - London', input.color, group=groupFill)
+nyFillColor = input(color.new(#4e092e, 55), 'Fill - New York', input.color, group=groupFill)
+brinksFillColor = input(color.new(#b2b5be, 80), 'Fill - Brinks', group=groupFill)
+last15FillColor = input(color.new(#f57f17, 90), 'Fill - Last 15 min of day', group=groupFill)
 
 sessionFillOpacity = input(60, 'Opacity - Session Fill', minval=0, maxval=100, group=groupFill)
 overrideFillOpacity = input(false, 'Override Fill Opacity', group=groupFill, tooltip='If true, use a consistent opacity for all session fills.')
 
-sessionLevelsLinesJoined = input(false, 'Join points?', group=groupFill)
-sessionLevelsBorderPlotStyle = input(plot.style_stepline, 'Plot Style - H/L', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-sessionLevelsLookbackHours = input(0, 'Lookback Hours', input.integer, minval=0, maxval=24, tooltip=TT_LB, group=groupFill)
-sessionLevelsLineWidth = input(2, 'Line Width', group=groupFill, options=[1,2,3,4])
+// borders
+
+asiaBorderColor = input(color.new(#0b3d37, 90), 'Border - Asia', input.color, group=groupBorders)
+londonBorderColor = input(color.new(#1a1736, 90), 'Border - London', input.color, group=groupBorders)
+nyBorderColor = input(color.new(#880e4f, 90), 'Border - New York', input.color, group=groupBorders)
+brinksBorderColor = input(color.new(#b2b5be, 90), 'Border - Brinks', group=groupBorders)
+last15BorderColor = input(color.new(#f57f17, 90), 'Border - Last 15 min of day', group=groupBorders)
+
+sessionLevelsBorderPlotStyle = input(plot.style_stepline, 'Plot Style - H/L', group=groupBorders, options=[plot.style_circles, plot.style_cross, plot.style_stepline])
+borderLineWidth = input(2, 'Line Width', group=groupBorders, options=[1,2,3,4])
 
 // time ranges
 
@@ -170,19 +167,6 @@ _captureSessionLevels(timeRange) =>
 
     [_sessionHigh, _sessionLow, _sessionOpen]
 
-_isWithinSessionLevelsLookbackPeriod() => 
-    // the session start time must be after the lookback time
-    if sessionLevelsLookbackHours > 0
-        lookbackTimeInMs = MS_PER_HOUR * sessionLevelsLookbackHours
-        _currentBarTime() > (timenow - lookbackTimeInMs)
-    else 
-        true
-    
-    // lookbackHours = (24 * sessionLevelsLookbackDays) + hour
-    // timeOfSessionBeginning = _getTimeAtStartOfHourNHoursAgo(lookbackHours)
-    // timeAtBeginningOfLookbackDay = _getStartTimeNDaysBack(sessionLevelsLookbackDays)
-    // timeAtBeginningOfLookbackDay < timeOfSessionBeginning
-
 _getLevelsColors(borderColor, inSession, fillColor) => 
     highLowLineColor = inSession ? borderColor : na
             
@@ -193,18 +177,10 @@ _getLevelsColors(borderColor, inSession, fillColor) =>
 
 _getValuesForSessionFillPlotting(timeRange, borderColor, fillColor) => 
     isInSession = _isInSession(timeRange)
-
     [sessionHigh, sessionLow, sessionOpen] = _captureSessionLevels(timeRange)
-    
     [highLowLineColor, _fillColor] = _getLevelsColors(borderColor, isInSession, fillColor)
+    [sessionHigh, sessionLow, highLowLineColor, _fillColor]
 
-    isWithinMaxTimeframe = timeframe.multiplier <= sessionFillMaxTimeframe and timeframe.isintraday
-    conditionsMet = _isWithinSessionLevelsLookbackPeriod() and isWithinMaxTimeframe
-
-    if conditionsMet
-        [sessionHigh, sessionLow, highLowLineColor, _fillColor]
-    else 
-        [na, na, na, na]
 
 /////////////////////////////////////////////////////////
 // 
@@ -223,17 +199,15 @@ asiaPlotHigh = plot(
       fillsActive and fillAsianSession ? asiaHigh : na, 
       "Asia High", 
       _asiaBorderColor, 
-      sessionLevelsLineWidth, 
-      sessionLevelsBorderPlotStyle, 
-      join=sessionLevelsLinesJoined)
+      borderLineWidth, 
+      sessionLevelsBorderPlotStyle)
 
 asiaPlotLow  = plot(
       fillsActive and fillAsianSession ? asiaLow : na, 
       "Asia Low",  
       _asiaBorderColor,  
-      sessionLevelsLineWidth, 
-      sessionLevelsBorderPlotStyle, 
-      join=sessionLevelsLinesJoined)
+      borderLineWidth, 
+      sessionLevelsBorderPlotStyle)
 
 // ---- london ----
 
@@ -246,17 +220,15 @@ londonPlotHigh = plot(
       fillsActive and fillLondonSession ? londonHigh : na, 
       "London Session High", 
       _londonBorderColor, 
-      sessionLevelsLineWidth, 
-      sessionLevelsBorderPlotStyle, 
-      join=sessionLevelsLinesJoined)
+      borderLineWidth, 
+      sessionLevelsBorderPlotStyle)
       
 londonPlotLow  = plot(
       fillsActive and fillLondonSession ? londonLow : na,  
       "London Low",  
       _londonBorderColor,  
-      sessionLevelsLineWidth, 
-      sessionLevelsBorderPlotStyle, 
-      join=sessionLevelsLinesJoined)
+      borderLineWidth, 
+      sessionLevelsBorderPlotStyle)
 
 // ---- new york ----
 
@@ -269,17 +241,15 @@ nyPlotHigh = plot(
       fillsActive and fillNySession ? nyHigh : na, 
       "New York Session High", 
       _nyBorderColor, 
-      sessionLevelsLineWidth, 
-      sessionLevelsBorderPlotStyle, 
-      join=sessionLevelsLinesJoined)
+      borderLineWidth, 
+      sessionLevelsBorderPlotStyle)
 
 nyPlotLow  = plot(
       fillsActive and fillNySession ? nyLow : na,  
       "New York Session Low",  
       _nyBorderColor,  
-      sessionLevelsLineWidth, 
-      sessionLevelsBorderPlotStyle, 
-      join=sessionLevelsLinesJoined)
+      borderLineWidth, 
+      sessionLevelsBorderPlotStyle)
 
 
 // ---- eu brinks ----
@@ -293,17 +263,15 @@ euBrinksPlotHigh = plot(
       fillsActive and fillEuBrinks ? euBrinksHigh : na, 
       "EU Brinks High", 
       _euBrinksBorderColor, 
-      sessionLevelsLineWidth, 
-      sessionLevelsBorderPlotStyle, 
-      join=sessionLevelsLinesJoined)
+      borderLineWidth, 
+      sessionLevelsBorderPlotStyle)
 
 euBrinksPlotLow  = plot(
       fillsActive and fillEuBrinks ? euBrinksLow : na,  
       "EU Brinks Low", 
       _euBrinksBorderColor, 
-      sessionLevelsLineWidth, 
-      sessionLevelsBorderPlotStyle,  
-      join=sessionLevelsLinesJoined)
+      borderLineWidth, 
+      sessionLevelsBorderPlotStyle)
 
 // ---- usa brinks ----
 
@@ -316,17 +284,15 @@ usaBrinksPlotHigh = plot(
       fillsActive and fillUsaBrinks ? usaBrinksHigh : na, 
       "USA Brinks High", 
       _usaBrinksBorderColor, 
-      sessionLevelsLineWidth, 
-      sessionLevelsBorderPlotStyle, 
-      join=sessionLevelsLinesJoined)
+      borderLineWidth, 
+      sessionLevelsBorderPlotStyle)
 
 usaBrinksPlotLow  = plot(
       fillsActive and fillUsaBrinks ? usaBrinksLow : na,  
       "USA Brinks Low", 
       _usaBrinksBorderColor, 
-      sessionLevelsLineWidth, 
-      sessionLevelsBorderPlotStyle,  
-      join=sessionLevelsLinesJoined)
+      borderLineWidth, 
+      sessionLevelsBorderPlotStyle)
 
 
 // ---- last 15 minutes of the day ----
@@ -340,17 +306,15 @@ last15PlotHigh = plot(
       fillsActive and fillLast15 ? last15High : na, 
       "Last 15 Minutes of Day High", 
       _last15BorderColor, 
-      sessionLevelsLineWidth, 
-      sessionLevelsBorderPlotStyle, 
-      join=sessionLevelsLinesJoined)
+      borderLineWidth, 
+      sessionLevelsBorderPlotStyle)
 
 last15PlotLow  = plot(
       fillsActive and fillLast15 ? last15Low : na,  
       "Last 15 Minutes of Day Low", 
       _last15BorderColor, 
-      sessionLevelsLineWidth, 
-      sessionLevelsBorderPlotStyle,  
-      join=sessionLevelsLinesJoined)
+      borderLineWidth, 
+      sessionLevelsBorderPlotStyle)
 
 
 // *** IMPORTANT ***
