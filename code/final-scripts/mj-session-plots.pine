@@ -116,16 +116,16 @@ isValidTimeframeToPlotLines = timeframe.multiplier <= maxTimeframeForLinesPlot
 [dailyHigh, dailyLow, dailyOpen] = _captureSessionLevels(dailyOpenTimeRange)
 
 londonPlotOpen  = plot(
-      plotLondonOpenActive and isValidTimeframeToPlotLines ? londonOpen : na,  
+      plotLondonOpenActive and isValidTimeframeToPlotLines and _isInSession(londonTimeRange) ? londonOpen : na,  
       "London Open",  
-      londonColor,  
+      _isInSession(londonTimeRange) ? londonColor : na,  
       lineWidth, 
       londonOpenPlotStyle)
 
 nyPlotOpen  = plot(
-      plotNyOpenActive and isValidTimeframeToPlotLines ? nyOpen : na,  
+      plotNyOpenActive and isValidTimeframeToPlotLines and _isInSession(nyTimeRange) ? nyOpen : na,  
       "New York Open",  
-      nyColor,  
+      _isInSession(nyTimeRange) ? nyColor : na,  
       lineWidth, 
       nyOpenPlotStyle)
 

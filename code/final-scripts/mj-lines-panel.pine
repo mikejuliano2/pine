@@ -147,7 +147,6 @@ _drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText,
 // -----------------------
 
 groupOffset = 'Offset'
-groupFill = 'Fill'
 groupPlotSwitches = 'Plot Switches'
 groupLineSwitches = 'Line Switches'
 groupColors = 'Colors'
@@ -159,21 +158,10 @@ groupMarkers='Markers'
 
 // ----------------------------------------------------------------------------------
 // tooltips
-string TT_PR = "Final time to which the High and Low of the session will be held"
-string TT_TZ = "Offsets all time inputs together to help align to preferred timezone"
+
 string TT_LB = "The number of days back to plot the session levels"
 
 // switches
-
-plotLondonOpenActive = input(true, 'Plot - London Open', group=groupPlotSwitches)
-plotNyOpenActive = input(false, 'Plot - NY Open', group=groupPlotSwitches)
-plotDailyOpenActive = input(true, 'Plot - Daily Open', group=groupPlotSwitches)
-plotMt4DailyOpenActive = input(false, 'Plot - MT4 Daily Open', group=groupPlotSwitches)
-
-fillsActive = input(true, 'Fills Active', group=groupPlotSwitches)
-fillAsianSession = input(true, 'Fill - Asian Session', group=groupPlotSwitches)
-fillLondonSession = input(false, 'Fill - London Session', group=groupPlotSwitches)
-fillNySession = input(false, 'Fill - NY Session', group=groupPlotSwitches)
 
 lineLondonOpenActive = input(true, 'Line - London Open', group=groupLineSwitches)
 lineNyOpenActive = input(true, 'Line - NY Open', group=groupLineSwitches)
@@ -181,63 +169,35 @@ lineNyHighLowActive = input(true, 'Line - NY HL', group=groupLineSwitches)
 lineLondonHighLowActive = input(false, 'Line - London HL', group=groupLineSwitches)
 lineMt4DailyOpenActive = input(true, 'Line - MT4 Daily Open', group=groupLineSwitches)
 
-// master colors
+// colors
 
 dailyOpenColor = input(#2962ff, 'Daily Open Color', input.color, group=groupColors)
 mt4DailyOpenColor = input(#2962ff, 'MT4 Daily Open Color', input.color, group=groupColors)
-
-asiaMasterColor = input(#0b3d37, 'Master - Asia', input.color, group=groupColors)
-londonMasterColor = input(#ff851a, 'Master - London', input.color, group=groupColors)
-nyMasterColor = input(#880e4f, 'Master - New York', input.color, group=groupColors)
 nyLineColor = input(COLOR_YELLOW, 'Line - New York', input.color, group=groupColors)
 asiaLineColor = input(COLOR_TURQUOISE, 'Line - Asia', input.color, group=groupColors)
 londonLineColor = input(COLOR_ORANGE, 'Line - London', input.color, group=groupColors)
 
-// fill
+// session levels line style
 
-asiaFillColor = input(color.new(#043c36, 20), 'Fill - Asia', input.color, group=groupFill)
-londonFillColor = input(color.new(#1a1736, 20), 'Fill - London', input.color, group=groupFill)
-nyFillColor = input(color.new(#4e092e, 60), 'Fill - New York', input.color, group=groupFill)
+groupSessionLevelsLineStyle = 'Session Levels Line Style'
+sessionLevelsLineOffsetInBars = input(15, 'Session Levels - Line Offset', group=groupSessionLevelsLineStyle)
+sessionLevelsLineLengthInBars = input(20, 'Session Levels - Line Length', group=groupSessionLevelsLineStyle)
+sessionLabelOffsetInBars = input(-5, 'Session Levels - Label Offset', group=groupSessionLevelsLineStyle)
+sessionLevelsHighLowLineStyle = input(line.style_solid, 'Session Levels - HL Line Style', group=groupSessionLevelsLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+sessionLevelsLineWidth = input(2, 'Session Levels - Line Width', group=groupSessionLevelsLineStyle, options=[1,2,3,4])
+sessionHighLowLineOpacity = input(50, 'Session Levels - Opacity HL', minval=0, maxval=100, group=groupSessionLevelsLineStyle)
+sessionLevelsOpenLineOpacity = input(10, 'Session Levels - Opacity Open', minval=0, maxval=100, group=groupSessionLevelsLineStyle)
 
-sessionFillOpacity = input(60, 'Opacity - Session Fill', minval=0, maxval=100, group=groupFill)
-overrideFillOpacity = input(false, 'Override Fill Opacity', group=groupFill, tooltip='If true, use a consistent opacity for all session fills.')
+asianOpenLineStyle = input(line.style_solid, 'Line Style - Asia Open', group=groupSessionLevelsLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+londonOpenLineStyle = input(line.style_solid, 'Line Style - London Open', group=groupSessionLevelsLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+nyOpenLineStyle = input(line.style_solid, 'Line Style - NY Open', group=groupSessionLevelsLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+dailyOpenLineStyle = input(line.style_solid, 'Line Style - Daily Open', group=groupSessionLevelsLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
-sessionLevelsLinesJoined = input(false, 'Join points?', group=groupFill)
-asianOpenPlotStyle = input(plot.style_stepline, 'Plot Style - Asia Open', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-londonOpenPlotStyle = input(plot.style_stepline, 'Plot Style - London Open', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-nyOpenPlotStyle = input(plot.style_stepline, 'Plot Style - NY Open', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
+// extend
 
-sessionLevelsHighLowPlotStyle = input(plot.style_stepline, 'Plot Style - H/L', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-
-sessionHighLowLineOpacity = input(50, 'Opacity - Session H/L', minval=0, maxval=100, group=groupFill) // TODO this applies to line and fill
-sessionLevelsOpenLineOpacity = input(10, 'Opacity - Open Line', minval=0, maxval=100, group=groupFill) // TODO this applies to line and fill
-sessionLevelsLookbackHours = input(0, 'Lookback Hours', input.integer, minval=0, maxval=24, tooltip=TT_LB, group=groupFill)
-sessionFillMaxTimeframe = input(title='Max Timeframe - Session Fill', defval=15, maxval=240, minval=1, group=groupFill)
-
-// daily open plot
-
-dailyOpenPlotStyle = input(plot.style_stepline, 'Plot Style - Daily Open', group=groupDailyOpenPlot, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-mt4DailyOpenPlotStyle = input(plot.style_circles, 'Plot Style - MT4 Daily Open', group=groupDailyOpenPlot, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-dailyOpenPlotOpacity = input(0, 'Plot Opacity - Daily Open', group=groupDailyOpenPlot, minval=0, maxval=100)
-mt4DailyOpenPlotOpacity = input(50, 'Plot Opacity - MT4 Daily Open', group=groupDailyOpenPlot, minval=0, maxval=100)
-dailyOpenPlotMaxTimeframe = input(title='Max Timeframe', defval=15, maxval=240, minval=1, group=groupDailyOpenPlot)
-
-// line style
-
-sessionLevelsLineOffsetInBars = input(15, 'Line Offset (in bars)', group=groupLineStyle)
-sessionLevelsLineLengthInBars = input(20, 'Line Length (in bars)', group=groupLineStyle)
-sessionLabelOffsetInBars = input(-5, 'Label Offset (in bars)', group=groupLineStyle)
-
-dailyOpenLineExtend = input(extend.none, 'Daily Open Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupLineStyle)
-sessionLevelsLineExtend = input(extend.none, 'Session Levels Line Extend', options=[extend.none, extend.left, extend.right, extend.both], group=groupLineStyle)
-
-sessionLevelsHighLowLineStyle = input(line.style_solid, 'Line Style - H/L', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
-sessionLevelsLineWidth = input(2, 'Line Width', group=groupLineStyle, options=[1,2,3,4])
-
-asianOpenLineStyle = input(line.style_solid, 'Line Style - Asia Open', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
-londonOpenLineStyle = input(line.style_solid, 'Line Style - London Open', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
-nyOpenLineStyle = input(line.style_solid, 'Line Style - NY Open', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
-dailyOpenLineStyle = input(line.style_solid, 'Line Style - Daily Open', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+groupExtend = 'Extend'
+dailyOpenLineExtend = input(extend.none, 'Extend - Daily Open', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
+sessionLevelsLineExtend = input(extend.none, 'Extend - Sessions Levels', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
 
 // labels
 
@@ -250,9 +210,7 @@ sessionLabelShowPrice = input(false, 'Show Price in Label?', group=groupLabels)
 
 asiaTimeRange = input('2100-0500:23456', 'Asian Session Time', group=groupTimeRanges, type=input.session)
 londonTimeRange = input('0800-1630:23456', 'London Session Time', group=groupTimeRanges, type=input.session)
-nyTimeRange = input('1300-1700:23456', 'New York Session Time', group=groupTimeRanges, type=input.session)
-// to get high and low for NY '1300-2100:23456'
-
+nyTimeRange = input('1300-2100:23456', 'New York Session Time', group=groupTimeRanges, type=input.session)
 dailyOpenTimeRange = input('0000-0015:1234567', 'Daily Open Time', group=groupTimeRanges, type=input.session)
 mt4DailyOpenTimeRange = input('2200-2215:1234567', 'MT4 Daily Open Time', group=groupTimeRanges, type=input.session)
 
@@ -285,130 +243,17 @@ _captureSessionLevels(timeRange) =>
 
     [_sessionHigh, _sessionLow, _sessionOpen]
 
-_isWithinSessionLevelsLookbackPeriod() => 
-    // the session start time must be after the lookback time
-    if sessionLevelsLookbackHours > 0
-        lookbackTimeInMs = MS_PER_HOUR * sessionLevelsLookbackHours
-        _currentBarTime() > (timenow - lookbackTimeInMs)
-    else 
-        true
-    
-    // lookbackHours = (24 * sessionLevelsLookbackDays) + hour
-    // timeOfSessionBeginning = _getTimeAtStartOfHourNHoursAgo(lookbackHours)
-    // timeAtBeginningOfLookbackDay = _getStartTimeNDaysBack(sessionLevelsLookbackDays)
-    // timeAtBeginningOfLookbackDay < timeOfSessionBeginning
-
-_getLevelsColors(masterColor, inSession, openPlotActive, highLowPlotActive, fillColor) => 
-    openLineColor = openPlotActive and inSession ? color.new(masterColor, sessionLevelsOpenLineOpacity) : na
-    
-    highLowLineColor = not highLowPlotActive ? na : 
-              inSession ? color.new(masterColor, sessionHighLowLineOpacity ) : na
-            
-    fc = overrideFillOpacity ? color.new(fillColor, sessionFillOpacity) : fillColor
-
-    _fillColor = not highLowPlotActive ? na : 
-              inSession and inSession[1] ? fc : na
-
-    [openLineColor, highLowLineColor, _fillColor]    
-
-_getValuesForSessionFillPlotting(timeRange, masterColor, openPlotActive, highLowPlotActive, fillColor) => 
-    isInSession = _isInSession(timeRange)
-
-    [sessionHigh, sessionLow, sessionOpen] = _captureSessionLevels(timeRange)
-    
-    [openLineColor, highLowLineColor, _fillColor] = _getLevelsColors(masterColor, isInSession, openPlotActive, highLowPlotActive, fillColor)
-
-    isWithinMaxTimeframe = timeframe.multiplier <= sessionFillMaxTimeframe and timeframe.isintraday
-    conditionsMet = _isWithinSessionLevelsLookbackPeriod() and isWithinMaxTimeframe
-
-    if conditionsMet
-        [sessionHigh, sessionLow, sessionOpen, openLineColor, highLowLineColor, _fillColor]
-    else 
-        [na, na, na, na, na, na]
-
-/////////////////////////////////////////////////////////
-// 
-// --- LINE PLOTS ---
-// 
-/////////////////////////////////////////////////////////
-
-// ---- asia ----
-
-[asiaHigh, asiaLow, asiaOpen, asiaOpenLineColor, asiaHighLowLineColor, _asiaFillColor] = _getValuesForSessionFillPlotting(
-     asiaTimeRange, 
-     asiaMasterColor, 
-     true, 
-     true,
-     asiaFillColor)
-
-// ---- london ----
-
-[londonHigh, londonLow, londonOpen, londonOpenPlotColor, londonHLPlotColor, _londonFillColor] = _getValuesForSessionFillPlotting(
-     londonTimeRange, 
-     londonMasterColor, 
-     true, 
-     true,
-     londonFillColor)
-
-londonPlotOpen  = plot(
-      plotLondonOpenActive ? londonOpen : na,  
-      "London Open",  
-      londonOpenPlotColor,  
-      sessionLevelsLineWidth, 
-      londonOpenPlotStyle, 
-      join=sessionLevelsLinesJoined)
-
-// ---- new york ----
-
-[nyHigh, nyLow, nyOpen, nyOpenLineColor, nyHighLowLineColor, _nyFillColor] = _getValuesForSessionFillPlotting(
-      nyTimeRange, 
-      nyMasterColor, 
-      true, 
-      true,
-      nyFillColor)
-
-nyPlotOpen  = plot(
-      plotNyOpenActive ? nyOpen : na,  
-      "New York Open",  
-      nyOpenLineColor,  
-      sessionLevelsLineWidth, 
-      nyOpenPlotStyle, 
-      join=sessionLevelsLinesJoined)
-
-
-////////////////////////////////////////////////////////
-// 
-// ---- Daily Open Plot ---
-// 
-////////////////////////////////////////////////////////
-
-[mt4High, mt4Low, mt4Open] = _captureSessionLevels(mt4DailyOpenTimeRange)
-[dailyHigh, dailyLow, dailyOpen] = _captureSessionLevels(dailyOpenTimeRange)
-
-isValidTimeframeToPlotDailyOpen = timeframe.multiplier <= dailyOpenPlotMaxTimeframe
-
-dailyOpenPlot  = plot(
-     plotDailyOpenActive and isValidTimeframeToPlotDailyOpen ? dailyOpen : na,  
-     "Daily Open",  
-     plotDailyOpenActive ? color.new(dailyOpenColor, dailyOpenPlotOpacity) : na,  
-     sessionLevelsLineWidth, 
-     dailyOpenPlotStyle, 
-     join=sessionLevelsLinesJoined)
-
-mt4DailyOpenPlot  = plot(
-     plotMt4DailyOpenActive and isValidTimeframeToPlotDailyOpen ? mt4Open : na,  
-     "MT4 Daily Open",  
-     plotMt4DailyOpenActive ? color.new(mt4DailyOpenColor, mt4DailyOpenPlotOpacity) : na,  
-     sessionLevelsLineWidth, 
-     mt4DailyOpenPlotStyle, 
-     join=sessionLevelsLinesJoined)
-
-
 ////////////////////////////////////////////////////////
 // 
 // ---- Labelled Lines ---
 // 
 ////////////////////////////////////////////////////////
+
+[asiaHigh, asiaLow, asiaOpen] = _captureSessionLevels(asiaTimeRange)
+[londonHigh, londonLow, londonOpen] = _captureSessionLevels(londonTimeRange)
+[nyHigh, nyLow, nyOpen] = _captureSessionLevels(nyTimeRange)
+[mt4High, mt4Low, mt4Open] = _captureSessionLevels(mt4DailyOpenTimeRange)
+[dailyHigh, dailyLow, dailyOpen] = _captureSessionLevels(dailyOpenTimeRange)
 
 var line asianOpenLineId = na
 var line asianHighLineId = na
@@ -421,7 +266,7 @@ var line londonHighLineId = na
 var line londonLowLineId = na
 var line mt4DailyOpenLineId = na
 
-_getLineColor(masterColor, opacity, isActive) => color.new(masterColor, isActive ? opacity : 100)
+_getLineColor(_color, opacity, isActive) => color.new(_color, isActive ? opacity : 100)
 
 _drawSessionLines() =>
     x1 = _getTimeNBarsFromNow(sessionLevelsLineOffsetInBars)
@@ -431,9 +276,9 @@ _drawSessionLines() =>
     londonHighLowLabelVisible = true
     mt4DailyOpenHighLowLabelVisible = false
 
-    asianLabelColor = color.new(asiaMasterColor, sessionLabelOpacity)
-    londonLabelColor = color.new(londonMasterColor, sessionLabelOpacity)
-    nyLabelColor = color.new(nyMasterColor, sessionLabelOpacity)
+    asianLabelColor = color.new(asiaLineColor, sessionLabelOpacity)
+    londonLabelColor = color.new(londonLineColor, sessionLabelOpacity)
+    nyLabelColor = color.new(nyLineColor, sessionLabelOpacity)
     
     labelTextColor = color.new(color.white, 0)
     labelSize = sessionLabelSize
@@ -668,94 +513,5 @@ if na(_londonLowLineId)
 
 if na(_mt4DailyOpenLineId)
     mt4DailyOpenLineId := _mt4DailyOpenLineId
-
-
-/////////////////////////////////////////////////////////////
-// 
-// --- MARKERS ---
-//
-/////////////////////////////////////////////////////////////
-
-didCrossMT4DailyOpen = cross(close, mt4Open)
-didCrossDailyOpen = cross(close, asiaOpen)
-didCrossNyOpen = cross(close, nyOpen)
-didCrossLondonOpen = cross(close, londonOpen)
-
-markerCrossPlotStyle = input(
-     shape.xcross, 
-     'Cross Marker Style', 
-     options=[shape.xcross, shape.cross, shape.triangleup, shape.triangledown, shape.flag, shape.circle, shape.arrowup, shape.arrowdown, shape.labelup, shape.labeldown, shape.square, shape.diamond], 
-     group=groupMarkers)
-
-markerCrossPlotLocation = input(
-     location.bottom, 
-     'Cross Marker Location', 
-     options=[location.abovebar, location.belowbar, location.top, location.bottom, location.absolute], 
-     group=groupMarkers)
-
-markerOpacity = input(10, 'Marker Shape Opacity', minval=0, maxval=100, group=groupMarkers)
-markerTextOpacity = input(0, 'Marker Text Opacity', minval=0, maxval=100, group=groupMarkers)
-markerShapeSize = size.small // must be constant or compiler will complain
-
-markerTextColorSameAsMarkerColor = input(false, 'Text Color Same As Marker Color?', group=groupMarkers)
-showCrossMarkerMt4Open = input(false, 'Show Cross Marker - MT4 Daily Open', group=groupMarkers)
-showCrossMarkerDailyOpen = input(false, 'Show Cross Marker - Daily Open', group=groupMarkers)
-showCrossMarkerNyOpen = input(false, 'Show Cross Marker - NY Open', group=groupMarkers)
-showCrossMarkerLondonOpen = input(false, 'Show Cross Marker - London Open', group=groupMarkers)
-
-_markerTextColor(baseColor) => color.new(markerTextColorSameAsMarkerColor ? baseColor : color.white, markerTextOpacity)
-
-plotshape(
-     series=showCrossMarkerMt4Open ? didCrossMT4DailyOpen : na, 
-     text='MT4',
-     title='Cross - MT4 Daily Open', 
-     style=markerCrossPlotStyle, 
-     location=markerCrossPlotLocation, 
-     color=color.new(mt4DailyOpenColor, markerOpacity),
-     textcolor=_markerTextColor(mt4DailyOpenColor),
-     size=markerShapeSize)
-
-plotshape(
-     series=showCrossMarkerDailyOpen ? didCrossDailyOpen : na, 
-     text='D',
-     title='Cross - Daily Open', 
-     style=markerCrossPlotStyle, 
-     location=markerCrossPlotLocation, 
-     color=color.new(dailyOpenColor, markerOpacity),
-     textcolor=_markerTextColor(dailyOpenColor),
-     size=markerShapeSize)
-
-plotshape(
-     series=showCrossMarkerNyOpen ? didCrossNyOpen : na, 
-     text='NY',
-     title='Cross - NY Open', 
-     style=markerCrossPlotStyle, 
-     location=markerCrossPlotLocation, 
-     color=color.new(nyMasterColor, markerOpacity),
-     textcolor=_markerTextColor(nyMasterColor),
-     size=markerShapeSize)
-
-plotshape(
-     series=showCrossMarkerLondonOpen ? didCrossLondonOpen : na, 
-     text='L',
-     title='Cross - London', 
-     style=markerCrossPlotStyle, 
-     location=markerCrossPlotLocation, 
-     color=color.new(londonMasterColor, markerOpacity),
-     textcolor=_markerTextColor(londonMasterColor),
-     size=markerShapeSize)
-
-/////////////////////////////////////////////////////////////
-// 
-// --- ALERTS ---
-//
-/////////////////////////////////////////////////////////////
-
-alertcondition(didCrossMT4DailyOpen, title='Price x MT4 Daily Open', message='{{ticker}} Price x MT4 Daily Open')
-alertcondition(didCrossDailyOpen, title='Price x Daily Open', message='{{ticker}} Price x Daily Open')
-alertcondition(didCrossNyOpen, title='Price x NY Open', message='{{ticker}} Price x NY Open')
-alertcondition(didCrossLondonOpen, title='Price x London Open', message='{{ticker}} Price x London Open')     
-
-
 
 
