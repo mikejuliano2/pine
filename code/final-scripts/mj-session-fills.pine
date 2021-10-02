@@ -86,15 +86,18 @@ string TT_LB = "The number of days back to plot the session levels"
 
 // switches
 
+sessionFillMaxTimeframe = input(title='Max Timeframe - Session Fill', defval=15, maxval=240, minval=1, group=groupPlotSwitches)
+
 fillsActive = input(true, 'Fills Active', group=groupPlotSwitches)
 fillAsianSession = input(true, 'Fill - Asian Session', group=groupPlotSwitches)
 fillLondonSession = input(true, 'Fill - London Session', group=groupPlotSwitches)
 fillNySession = input(true, 'Fill - NY Session', group=groupPlotSwitches)
 fillEuBrinks = input(true, 'Fill - EU Brinks', group=groupPlotSwitches)
 fillUsaBrinks = input(true, 'Fill - USA Brinks', group=groupPlotSwitches)
-fillLast15 = input(true, 'Fill - Last 15 min of day', group=groupPlotSwitches)
+fillLast15 = input(false, 'Fill - Last 15 min of day', group=groupPlotSwitches)
 
 // extend vertically
+
 extendAsia = input(false, 'Extend - Asia', group=groupExtend)
 extendNy = input(false, 'Extend - NY', group=groupExtend)
 extendLondon = input(false, 'Extend - London', group=groupExtend)
@@ -112,8 +115,8 @@ last15BorderColor = input(color.new(#f57f17, 90), 'Border - Last 15 min of day',
 // fill colors
 
 asiaFillColor = input(color.new(#043c36, 60), 'Fill - Asia', input.color, group=groupFillColors)
-londonFillColor = input(color.new(#1a1736, 50), 'Fill - London', input.color, group=groupFillColors)
-nyFillColor = input(color.new(#4e092e, 70), 'Fill - New York', input.color, group=groupFillColors)
+londonFillColor = input(color.new(#1a1736, 30), 'Fill - London', input.color, group=groupFillColors)
+nyFillColor = input(color.new(#4e092e, 55), 'Fill - New York', input.color, group=groupFillColors)
 brinksFillColor = input(color.new(#b2b5be, 80), 'Fill - Brinks', group=groupFillColors)
 last15FillColor = input(color.new(#f57f17, 90), 'Fill - Last 15 min of day', group=groupFillColors)
 
@@ -123,7 +126,6 @@ overrideFillOpacity = input(false, 'Override Fill Opacity', group=groupFill, too
 sessionLevelsLinesJoined = input(false, 'Join points?', group=groupFill)
 sessionLevelsBorderPlotStyle = input(plot.style_stepline, 'Plot Style - H/L', group=groupFill, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
 sessionLevelsLookbackHours = input(0, 'Lookback Hours', input.integer, minval=0, maxval=24, tooltip=TT_LB, group=groupFill)
-sessionFillMaxTimeframe = input(title='Max Timeframe - Session Fill', defval=15, maxval=240, minval=1, group=groupFill)
 sessionLevelsLineWidth = input(2, 'Line Width', group=groupFill, options=[1,2,3,4])
 
 // time ranges

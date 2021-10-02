@@ -6,13 +6,8 @@
 DAD WIFI e7500dc77b
 
 
-update Asia time
-shade change when london closes
-decouple the HL calculations for the sessions from the filling
 option to color frankfurt
 option to color Tokyo, HongKong, Syndey, Full Asian Session
-*** move all plots in front of brinks, sessions, m candles
-*** mark the london close in the future 12:30pm
 
 
 *** print the % difference between the 50 and the 200. Color Code it.  Consider doing it on all timeframes like the candle meter

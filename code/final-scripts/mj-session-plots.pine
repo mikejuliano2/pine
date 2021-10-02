@@ -27,10 +27,12 @@ COLOR_PEACH = #e57373
 // 
 //////////////////////////////////////////////////////////////////
 
-groupPlotSwitches = 'Plot Switches'
+groupSwitches='Switches'
+groupLineWidth='Line Width'
+groupPlotStyle='Plot Style'
 groupColors = 'Colors'
 groupTimeRanges = 'Time Ranges'
-groupLinePlot='Line Plot'
+groupMaxTF = 'Max Timeframe'
 groupMarkers='Markers'
 
 // tooltips
@@ -41,41 +43,52 @@ string TT_LB = "The number of days back to plot the session levels"
 
 // switches
 
-plotLondonOpenActive = input(false, 'Plot - London Open', group=groupPlotSwitches)
-plotNyOpenActive = input(false, 'Plot - NY Open', group=groupPlotSwitches)
-plotDailyOpenActive = input(true, 'Plot - Daily Open', group=groupPlotSwitches)
-plotMt4DailyOpenActive = input(false, 'Plot - MT4 Daily Open', group=groupPlotSwitches)
+plotAsiaOpenActive = input(true, 'Plot - Asia Open', group=groupSwitches)
+plotLondonOpenActive = input(true, 'Plot - London Open', group=groupSwitches)
+plotNyOpenActive = input(true, 'Plot - NY Open', group=groupSwitches)
+plotDailyOpenActive = input(true, 'Plot - Daily Open', group=groupSwitches)
+
+// line width
+
+lineWidthAsiaOpen = input(2, 'Line Width - Asia Open', group=groupLineWidth, options=[1,2,3,4])
+lineWidthLondonOpen = input(2, 'Line Width - London Open', group=groupLineWidth, options=[1,2,3,4])
+lineWidthNyOpen = input(2, 'Line Width - NY Open', group=groupLineWidth, options=[1,2,3,4])
+lineWidthDailyOpen = input(2, 'Line Width - Daily Open', group=groupLineWidth, options=[1,2,3,4])
+
+// plot style
+
+asiaOpenPlotStyle = input(plot.style_stepline, 'Plot Style - Asia Open', group=groupPlotStyle, options=[plot.style_circles, plot.style_cross, plot.style_stepline])
+londonOpenPlotStyle = input(plot.style_stepline, 'Plot Style - London Open', group=groupPlotStyle, options=[plot.style_circles, plot.style_cross, plot.style_stepline])
+nyOpenPlotStyle = input(plot.style_stepline, 'Plot Style - NY Open', group=groupPlotStyle, options=[plot.style_circles, plot.style_cross, plot.style_stepline])
+dailyOpenPlotStyle = input(plot.style_stepline, 'Plot Style - Daily Open', group=groupPlotStyle, options=[plot.style_circles, plot.style_cross, plot.style_stepline])
 
 // colors
 
-dailyOpenColor = input(color.new(#2962ff, 20), 'Daily Open Color', input.color, group=groupColors)
-mt4DailyOpenColor = input(color.new(#2962ff, 20), 'MT4 Daily Open Color', input.color, group=groupColors)
-londonColor = input(#ff851a, 'Master - London', input.color, group=groupColors)
-nyColor = input(#880e4f, 'Master - New York', input.color, group=groupColors)
+asiaColor = input(color.new(#00897b, 30), 'Asia', input.color, group=groupColors)
+dailyOpenColor = input(color.new(#2962ff, 20), 'Daily Open', input.color, group=groupColors)
+londonColor = input(color.new(#7e57c2, 20), 'London', input.color, group=groupColors)
+nyColor = input(color.new(#880e4f, 20), 'New York', input.color, group=groupColors)
 
-// line plot
+// max timeframe
 
-londonOpenPlotStyle = input(plot.style_stepline, 'Plot Style - London Open', group=groupLinePlot, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-nyOpenPlotStyle = input(plot.style_stepline, 'Plot Style - NY Open', group=groupLinePlot, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-dailyOpenPlotStyle = input(plot.style_stepline, 'Plot Style - Daily Open', group=groupLinePlot, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-mt4DailyOpenPlotStyle = input(plot.style_circles, 'Plot Style - MT4 Daily Open', group=groupLinePlot, options=[plot.style_circles, plot.style_cross, plot.style_line, plot.style_linebr, plot.style_stepline])
-
-maxTimeframeForLinesPlot = input(title='Max Timeframe', defval=15, maxval=240, minval=1, group=groupLinePlot)
-lineWidth = input(2, 'Line Width', group=groupLinePlot, options=[1,2,3,4])
+maxTimeframeAsiaOpen = input(5, 'Max TF - Asia Open', maxval=240, minval=1, group=groupMaxTF)
+maxTimeframeLondonOpen = input(5, 'Max TF - London Open', maxval=240, minval=1, group=groupMaxTF)
+maxTimeframeNyOpen = input(5, 'Max TF - NY Open', maxval=240, minval=1, group=groupMaxTF)
+maxTimeframeDailyOpen = input(15, 'Max TF - Daily Open', maxval=240, minval=1, group=groupMaxTF)
 
 // time ranges
 
-londonTimeRange = input('0800-1630:23456', 'London Session Time', group=groupTimeRanges, type=input.session)
-nyTimeRange = input('1300-2100:23456', 'New York Session Time', group=groupTimeRanges, type=input.session)
-dailyOpenTimeRange = input('0000-0015:1234567', 'Daily Open Time', group=groupTimeRanges, type=input.session)
-mt4DailyOpenTimeRange = input('2200-2215:1234567', 'MT4 Daily Open Time', group=groupTimeRanges, type=input.session)
+asiaOpenTimeRange = input('2200-2145:1234567', 'Asia Open', group=groupTimeRanges, type=input.session)
+londonTimeRange = input('0800-1630:23456', 'London Open', group=groupTimeRanges, type=input.session)
+nyTimeRange = input('1300-2100:23456', 'New York Open', group=groupTimeRanges, type=input.session)
+dailyOpenTimeRange = input('0000-0015:1234567', 'Daily Open', group=groupTimeRanges, type=input.session)
 
 _isInSession(timeRange) =>
     not na(time(timeframe.period, timeRange))
 
-_captureSessionLevels(timeRange) => 
+_captureSessionLevels(timeRange, holdActive) => 
     _inSession = _isInSession(timeRange)
-    _inHolding = not _inSession
+    _inHolding = holdActive and not _inSession
 
     var float _sessionHigh = na
     var float _sessionLow = na
@@ -108,40 +121,40 @@ _captureSessionLevels(timeRange) =>
 // 
 /////////////////////////////////////////////////////////
 
-isValidTimeframeToPlotLines = timeframe.multiplier <= maxTimeframeForLinesPlot
+_isValidTF(maxTF) => timeframe.isminutes and timeframe.multiplier <= maxTF
 
-[londonHigh, londonLow, londonOpen] = _captureSessionLevels(londonTimeRange)
-[nyHigh, nyLow, nyOpen] = _captureSessionLevels(nyTimeRange)
-[mt4High, mt4Low, mt4Open] = _captureSessionLevels(mt4DailyOpenTimeRange)
-[dailyHigh, dailyLow, dailyOpen] = _captureSessionLevels(dailyOpenTimeRange)
+[asiaHigh, asiaLow, asiaOpen] = _captureSessionLevels(asiaOpenTimeRange, false)
+[londonHigh, londonLow, londonOpen] = _captureSessionLevels(londonTimeRange, false)
+[nyHigh, nyLow, nyOpen] = _captureSessionLevels(nyTimeRange, false)
+[dailyHigh, dailyLow, dailyOpen] = _captureSessionLevels(dailyOpenTimeRange, true)
+
+asiaOpenPlot  = plot(
+     plotAsiaOpenActive and _isValidTF(maxTimeframeAsiaOpen) and _isInSession(asiaOpenTimeRange) ? asiaOpen : na,  
+     "Asia Open",  
+     plotAsiaOpenActive and _isInSession(asiaOpenTimeRange) ? asiaColor : na,  
+     lineWidthAsiaOpen, 
+     asiaOpenPlotStyle)
 
 londonPlotOpen  = plot(
-      plotLondonOpenActive and isValidTimeframeToPlotLines and _isInSession(londonTimeRange) ? londonOpen : na,  
+      plotLondonOpenActive and _isValidTF(maxTimeframeLondonOpen) and _isInSession(londonTimeRange) ? londonOpen : na,  
       "London Open",  
       _isInSession(londonTimeRange) ? londonColor : na,  
-      lineWidth, 
+      lineWidthLondonOpen, 
       londonOpenPlotStyle)
 
 nyPlotOpen  = plot(
-      plotNyOpenActive and isValidTimeframeToPlotLines and _isInSession(nyTimeRange) ? nyOpen : na,  
+      plotNyOpenActive and _isValidTF(maxTimeframeNyOpen) and _isInSession(nyTimeRange) ? nyOpen : na,  
       "New York Open",  
       _isInSession(nyTimeRange) ? nyColor : na,  
-      lineWidth, 
+      lineWidthNyOpen, 
       nyOpenPlotStyle)
 
 dailyOpenPlot  = plot(
-     plotDailyOpenActive and isValidTimeframeToPlotLines ? dailyOpen : na,  
+     plotDailyOpenActive and _isValidTF(maxTimeframeDailyOpen) ? dailyOpen : na,  
      "Daily Open",  
      plotDailyOpenActive ? dailyOpenColor : na,  
-     lineWidth, 
+     lineWidthDailyOpen, 
      dailyOpenPlotStyle)
-
-mt4DailyOpenPlot  = plot(
-     plotMt4DailyOpenActive and isValidTimeframeToPlotLines ? mt4Open : na,  
-     "MT4 Daily Open",  
-     plotMt4DailyOpenActive ? mt4DailyOpenColor : na,  
-     lineWidth, 
-     mt4DailyOpenPlotStyle)
 
 /////////////////////////////////////////////////////////////
 // 
@@ -149,7 +162,7 @@ mt4DailyOpenPlot  = plot(
 //
 /////////////////////////////////////////////////////////////
 
-didCrossMT4DailyOpen = cross(close, mt4Open)
+didCrossAsiaOpen = cross(close, asiaOpen)
 didCrossDailyOpen = cross(close, dailyOpen)
 didCrossNyOpen = cross(close, nyOpen)
 didCrossLondonOpen = cross(close, londonOpen)
@@ -171,7 +184,7 @@ markerTextOpacity = input(0, 'Marker Text Opacity', minval=0, maxval=100, group=
 markerShapeSize = size.small // must be constant or compiler will complain
 
 markerTextColorSameAsMarkerColor = input(false, 'Text Color Same As Marker Color?', group=groupMarkers)
-showCrossMarkerMt4Open = input(false, 'Show Cross Marker - MT4 Daily Open', group=groupMarkers)
+showCrossMarkerAsiaOpen = input(false, 'Show Cross Marker - Asia Open', group=groupMarkers)
 showCrossMarkerDailyOpen = input(false, 'Show Cross Marker - Daily Open', group=groupMarkers)
 showCrossMarkerNyOpen = input(false, 'Show Cross Marker - NY Open', group=groupMarkers)
 showCrossMarkerLondonOpen = input(false, 'Show Cross Marker - London Open', group=groupMarkers)
@@ -179,13 +192,13 @@ showCrossMarkerLondonOpen = input(false, 'Show Cross Marker - London Open', grou
 _markerTextColor(baseColor) => color.new(markerTextColorSameAsMarkerColor ? baseColor : color.white, markerTextOpacity)
 
 plotshape(
-     series=showCrossMarkerMt4Open ? didCrossMT4DailyOpen : na, 
-     text='MT4',
-     title='Cross - MT4 Daily Open', 
+     series=showCrossMarkerAsiaOpen ? didCrossAsiaOpen : na, 
+     text='A',
+     title='Cross - Asia Open', 
      style=markerCrossPlotStyle, 
      location=markerCrossPlotLocation, 
-     color=color.new(mt4DailyOpenColor, markerOpacity),
-     textcolor=_markerTextColor(mt4DailyOpenColor),
+     color=color.new(asiaColor, markerOpacity),
+     textcolor=_markerTextColor(asiaColor),
      size=markerShapeSize)
 
 plotshape(
@@ -224,7 +237,7 @@ plotshape(
 //
 /////////////////////////////////////////////////////////////
 
-alertcondition(didCrossMT4DailyOpen, title='Price x MT4 Daily Open', message='{{ticker}} Price x MT4 Daily Open')
-alertcondition(didCrossDailyOpen, title='Price x Daily Open', message='{{ticker}} Price x Daily Open')
+alertcondition(didCrossAsiaOpen, title='Price x Asia Open', message='{{ticker}} Price x Asia Open')
 alertcondition(didCrossNyOpen, title='Price x NY Open', message='{{ticker}} Price x NY Open')
 alertcondition(didCrossLondonOpen, title='Price x London Open', message='{{ticker}} Price x London Open')     
+alertcondition(didCrossDailyOpen, title='Price x Daily Open', message='{{ticker}} Price x Daily Open')
