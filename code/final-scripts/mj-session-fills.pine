@@ -193,6 +193,12 @@ isValidBgShadeTF = _isValidTF(maxTimeframeBackgroundShading)
 // 
 /////////////////////////////////////////////////////////
 
+_asiaInSession = _isInSession(asiaTimeRange)
+_londonInSession = _isInSession(londonTimeRange)
+_nyInSession = _isInSession(nyTimeRange)
+_usaBrinksInSession = _isInSession(usaBrinksTimeRange)
+_euBrinksInSession = _isInSession(euBrinksTimeRange)
+_last15InSession = _isInSession(last15TimeRange)
 
 // ---- asia ----
 
@@ -202,14 +208,14 @@ isValidBgShadeTF = _isValidTF(maxTimeframeBackgroundShading)
      asiaFillColor)
 
 asiaPlotHigh = plot(
-      fillsActive and fillAsianSession and isValidFillTF ? asiaHigh : na, 
+      fillsActive and fillAsianSession and isValidFillTF and _asiaInSession ? asiaHigh : na, 
       "Asia High", 
       _asiaBorderColor, 
       borderLineWidth, 
       sessionLevelsBorderPlotStyle)
 
 asiaPlotLow  = plot(
-      fillsActive and fillAsianSession and isValidFillTF ? asiaLow : na, 
+      fillsActive and fillAsianSession and isValidFillTF and _asiaInSession? asiaLow : na, 
       "Asia Low",  
       _asiaBorderColor,  
       borderLineWidth, 
@@ -223,14 +229,14 @@ asiaPlotLow  = plot(
      londonFillColor)
 
 londonPlotHigh = plot(
-      fillsActive and fillLondonSession and isValidFillTF ? londonHigh : na, 
+      fillsActive and fillLondonSession and isValidFillTF and _londonInSession ? londonHigh : na, 
       "London Session High", 
       _londonBorderColor, 
       borderLineWidth, 
       sessionLevelsBorderPlotStyle)
       
 londonPlotLow  = plot(
-      fillsActive and fillLondonSession and isValidFillTF ? londonLow : na,  
+      fillsActive and fillLondonSession and isValidFillTF and _londonInSession ? londonLow : na,  
       "London Low",  
       _londonBorderColor,  
       borderLineWidth, 
@@ -244,14 +250,14 @@ londonPlotLow  = plot(
       nyFillColor)
 
 nyPlotHigh = plot(
-      fillsActive and fillNySession and isValidFillTF ? nyHigh : na, 
+      fillsActive and fillNySession and isValidFillTF and _nyInSession ? nyHigh : na, 
       "New York Session High", 
       _nyBorderColor, 
       borderLineWidth, 
       sessionLevelsBorderPlotStyle)
 
 nyPlotLow  = plot(
-      fillsActive and fillNySession and isValidFillTF ? nyLow : na,  
+      fillsActive and fillNySession and isValidFillTF and _nyInSession ? nyLow : na,  
       "New York Session Low",  
       _nyBorderColor,  
       borderLineWidth, 
@@ -266,14 +272,14 @@ nyPlotLow  = plot(
       brinksFillColor)
 
 euBrinksPlotHigh = plot(
-      fillsActive and fillEuBrinks and isValidFillTF ? euBrinksHigh : na, 
+      fillsActive and fillEuBrinks and isValidFillTF and _euBrinksInSession ? euBrinksHigh : na, 
       "EU Brinks High", 
       _euBrinksBorderColor, 
       borderLineWidth, 
       sessionLevelsBorderPlotStyle)
 
 euBrinksPlotLow  = plot(
-      fillsActive and fillEuBrinks and isValidFillTF ? euBrinksLow : na,  
+      fillsActive and fillEuBrinks and isValidFillTF and _euBrinksInSession ? euBrinksLow : na,  
       "EU Brinks Low", 
       _euBrinksBorderColor, 
       borderLineWidth, 
@@ -287,14 +293,14 @@ euBrinksPlotLow  = plot(
       brinksFillColor)
 
 usaBrinksPlotHigh = plot(
-      fillsActive and fillUsaBrinks and isValidFillTF ? usaBrinksHigh : na, 
+      fillsActive and fillUsaBrinks and isValidFillTF and _usaBrinksInSession ? usaBrinksHigh : na, 
       "USA Brinks High", 
       _usaBrinksBorderColor, 
       borderLineWidth, 
       sessionLevelsBorderPlotStyle)
 
 usaBrinksPlotLow  = plot(
-      fillsActive and fillUsaBrinks and isValidFillTF ? usaBrinksLow : na,  
+      fillsActive and fillUsaBrinks and isValidFillTF and _usaBrinksInSession ? usaBrinksLow : na,  
       "USA Brinks Low", 
       _usaBrinksBorderColor, 
       borderLineWidth, 
@@ -309,14 +315,14 @@ usaBrinksPlotLow  = plot(
       last15FillColor)
 
 last15PlotHigh = plot(
-      fillsActive and fillLast15 and isValidFillTF ? last15High : na, 
+      fillsActive and fillLast15 and isValidFillTF and _last15InSession ? last15High : na, 
       "Last 15 Minutes of Day High", 
       _last15BorderColor, 
       borderLineWidth, 
       sessionLevelsBorderPlotStyle)
 
 last15PlotLow  = plot(
-      fillsActive and fillLast15 and isValidFillTF ? last15Low : na,  
+      fillsActive and fillLast15 and isValidFillTF and _last15InSession ? last15Low : na,  
       "Last 15 Minutes of Day Low", 
       _last15BorderColor, 
       borderLineWidth, 
