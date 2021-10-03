@@ -105,13 +105,9 @@ new_bar(res) => change(time(res)) != 0
 // 
 //////////////////////////////////////////////////////////////////
 
-_drawLabelledLine(lineId, x1, x2, y, _color, _width, _style, _extend, labelText, labelStyle, labelColor, labelTextColor, labelSize, showLabel, labelOffsetInBars, showPrice) => 
+_drawLabelledLine(x1, x2, y, _color, _width, _style, _extend, labelText, labelStyle, labelColor, labelTextColor, labelSize, showLabel, labelOffsetInBars, showPrice) => 
     // x1 and x2 are in time (not bars)
-
-    _lineId = lineId
-
-    if na(_lineId)
-        _lineId := line.new(x1, y, x2, y, xloc.bar_time, _extend)
+    _lineId = line.new(x1, y, x2, y, xloc.bar_time, _extend)
 
     line.set_xy1(_lineId, x1, y)
     line.set_xy2(_lineId, x2, y)
@@ -163,18 +159,22 @@ string TT_LB = "The number of days back to plot the session levels"
 
 // switches
 
+lineAsiaOpenActive = input(true, 'Line - Asia Open', group=groupLineSwitches)
+lineAsiaHLActive = input(true, 'Line - Asia HL', group=groupLineSwitches)
+
 lineLondonOpenActive = input(true, 'Line - London Open', group=groupLineSwitches)
+lineLondonHLActive = input(false, 'Line - London HL', group=groupLineSwitches)
+
 lineNyOpenActive = input(true, 'Line - NY Open', group=groupLineSwitches)
-lineNyHighLowActive = input(true, 'Line - NY HL', group=groupLineSwitches)
-lineLondonHighLowActive = input(false, 'Line - London HL', group=groupLineSwitches)
-lineMt4DailyOpenActive = input(true, 'Line - MT4 Daily Open', group=groupLineSwitches)
+lineNyHLActive = input(true, 'Line - NY HL', group=groupLineSwitches)
+
+lineDailyOpenActive = input(true, 'Line - Daily Open', group=groupLineSwitches)
 
 // colors
 
-dailyOpenColor = input(#2962ff, 'Daily Open Color', input.color, group=groupColors)
-mt4DailyOpenColor = input(#2962ff, 'MT4 Daily Open Color', input.color, group=groupColors)
-nyLineColor = input(COLOR_YELLOW, 'Line - New York', input.color, group=groupColors)
+dailyOpenColor = input(color.new(#2962ff, 0), 'Daily Open Color', input.color, group=groupColors)
 asiaLineColor = input(COLOR_TURQUOISE, 'Line - Asia', input.color, group=groupColors)
+nyLineColor = input(COLOR_YELLOW, 'Line - New York', input.color, group=groupColors)
 londonLineColor = input(COLOR_ORANGE, 'Line - London', input.color, group=groupColors)
 
 // session levels line style
@@ -188,10 +188,10 @@ sessionLevelsLineWidth = input(2, 'Session Levels - Line Width', group=groupSess
 sessionHighLowLineOpacity = input(50, 'Session Levels - Opacity HL', minval=0, maxval=100, group=groupSessionLevelsLineStyle)
 sessionLevelsOpenLineOpacity = input(10, 'Session Levels - Opacity Open', minval=0, maxval=100, group=groupSessionLevelsLineStyle)
 
-asianOpenLineStyle = input(line.style_solid, 'Line Style - Asia Open', group=groupSessionLevelsLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+dailyOpenLineStyle = input(line.style_solid, 'Line Style - Daily Open', group=groupSessionLevelsLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+asiaOpenLineStyle = input(line.style_solid, 'Line Style - Asia Open', group=groupSessionLevelsLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 londonOpenLineStyle = input(line.style_solid, 'Line Style - London Open', group=groupSessionLevelsLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 nyOpenLineStyle = input(line.style_solid, 'Line Style - NY Open', group=groupSessionLevelsLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
-dailyOpenLineStyle = input(line.style_solid, 'Line Style - Daily Open', group=groupSessionLevelsLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
 // extend
 
@@ -212,7 +212,6 @@ asiaTimeRange = input('2100-0500:23456', 'Asian Session Time', group=groupTimeRa
 londonTimeRange = input('0800-1630:23456', 'London Session Time', group=groupTimeRanges, type=input.session)
 nyTimeRange = input('1300-2100:23456', 'New York Session Time', group=groupTimeRanges, type=input.session)
 dailyOpenTimeRange = input('0000-0015:1234567', 'Daily Open Time', group=groupTimeRanges, type=input.session)
-mt4DailyOpenTimeRange = input('2200-2215:1234567', 'MT4 Daily Open Time', group=groupTimeRanges, type=input.session)
 
 _captureSessionLevels(timeRange) => 
     _inSession = _isInSession(timeRange)
@@ -252,33 +251,29 @@ _captureSessionLevels(timeRange) =>
 [asiaHigh, asiaLow, asiaOpen] = _captureSessionLevels(asiaTimeRange)
 [londonHigh, londonLow, londonOpen] = _captureSessionLevels(londonTimeRange)
 [nyHigh, nyLow, nyOpen] = _captureSessionLevels(nyTimeRange)
-[mt4High, mt4Low, mt4Open] = _captureSessionLevels(mt4DailyOpenTimeRange)
 [dailyHigh, dailyLow, dailyOpen] = _captureSessionLevels(dailyOpenTimeRange)
-
-var line asianOpenLineId = na
-var line asianHighLineId = na
-var line asianLowLineId = na
-var line nyOpenLineId = na
-var line nyHighLineId = na
-var line nyLowLineId = na
-var line londonOpenLineId = na
-var line londonHighLineId = na
-var line londonLowLineId = na
-var line mt4DailyOpenLineId = na
 
 _getLineColor(_color, opacity, isActive) => color.new(_color, isActive ? opacity : 100)
 
-_drawSessionLines() =>
+_drawSessionLines(linesArray) =>
+    initialArraySize = array.size(linesArray)
+
+     // cleanup
+    if initialArraySize > 0
+        for i = 0 to initialArraySize - 1 
+            lineToDelete = array.shift(linesArray)
+            line.delete(lineToDelete)
+
     x1 = _getTimeNBarsFromNow(sessionLevelsLineOffsetInBars)
     x2 = _getTimeNBarsFromNow(sessionLevelsLineOffsetInBars + sessionLevelsLineLengthInBars)
     
     nyHighLowLabelVisible = true
     londonHighLowLabelVisible = true
-    mt4DailyOpenHighLowLabelVisible = false
 
-    asianLabelColor = color.new(asiaLineColor, sessionLabelOpacity)
+    asiaLabelColor = color.new(asiaLineColor, sessionLabelOpacity)
     londonLabelColor = color.new(londonLineColor, sessionLabelOpacity)
     nyLabelColor = color.new(nyLineColor, sessionLabelOpacity)
+    dailyOpenLabelColor = color.new(dailyOpenColor, sessionLabelOpacity)
     
     labelTextColor = color.new(color.white, 0)
     labelSize = sessionLabelSize
@@ -289,17 +284,16 @@ _drawSessionLines() =>
     // ---------------
 
     _asianOpenLineId = _drawLabelledLine(
-         asianOpenLineId, 
          x1, 
          x2, 
-         dailyOpen, 
-         mt4DailyOpenColor, 
+         lineAsiaOpenActive ? asiaOpen : na, 
+         _getLineColor(asiaLineColor, sessionLevelsOpenLineOpacity, lineAsiaOpenActive),
          sessionLevelsLineWidth, 
-         asianOpenLineStyle, 
-         dailyOpenLineExtend, 
-         'Daily Open', 
+         asiaOpenLineStyle, 
+         sessionLevelsLineExtend, 
+         'Asia Open', 
          sessionLabelStyle, 
-         asianLabelColor, 
+         asiaLabelColor, 
          labelTextColor, 
          labelSize, 
          labelVisible, 
@@ -307,17 +301,16 @@ _drawSessionLines() =>
          sessionLabelShowPrice)
     
     _asianHighLineId = _drawLabelledLine(
-         asianHighLineId, 
          x1, 
          x2, 
-         asiaHigh, 
+         lineAsiaHLActive ? asiaHigh : na, 
          asiaLineColor,
          sessionLevelsLineWidth, 
          sessionLevelsHighLowLineStyle, 
          sessionLevelsLineExtend, 
          'Asia High', 
          sessionLabelStyle, 
-         asianLabelColor, 
+         asiaLabelColor, 
          labelTextColor, 
          labelSize, 
          labelVisible, 
@@ -325,17 +318,16 @@ _drawSessionLines() =>
          sessionLabelShowPrice)
 
     _asianLowLineId = _drawLabelledLine(
-         asianLowLineId, 
          x1, 
          x2, 
-         asiaLow, 
+         lineAsiaHLActive ? asiaLow : na, 
          asiaLineColor, 
          sessionLevelsLineWidth, 
          sessionLevelsHighLowLineStyle, 
          sessionLevelsLineExtend, 
          'Asia Low', 
          sessionLabelStyle, 
-         asianLabelColor, 
+         asiaLabelColor, 
          labelTextColor, 
          labelSize, 
          labelVisible, 
@@ -347,7 +339,6 @@ _drawSessionLines() =>
     // ---------------
 
     _nyOpenLineId = _drawLabelledLine(
-         nyOpenLineId, 
          x1, 
          x2, 
          lineNyOpenActive ? nyOpen : na, 
@@ -364,13 +355,11 @@ _drawSessionLines() =>
          sessionLabelOffsetInBars, 
          sessionLabelShowPrice)
 
-    nyHLLineOpacity = lineNyHighLowActive ? 50 : 100
     _nyHighLineId = _drawLabelledLine(
-         nyHighLineId, 
          x1, 
          x2, 
-         lineNyHighLowActive ? nyHigh : na, 
-         _getLineColor(nyLineColor, sessionHighLowLineOpacity, lineNyHighLowActive),
+         lineNyHLActive ? nyHigh : na, 
+         _getLineColor(nyLineColor, sessionHighLowLineOpacity, lineNyHLActive),
          sessionLevelsLineWidth, 
          sessionLevelsHighLowLineStyle,
          sessionLevelsLineExtend, 
@@ -384,11 +373,10 @@ _drawSessionLines() =>
          sessionLabelShowPrice)
 
     _nyLowLineId = _drawLabelledLine(
-         nyLowLineId, 
          x1, 
          x2, 
-         lineNyHighLowActive ? nyLow : na, 
-         _getLineColor(nyLineColor, sessionHighLowLineOpacity, lineNyHighLowActive),
+         lineNyHLActive ? nyLow : na, 
+         _getLineColor(nyLineColor, sessionHighLowLineOpacity, lineNyHLActive),
          sessionLevelsLineWidth, 
          sessionLevelsHighLowLineStyle,
          sessionLevelsLineExtend, 
@@ -406,7 +394,6 @@ _drawSessionLines() =>
     // ---------------         
 
     _londonOpenLineId = _drawLabelledLine(
-         londonOpenLineId, 
          x1, 
          x2, 
          lineLondonOpenActive ? londonOpen : na, 
@@ -423,12 +410,10 @@ _drawSessionLines() =>
          sessionLabelOffsetInBars, 
          sessionLabelShowPrice)
 
-    londonHLLineOpacity = lineNyHighLowActive ? 50 : 100
     _londonHighLineId = _drawLabelledLine(
-         londonHighLineId, 
          x1, 
          x2, 
-         lineLondonHighLowActive ? londonHigh : na, 
+         lineLondonHLActive ? londonHigh : na, 
          _getLineColor(londonLineColor, sessionHighLowLineOpacity, lineLondonOpenActive),
          sessionLevelsLineWidth, 
          sessionLevelsHighLowLineStyle,
@@ -441,11 +426,11 @@ _drawSessionLines() =>
          londonHighLowLabelVisible, 
          sessionLabelOffsetInBars, 
          sessionLabelShowPrice)
+    
     _londonLowLineId = _drawLabelledLine(
-         lineId=londonLowLineId, 
          x1=x1, 
          x2=x2, 
-         y=lineLondonHighLowActive ? londonLow : na,
+         y=lineLondonHLActive ? londonLow : na,
          _color=_getLineColor(londonLineColor, sessionHighLowLineOpacity, lineLondonOpenActive),
          _width=sessionLevelsLineWidth, 
          _style=sessionLevelsHighLowLineStyle,
@@ -459,59 +444,36 @@ _drawSessionLines() =>
          labelOffsetInBars=sessionLabelOffsetInBars, 
          showPrice=sessionLabelShowPrice)
     
-    _mt4DailyOpenLineId = _drawLabelledLine(
-         mt4DailyOpenLineId, 
+    _dailyOpenLineId = _drawLabelledLine(
          x1, 
          x2, 
-         lineMt4DailyOpenActive ? mt4Open : na, 
-         mt4DailyOpenColor, 
+         lineDailyOpenActive ? dailyOpen : na, 
+         _getLineColor(dailyOpenColor, 0, lineDailyOpenActive), 
          sessionLevelsLineWidth, 
          dailyOpenLineStyle, 
          dailyOpenLineExtend, 
-         'MT4 Open', 
+         'Daily Open', 
          sessionLabelStyle, 
-         londonLabelColor, 
+         dailyOpenLabelColor, 
          labelTextColor, 
          labelSize, 
          labelVisible, 
          sessionLabelOffsetInBars, 
          sessionLabelShowPrice)
+
+    array.push(linesArray, _dailyOpenLineId)
+    array.push(linesArray, _asianOpenLineId)
+    array.push(linesArray, _asianHighLineId)
+    array.push(linesArray, _asianLowLineId)
+    array.push(linesArray, _nyOpenLineId)
+    array.push(linesArray, _nyHighLineId)
+    array.push(linesArray, _nyLowLineId)
+    array.push(linesArray, _londonOpenLineId)
+    array.push(linesArray, _londonHighLineId)
     
-    [_asianOpenLineId, _asianHighLineId, _asianLowLineId, _nyOpenLineId, _nyHighLineId, _nyLowLineId, _londonOpenLineId, _londonHighLineId, _londonLowLineId, _mt4DailyOpenLineId]
+   
 
 
-[_asianOpenLineId, _asianHighLineId, _asianLowLineId, _nyOpenLineId, _nyHighLineId, _nyLowLineId, _londonOpenLineId, _londonHighLineId, _londonLowLineId, _mt4DailyOpenLineId] = _drawSessionLines()
-
-// Pine Script won't let these IDs be set in the method, so have to do it here.  Stupid.
-
-if na(_asianOpenLineId) 
-    asianOpenLineId := _asianOpenLineId
-
-if na(_asianHighLineId)
-    asianHighLineId := _asianHighLineId
-
-if na(_asianLowLineId)
-    asianLowLineId := _asianLowLineId
-
-if na(_nyOpenLineId)
-    nyOpenLineId := _nyOpenLineId
-
-if na(_nyHighLineId)
-    nyHighLineId := _nyHighLineId
-
-if na(_nyLowLineId)
-    nyLowLineId := _nyLowLineId
-
-if na(_londonOpenLineId)
-    londonOpenLineId := _londonOpenLineId
-
-if na(_londonHighLineId)
-    londonHighLineId := _londonHighLineId
-
-if na(_londonLowLineId)
-    londonLowLineId := _londonLowLineId
-
-if na(_mt4DailyOpenLineId)
-    mt4DailyOpenLineId := _mt4DailyOpenLineId
-
+var line[] _lines = array.new_line(0)
+_drawSessionLines(_lines)
 

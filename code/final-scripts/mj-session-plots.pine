@@ -78,7 +78,7 @@ maxTimeframeDailyOpen = input(15, 'Max TF - Daily Open', maxval=240, minval=1, g
 
 // time ranges
 
-asiaOpenTimeRange = input('2200-2145:1234567', 'Asia Open', group=groupTimeRanges, type=input.session)
+asiaOpenTimeRange = input('2100-2045:1234567', 'Asia Open', group=groupTimeRanges, type=input.session)
 londonTimeRange = input('0800-1630:23456', 'London Open', group=groupTimeRanges, type=input.session)
 nyTimeRange = input('1300-2100:23456', 'New York Open', group=groupTimeRanges, type=input.session)
 dailyOpenTimeRange = input('0000-0015:1234567', 'Daily Open', group=groupTimeRanges, type=input.session)
