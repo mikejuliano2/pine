@@ -7,45 +7,50 @@ study("MJ - Sweet Spot", overlay=true)
 // 
 //////////////////////////////////////////////////////////////////
 
-groupSweetSpot = '---- Sweet Spot ----'
+groupConfig = 'Config'
+groupExtend = 'Extend'
+groupSwitches = 'Switches'
+groupLinesAndLabels = 'Lines and Labels'
+groupColors = 'Colors'
 
-ssMaxTimeframe = input(15, 'Max Timeframe', group=groupSweetSpot, minval=1, maxval=240, tooltip='Hidden if above this timeframe')
+ssLineExtendWhole = input(extend.both, 'Extend - Whole', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
+ssLineExtendHalf = input(extend.none, 'Extend - Half', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
+ssLineExtendQuarter = input(extend.none, 'Extend - Quarter', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
+
+ssActive = input(true, 'Sweet Spot Active', group=groupSwitches)
+ssShowLabels = input(true, 'Show Labels?', group=groupSwitches)
+ssShowWhole = input(true, 'Show Whole', group=groupSwitches)
+ssShowHalf = input(true, 'Show Half', group=groupSwitches)
+ssShowQuarter = input(false, 'Show Quarter', group=groupSwitches)
 
 
-ssActive = input(true, 'Sweet Spot Active', group=groupSweetSpot)
-ssShowLabels = input(true, 'Show Labels?', group=groupSweetSpot)
-ssShowWhole = input(true, 'Show Whole', group=groupSweetSpot)
-ssShowHalf = input(true, 'Show Half', group=groupSweetSpot)
-ssShowQuarter = input(false, 'Show Quarter', group=groupSweetSpot)
+ssMaxTimeframe = input(15, 'Max Timeframe', group=groupConfig, minval=1, maxval=240, tooltip='Hidden if above this timeframe')
+
 ssPlotRangeInMultiplesOfWhole = input(6, 'Plot Range (in multiples of the whole)', 
  minval=0,
  tooltip='Example:  plotRange=2.  open = 31,795.  This would plot a line at each whole level between 30k (32-2) and 34k (32+2).', 
- group=groupSweetSpot)
+ group=groupConfig)
 
-ssLineExtendWhole = input(extend.both, 'Line Extend Whole', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
-ssLineExtendHalf = input(extend.none, 'Line Extend Half', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
-ssLineExtendQuarter = input(extend.none, 'Line Extend Quarter', options=[extend.none, extend.left, extend.right, extend.both], group=groupSweetSpot)
+ssWholeLevelOverride = input(0, 'Whole Level Override', minval=0, tooltip='Only active if greater than 0.  You shouldn\'t need to use this, but just in case.', group=groupConfig, step=0.01)
 
-ssWholeLevelOverride = input(0, 'Whole Level Override', minval=0, tooltip='Only active if greater than 0.  You shouldn\'t need to use this, but just in case.', group=groupSweetSpot, step=0.01)
+ssLineOffset = input(43, 'Line Offset (in bars)', group=groupLinesAndLabels)
+ssLineLength = input(20, 'Line Length (in bars)', group=groupLinesAndLabels)
+ssLabelOffset = input(-4, 'Label Offset (in bars)', group=groupLinesAndLabels)
 
-ssLineOffset = input(43, 'Line Offset (in bars)', group=groupSweetSpot)
-ssLineLength = input(20, 'Line Length (in bars)', group=groupSweetSpot)
-ssLabelOffset = input(-4, 'Label Offset (in bars)', group=groupSweetSpot)
+ssLineWidth = input(2, 'Line Width', options=[1,2,3,4], group=groupLinesAndLabels)
+ssLineStyle = input(line.style_solid, 'Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLinesAndLabels)
 
-ssLineWidth = input(2, 'Line Width', options=[1,2,3,4], group=groupSweetSpot)
-ssLineStyle = input(line.style_solid, 'Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupSweetSpot)
-
-ssLabelStyle = input(label.style_none, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle], group=groupSweetSpot)
-ssLabelTextColor = input(color.white, 'Label Text Color', group=groupSweetSpot)
-ssLabelSize = input(size.large, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupSweetSpot)
+ssLabelStyle = input(label.style_none, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle], group=groupLinesAndLabels)
+ssLabelTextColor = input(color.white, 'Label Text Color', group=groupLinesAndLabels)
+ssLabelSize = input(size.large, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupLinesAndLabels)
 
 COLOR_PEACH = #e57373
 
-ssUseSingleColor = input(true, 'Use Single Color?', group=groupSweetSpot)
-masterColor = input(color.new(color.yellow, 30), 'Master Color', group=groupSweetSpot, tooltip='This is the color that will be used if Use Single Color is checked.')
-wholeColor = input(color.new(COLOR_PEACH, 30), 'Whole Color', group=groupSweetSpot)
-halfColor = input(color.new(COLOR_PEACH, 50), 'Half Color', group=groupSweetSpot)
-quarterColor = input(color.new(COLOR_PEACH, 70), 'Quarter Color', group=groupSweetSpot)
+ssUseSingleColor = input(true, 'Use Single Color?', group=groupColors)
+masterColor = input(color.new(color.yellow, 30), 'Master Color', group=groupColors, tooltip='This is the color that will be used if Use Single Color is checked.')
+wholeColor = input(color.new(COLOR_PEACH, 30), 'Whole Color', group=groupColors)
+halfColor = input(color.new(COLOR_PEACH, 50), 'Half Color', group=groupColors)
+quarterColor = input(color.new(COLOR_PEACH, 70), 'Quarter Color', group=groupColors)
 
 _getFutureTimeNBarsFromNow(numBars) => time + ( ( time - time[1] ) * numBars )
 
