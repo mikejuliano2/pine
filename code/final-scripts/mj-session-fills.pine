@@ -108,8 +108,9 @@ extendLast15 = input(true, 'Extend - Last 15 min', group=groupExtend)
 
 asiaFillColor = input(color.new(#043c36, 60), 'Fill - Asia', input.color, group=groupFill)
 londonFillColor = input(color.new(#1a1736, 30), 'Fill - London', input.color, group=groupFill)
-nyFillColor = input(color.new(#4e092e, 55), 'Fill - New York', input.color, group=groupFill)
-brinksFillColor = input(color.new(#b2b5be, 80), 'Fill - Brinks', group=groupFill)
+nyFillColor = input(color.new(#ec407a, 80), 'Fill - New York', input.color, group=groupFill)
+euBrinksFillColor = input(color.new(#b2b5be, 75), 'Fill - EU Brinks', group=groupFill)
+usaBrinksFillColor = input(color.new(#b2b5be, 75), 'Fill - USA Brinks', group=groupFill)
 last15FillColor = input(color.new(#f57f17, 90), 'Fill - Last 15 min of day', group=groupFill)
 
 sessionFillOpacity = input(60, 'Opacity - Session Fill', minval=0, maxval=100, group=groupFill)
@@ -266,10 +267,10 @@ nyPlotLow  = plot(
 
 // ---- eu brinks ----
 
-[euBrinksHigh, euBrinksLow, _euBrinksBorderColor, euBrinksFillColor] = _getValuesForSessionFillPlotting(
+[euBrinksHigh, euBrinksLow, _euBrinksBorderColor, _euBrinksFillColor] = _getValuesForSessionFillPlotting(
       euBrinksTimeRange, 
       brinksBorderColor, 
-      brinksFillColor)
+      euBrinksFillColor)
 
 euBrinksPlotHigh = plot(
       fillsActive and fillEuBrinks and isValidFillTF and _euBrinksInSession ? euBrinksHigh : na, 
@@ -287,10 +288,10 @@ euBrinksPlotLow  = plot(
 
 // ---- usa brinks ----
 
-[usaBrinksHigh, usaBrinksLow, _usaBrinksBorderColor, usaBrinksFillColor] = _getValuesForSessionFillPlotting(
+[usaBrinksHigh, usaBrinksLow, _usaBrinksBorderColor, _usaBrinksFillColor] = _getValuesForSessionFillPlotting(
       usaBrinksTimeRange, 
       brinksBorderColor, 
-      brinksFillColor)
+      usaBrinksFillColor)
 
 usaBrinksPlotHigh = plot(
       fillsActive and fillUsaBrinks and isValidFillTF and _usaBrinksInSession ? usaBrinksHigh : na, 
@@ -335,8 +336,8 @@ last15PlotLow  = plot(
 fill(asiaPlotHigh, asiaPlotLow, _asiaFillColor)
 fill(londonPlotHigh, londonPlotLow, _londonFillColor)
 fill(nyPlotHigh, nyPlotLow, _nyFillColor)
-fill(usaBrinksPlotHigh, usaBrinksPlotLow, usaBrinksFillColor)
-fill(euBrinksPlotHigh, euBrinksPlotLow, euBrinksFillColor)
+fill(usaBrinksPlotHigh, usaBrinksPlotLow, _usaBrinksFillColor)
+fill(euBrinksPlotHigh, euBrinksPlotLow, _euBrinksFillColor)
 fill(last15PlotHigh, last15PlotLow, _last15FillColor)
 
 /////////////////////////////////////////////////////////
@@ -352,6 +353,6 @@ _getBgColorForTimeRange(timeRange, isActive, fillColor) =>
 bgcolor(_getBgColorForTimeRange(asiaTimeRange, extendAsia, asiaFillColor))
 bgcolor(_getBgColorForTimeRange(londonTimeRange, extendLondon, londonFillColor))
 bgcolor(_getBgColorForTimeRange(nyTimeRange, extendNy, nyFillColor))
-bgcolor(_getBgColorForTimeRange(euBrinksTimeRange, extendBrinks, brinksFillColor))
-bgcolor(_getBgColorForTimeRange(usaBrinksTimeRange, extendBrinks, brinksFillColor))
+bgcolor(_getBgColorForTimeRange(euBrinksTimeRange, extendBrinks, usaBrinksFillColor))
+bgcolor(_getBgColorForTimeRange(usaBrinksTimeRange, extendBrinks, usaBrinksFillColor))
 bgcolor(_getBgColorForTimeRange(last15TimeRange, extendLast15, last15FillColor))
