@@ -2,7 +2,10 @@
 
 study("MJ - EMA Cloud", overlay=true)
 
-ema50CloudColor = input(color.new(#3179f5, 80), 'Cloud Fill Color')
+// light blue #3179f5
+// navy blue #090720
+
+ema50CloudColor = input(color.new(#090720, 20), 'Cloud Fill Color')
 ema50CloudBorderColor = input(color.new(#0097a7, 50), 'Cloud Border Color')
 
 ema50 = ema(close, 50)

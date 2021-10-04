@@ -91,10 +91,11 @@ maxTimeframeBackgroundShading = input(60, 'Max Timeframe - Background Shading', 
 fillsActive = input(true, 'Fills Active', group=groupPlotSwitches)
 fillAsianSession = input(true, 'Fill - Asian Session', group=groupPlotSwitches)
 fillLondonSession = input(true, 'Fill - London Session', group=groupPlotSwitches)
-fillNySession = input(true, 'Fill - NY Session', group=groupPlotSwitches)
+fillNySession = input(false, 'Fill - NY Session', group=groupPlotSwitches)
 fillEuBrinks = input(true, 'Fill - EU Brinks', group=groupPlotSwitches)
 fillUsaBrinks = input(true, 'Fill - USA Brinks', group=groupPlotSwitches)
 fillLast15 = input(false, 'Fill - Last 15 min of day', group=groupPlotSwitches)
+fillWeekend = input(true, 'Fill - Weekend', group=groupPlotSwitches)
 
 // extend vertically
 
@@ -112,6 +113,7 @@ nyFillColor = input(color.new(#0c3299, 85), 'Fill - New York', input.color, grou
 euBrinksFillColor = input(color.new(#b2b5be, 80), 'Fill - EU Brinks', group=groupFill)
 usaBrinksFillColor = input(color.new(#b2b5be, 75), 'Fill - USA Brinks', group=groupFill)
 last15FillColor = input(color.new(#f57f17, 90), 'Fill - Last 15 min of day', group=groupFill)
+weekendFillColor = input(color.new(#434651, 50), 'Fill - Weekend', group=groupFill)
 
 sessionFillOpacity = input(60, 'Opacity - Session Fill', minval=0, maxval=100, group=groupFill)
 overrideFillOpacity = input(false, 'Override Fill Opacity', group=groupFill, tooltip='If true, use a consistent opacity for all session fills.')
@@ -123,6 +125,7 @@ londonBorderColor = input(color.new(#1a1736, 90), 'Border - London', input.color
 nyBorderColor = input(color.new(#880e4f, 90), 'Border - New York', input.color, group=groupBorders)
 brinksBorderColor = input(color.new(#b2b5be, 90), 'Border - Brinks', group=groupBorders)
 last15BorderColor = input(color.new(#f57f17, 90), 'Border - Last 15 min of day', group=groupBorders)
+weekendBorderColor = input(color.new(#434651, 90), 'Border - Weekend', group=groupBorders)
 
 sessionLevelsBorderPlotStyle = input(plot.style_stepline, 'Plot Style - H/L', group=groupBorders, options=[plot.style_circles, plot.style_cross, plot.style_stepline])
 borderLineWidth = input(2, 'Line Width', group=groupBorders, options=[1,2,3,4])
@@ -135,6 +138,7 @@ nyTimeRange = input('1300-2100:23456', 'New York', group=groupTimeRanges, type=i
 usaBrinksTimeRange = input('1300-1401:23456', 'USA Brinks', group=groupTimeRanges, type=input.session)
 euBrinksTimeRange = input('0700-0801:23456', 'EU Brinks', group=groupTimeRanges, type=input.session)
 last15TimeRange = input('2345-0001:1234567', 'Last 15min of day', group=groupTimeRanges, type=input.session)
+weekendTimeRange = input('2100-2100:17', group=groupTimeRanges, type=input.session)
 
 // NY Pre-market
 // Frankfurt
@@ -200,6 +204,7 @@ _nyInSession = _isInSession(nyTimeRange)
 _usaBrinksInSession = _isInSession(usaBrinksTimeRange)
 _euBrinksInSession = _isInSession(euBrinksTimeRange)
 _last15InSession = _isInSession(last15TimeRange)
+_weekendInSession = _isInSession(weekendTimeRange)
 
 // ---- asia ----
 
@@ -329,6 +334,26 @@ last15PlotLow  = plot(
       borderLineWidth, 
       sessionLevelsBorderPlotStyle)
 
+// ---- weekend ----
+
+[weekendHigh, weekendLow, _weekendBorderColor, _weekendFillColor] = _getValuesForSessionFillPlotting(
+      weekendTimeRange, 
+      weekendBorderColor, 
+      weekendFillColor)
+
+weekendPlotHigh = plot(
+      fillsActive and fillWeekend and isValidFillTF and _weekendInSession ? weekendHigh : na, 
+      "Weekend High", 
+      _weekendBorderColor, 
+      borderLineWidth, 
+      sessionLevelsBorderPlotStyle)
+
+weekendPlotLow  = plot(
+      fillsActive and fillWeekend and isValidFillTF and _weekendInSession ? weekendLow : na,  
+      "Weekend Low", 
+      _weekendBorderColor, 
+      borderLineWidth, 
+      sessionLevelsBorderPlotStyle)
 
 // *** IMPORTANT ***
 // the order of fills matters, the last one in gets placed on top (z-index)
@@ -339,6 +364,7 @@ fill(nyPlotHigh, nyPlotLow, _nyFillColor)
 fill(usaBrinksPlotHigh, usaBrinksPlotLow, _usaBrinksFillColor)
 fill(euBrinksPlotHigh, euBrinksPlotLow, _euBrinksFillColor)
 fill(last15PlotHigh, last15PlotLow, _last15FillColor)
+fill(weekendPlotHigh, weekendPlotLow, _weekendFillColor)
 
 /////////////////////////////////////////////////////////
 // 
