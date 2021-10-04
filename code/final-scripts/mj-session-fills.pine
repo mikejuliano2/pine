@@ -107,13 +107,16 @@ extendLast15 = input(true, 'Extend - Last 15 min', group=groupExtend)
 
 // fill colors
 
+// ny marooon #880e4f
+// ny blue #0c3299
+
 asiaFillColor = input(color.new(#043c36, 60), 'Fill - Asia', input.color, group=groupFill)
 londonFillColor = input(color.new(#1a1736, 30), 'Fill - London', input.color, group=groupFill)
-nyFillColor = input(color.new(#0c3299, 85), 'Fill - New York', input.color, group=groupFill)
+nyFillColor = input(color.new(#880e4f, 85), 'Fill - New York', input.color, group=groupFill)
 euBrinksFillColor = input(color.new(#b2b5be, 80), 'Fill - EU Brinks', group=groupFill)
 usaBrinksFillColor = input(color.new(#b2b5be, 75), 'Fill - USA Brinks', group=groupFill)
 last15FillColor = input(color.new(#f57f17, 90), 'Fill - Last 15 min of day', group=groupFill)
-weekendFillColor = input(color.new(#434651, 50), 'Fill - Weekend', group=groupFill)
+weekendFillColor = input(color.new(#2a2e39, 50), 'Fill - Weekend', group=groupFill)
 
 sessionFillOpacity = input(60, 'Opacity - Session Fill', minval=0, maxval=100, group=groupFill)
 overrideFillOpacity = input(false, 'Override Fill Opacity', group=groupFill, tooltip='If true, use a consistent opacity for all session fills.')
