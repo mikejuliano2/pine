@@ -20,6 +20,8 @@ COLOR_GREEN = #4caf50
 COLOR_ROYAL_BLUE = #1848cc
 COLOR_TURQUOISE = #00897b
 COLOR_PEACH = #e57373
+COLOR_ELECTRIC_GREEN = #00e676
+COLOR_LIGHT_PURPLE = #7e57c2
 
 //////////////////////////////////////////////////////////////////
 // 
@@ -173,9 +175,9 @@ lineDailyOpenActive = input(true, 'Line - Daily Open', group=groupLineSwitches)
 // colors
 
 dailyOpenColor = input(color.new(#2962ff, 0), 'Daily Open Color', input.color, group=groupColors)
-asiaLineColor = input(COLOR_TURQUOISE, 'Line - Asia', input.color, group=groupColors)
-nyLineColor = input(COLOR_YELLOW, 'Line - New York', input.color, group=groupColors)
-londonLineColor = input(COLOR_ORANGE, 'Line - London', input.color, group=groupColors)
+asiaLineColor = input(COLOR_ELECTRIC_GREEN, 'Line - Asia', input.color, group=groupColors)
+nyLineColor = input(#880e4f, 'Line - New York', input.color, group=groupColors)
+londonLineColor = input(COLOR_LIGHT_PURPLE, 'Line - London', input.color, group=groupColors)
 
 // session levels line style
 

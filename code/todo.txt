@@ -6,6 +6,15 @@
 DAD WIFI e7500dc77b
 
 
+*** LOOKAHEAD for PVSRA.  you'll want to keep the candle colored like normal because that will act like confirmation.  show a dot above the current candle for unconfirmed vector
+
+
+fill NY #880e4f
+plot london #7e57c2
+plot NY #880e4f
+plot asia open #00e676
+
+
 option to color frankfurt
 option to color Tokyo, HongKong, Syndey, Full Asian Session
 

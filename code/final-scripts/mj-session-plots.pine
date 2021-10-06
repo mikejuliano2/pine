@@ -64,7 +64,10 @@ dailyOpenPlotStyle = input(plot.style_stepline, 'Plot Style - Daily Open', group
 
 // colors
 
-asiaColor = input(color.new(#00897b, 30), 'Asia', input.color, group=groupColors)
+// electric green #00e676
+// turqoise #00897b
+
+asiaColor = input(color.new(#00e676, 30), 'Asia', input.color, group=groupColors)
 dailyOpenColor = input(color.new(#2962ff, 20), 'Daily Open', input.color, group=groupColors)
 londonColor = input(color.new(#7e57c2, 20), 'London', input.color, group=groupColors)
 nyColor = input(color.new(#880e4f, 20), 'New York', input.color, group=groupColors)

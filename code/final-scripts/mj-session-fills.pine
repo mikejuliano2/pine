@@ -143,9 +143,15 @@ euBrinksTimeRange = input('0700-0801:23456', 'EU Brinks', group=groupTimeRanges,
 last15TimeRange = input('2345-0001:1234567', 'Last 15min of day', group=groupTimeRanges, type=input.session)
 weekendTimeRange = input('2100-2100:17', group=groupTimeRanges, type=input.session)
 
-// NY Pre-market
-// Frankfurt
-// Weekend
+// NY Pre-market 8am-9am
+// Frankfurt 2am-10am
+// EU Brinks 3am-4am
+// London 3am-11am
+// New York 8am-4pm
+// US Brinks 9am-10am
+// Sydney 5pm-1am
+// Tokyo 7pm-3am
+// Hong Kong 
 
 _captureSessionLevels(timeRange) => 
     _inSession = _isInSession(timeRange)
