@@ -121,8 +121,8 @@ _toDecimalPlaces(numDecimals, value) =>
 
 _deviationDisplay(valueOne, valueTwo) => 
     difference = valueOne - valueTwo
-    lowerVal = min(valueOne, valueTwo)
-    percentage = _toDecimalPlaces(2, abs((difference) / lowerVal) * 100)    
+    higherVal = max(valueOne, valueTwo)
+    percentage = _toDecimalPlaces(2, abs((difference) / higherVal) * 100)    
     tostring(percentage) + '%'
 
 _drawLabel(y, text, Color, textColor, offset) => 
