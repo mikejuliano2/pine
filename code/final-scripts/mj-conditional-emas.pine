@@ -58,7 +58,6 @@ showConditionalEma15mLabel = input(true, 'Show Conditional 15m label?', group=gr
 showConditionalEma5mLabel = input(true, 'Show Conditional 5m label?', group=groupSwitches)
 showConditionalEma30mLabel = input(true, 'Show Conditional 30m label?', group=groupSwitches)
 show50EmaCloud = input(false, 'Show 50 EMA Cloud?', group=groupSwitches)
-showDeviationLabels = input(true, 'Show Deviation % Labels', group=groupSwitches, tooltip='Show the percentage away from price as the label.')
 
 // --------------------------
 // LINES
@@ -88,9 +87,19 @@ labelSize = input(size.auto, 'Label Size', options=[size.auto, size.tiny, size.s
 // DEVIATION LABELS
 // --------------------------
 
-deviationLabelSize = input(size.large, 'Deviation Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupLabels)
+deviationLabelSize = input(size.large, 'Deviation Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupDeviationLabels)
 showFifty200DeviationLabel = input(true, 'Show 50/200 Deviation Label', group=groupDeviationLabels, tooltip='The % difference between the 50 and 200 EMA.  To determine if there is enough volatility to trade')
 labelOffsetFifty200Deviation = input(19, 'Offset - 50/200 Deviation', group=groupDeviationLabels)
+
+showDeviationLabels = input(true, 'Show Deviation % Labels', group=groupDeviationLabels, tooltip='Show the percentage away from price as the label.')
+deviationLabel5Active = input(false, 'Deviation Label - 5', group=groupDeviationLabels)
+deviationLabel13Active = input(false, 'Deviation Label - 13', group=groupDeviationLabels)
+deviationLabel50Active = input(true, 'Deviation Label - 50', group=groupDeviationLabels)
+deviationLabel200Active = input(true, 'Deviation Label - 200', group=groupDeviationLabels)
+deviationLabel800Active = input(true, 'Deviation Label - 800', group=groupDeviationLabels)
+deviationLabelActiveConditional5m = input(false, 'Deviation Label - Conditional 5m', group=groupDeviationLabels)
+deviationLabelActiveConditional15m = input(false, 'Deviation Label - Conditional 15m', group=groupDeviationLabels)
+deviationLabelActiveConditional60m = input(true, 'Deviation Label - Conditional 60m', group=groupDeviationLabels)
 
 _getConditionalValues() => 
     if timeframe.period == '1'
@@ -125,23 +134,24 @@ _deviationDisplay(valueOne, valueTwo) =>
     percentage = _toDecimalPlaces(2, abs((difference) / higherVal) * 100)    
     tostring(percentage) + '%'
 
-_drawLabel(y, text, Color, textColor, offset) => 
-    _offset = showDeviationLabels ? labelOffsetStandard : offset
+_drawLabel(y, text, Color, textColor, offset, deviationActive) => 
+    _deviationActive = deviationActive and showDeviationLabels
+    _offset = _deviationActive ? labelOffsetStandard : offset
     x = _getFutureTimeNBarsFromNow(_offset)
 
     if barstate.islast
+        _style = deviationActive ? label.style_none : labelStyle
         _color = color.new(Color, labelOpacity)
-        _textColor = labelStyle == label.style_none ? color.new(Color, 0) : textColor // If no label style, use the same color as the line
-        _text = showDeviationLabels ? _deviationDisplay(y, close) : showLabelText ? text : na
-
+        _textColor = _style == label.style_none ? color.new(_color, 0) : textColor // If no label style, use the same color as the line
+        _text = _deviationActive ? _deviationDisplay(y, close) : showLabelText ? text : na
         y ? label.new(
              x=x, 
              y=y, 
              text=_text, 
-             style=showDeviationLabels ? label.style_none : labelStyle, 
+             style=_style, 
              textcolor=_textColor, 
              color=_color, 
-             size=showDeviationLabels ? deviationLabelSize : labelSize, 
+             size=_deviationActive ? deviationLabelSize : labelSize, 
              tooltip=text,
              xloc=xloc.bar_time) : na
 
@@ -218,11 +228,11 @@ plot(
 
 // standard
 
-label5 = _drawLabel(ema5, '5', ema5Color, color.white, labelOffsetStandard)
-label13 = _drawLabel(ema13, '13', ema13Color, color.white, labelOffsetStandard)
-label50 = _drawLabel(ema50, '50', ema50Color, color.white, labelOffsetStandard)
-label200 = _drawLabel(ema200, '200', ema200Color, color.white, labelOffsetStandard)
-label800 = _drawLabel(ema800, '800', ema800Color, color.white, labelOffsetStandard)
+label5 = _drawLabel(ema5, '5', ema5Color, color.white, labelOffsetStandard, deviationLabel5Active)
+label13 = _drawLabel(ema13, '13', ema13Color, color.white, labelOffsetStandard, deviationLabel13Active)
+label50 = _drawLabel(ema50, '50', ema50Color, color.white, labelOffsetStandard, deviationLabel50Active)
+label200 = _drawLabel(ema200, '200', ema200Color, color.white, labelOffsetStandard, deviationLabel200Active)
+label800 = _drawLabel(ema800, '800', ema800Color, color.white, labelOffsetStandard, deviationLabel800Active)
 
 _drawFifty200DeviationLabel() => 
     x = _getFutureTimeNBarsFromNow(labelOffsetFifty200Deviation)
@@ -255,21 +265,24 @@ labelConditional1h = _drawLabel(
      emaConditional1hText, 
      emaConditional1hColor, 
      color.white, 
-     _conditionalLabelOffset)
+     _conditionalLabelOffset,
+     deviationLabelActiveConditional60m)
 
 labelConditional15m = _drawLabel(
      showConditionalEma15mLabel ? emaConditional15m : na, 
      emaConditional15mText, 
      emaConditional15mColor, 
      color.white, 
-     _conditionalLabelOffset)
+     _conditionalLabelOffset,
+     deviationLabelActiveConditional15m)
 
 labelConditional5m = _drawLabel(
      showConditionalEma5mLabel ? emaConditional5m : na, 
      emaConditional5mText, 
      emaConditional5mColor, 
      color.white, 
-     _conditionalLabelOffset)
+     _conditionalLabelOffset,
+     deviationLabelActiveConditional5m)
 
 // labelConditional30m = _drawLabel(
 //      showConditionalEma30mLabel ? emaConditional30m : na, 

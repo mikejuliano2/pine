@@ -1,6 +1,6 @@
 //@version=4
 
-study("MJ - Session Plots", overlay=true)
+study("MJ - Session PLOTS", overlay=true)
 
 COLOR_LIME = #1cd206
 COLOR_VOLT = #affd00
@@ -67,10 +67,16 @@ dailyOpenPlotStyle = input(plot.style_stepline, 'Plot Style - Daily Open', group
 // electric green #00e676
 // turqoise #00897b
 
+// ny marooon #880e4f
+// ny blue #0c3299
+// ny bright red #ad0c0c
+// london purple 1 #1a1736
+// london purple 2 #151048
+
 asiaColor = input(color.new(#00e676, 30), 'Asia', input.color, group=groupColors)
 dailyOpenColor = input(color.new(#2962ff, 20), 'Daily Open', input.color, group=groupColors)
-londonColor = input(color.new(#7e57c2, 20), 'London', input.color, group=groupColors)
-nyColor = input(color.new(#880e4f, 20), 'New York', input.color, group=groupColors)
+londonColor = input(color.new(#7e57c2, 10), 'London', input.color, group=groupColors)
+nyColor = input(color.new(#880e4f, 10), 'New York', input.color, group=groupColors)
 
 // max timeframe
 

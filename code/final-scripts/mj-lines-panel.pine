@@ -187,7 +187,7 @@ sessionLevelsLineLengthInBars = input(20, 'Session Levels - Line Length', group=
 sessionLabelOffsetInBars = input(-5, 'Session Levels - Label Offset', group=groupSessionLevelsLineStyle)
 sessionLevelsHighLowLineStyle = input(line.style_solid, 'Session Levels - HL Line Style', group=groupSessionLevelsLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 sessionLevelsLineWidth = input(2, 'Session Levels - Line Width', group=groupSessionLevelsLineStyle, options=[1,2,3,4])
-sessionHighLowLineOpacity = input(50, 'Session Levels - Opacity HL', minval=0, maxval=100, group=groupSessionLevelsLineStyle)
+sessionHighLowLineOpacity = input(20, 'Session Levels - Opacity HL', minval=0, maxval=100, group=groupSessionLevelsLineStyle)
 sessionLevelsOpenLineOpacity = input(10, 'Session Levels - Opacity Open', minval=0, maxval=100, group=groupSessionLevelsLineStyle)
 
 dailyOpenLineStyle = input(line.style_solid, 'Line Style - Daily Open', group=groupSessionLevelsLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])

@@ -1,6 +1,6 @@
 //@version=4
 
-study("MJ - Session Fills", overlay=true)
+study("MJ - Session FILLS", overlay=true)
 
 COLOR_LIME = #1cd206
 COLOR_VOLT = #affd00
@@ -109,10 +109,13 @@ extendLast15 = input(true, 'Extend - Last 15 min', group=groupExtend)
 
 // ny marooon #880e4f
 // ny blue #0c3299
+// ny bright red #ad0c0c
+// london purple 1 #1a1736
+// london purple 2 #151048
 
 asiaFillColor = input(color.new(#043c36, 60), 'Fill - Asia', input.color, group=groupFill)
-londonFillColor = input(color.new(#1a1736, 30), 'Fill - London', input.color, group=groupFill)
-nyFillColor = input(color.new(#880e4f, 85), 'Fill - New York', input.color, group=groupFill)
+londonFillColor = input(color.new(#151048, 40), 'Fill - London', input.color, group=groupFill)
+nyFillColor = input(color.new(#ad0c0c, 85), 'Fill - New York', input.color, group=groupFill)
 euBrinksFillColor = input(color.new(#b2b5be, 80), 'Fill - EU Brinks', group=groupFill)
 usaBrinksFillColor = input(color.new(#b2b5be, 75), 'Fill - USA Brinks', group=groupFill)
 last15FillColor = input(color.new(#f57f17, 90), 'Fill - Last 15 min of day', group=groupFill)
