@@ -5,6 +5,10 @@
 //////////////////////////////////////////////////////////////////
 DAD WIFI e7500dc77b
 
+do you need the extra minute on time ranges in session fills?
+fill Tokyo
+fill hong kong
+
 
 *** LOOKAHEAD for PVSRA.  you'll want to keep the candle colored like normal because that will act like confirmation.  show a dot above the current candle for unconfirmed vector
 

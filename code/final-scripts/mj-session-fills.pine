@@ -91,7 +91,7 @@ maxTimeframeBackgroundShading = input(60, 'Max Timeframe - Background Shading', 
 fillsActive = input(true, 'Fills Active', group=groupPlotSwitches)
 fillAsianSession = input(true, 'Fill - Asian Session', group=groupPlotSwitches)
 fillLondonSession = input(true, 'Fill - London Session', group=groupPlotSwitches)
-fillNySession = input(false, 'Fill - NY Session', group=groupPlotSwitches)
+fillNySession = input(true, 'Fill - NY Session', group=groupPlotSwitches)
 fillEuBrinks = input(true, 'Fill - EU Brinks', group=groupPlotSwitches)
 fillUsaBrinks = input(true, 'Fill - USA Brinks', group=groupPlotSwitches)
 fillLast15 = input(false, 'Fill - Last 15 min of day', group=groupPlotSwitches)
@@ -114,12 +114,15 @@ extendNyPremarket = input(false, 'Extend - NY Premarket', group=groupExtend)
 // ny bright red #ad0c0c
 // london purple 1 #1a1736
 // london purple 2 #151048
+// eu brinks white #b2b5be
+// eu brinks purple #9c27b0
+// us brinks orange #ffa726
 
 asiaFillColor = input(color.new(#043c36, 60), 'Fill - Asia', input.color, group=groupFill)
 londonFillColor = input(color.new(#151048, 40), 'Fill - London', input.color, group=groupFill)
 nyFillColor = input(color.new(#ad0c0c, 85), 'Fill - New York', input.color, group=groupFill)
-euBrinksFillColor = input(color.new(#b2b5be, 80), 'Fill - EU Brinks', group=groupFill)
-usaBrinksFillColor = input(color.new(#b2b5be, 75), 'Fill - USA Brinks', group=groupFill)
+euBrinksFillColor = input(color.new(#9c27b0, 80), 'Fill - EU Brinks', group=groupFill)
+usaBrinksFillColor = input(color.new(#ffa726, 75), 'Fill - USA Brinks', group=groupFill)
 last15FillColor = input(color.new(#f57f17, 90), 'Fill - Last 15 min of day', group=groupFill)
 weekendFillColor = input(color.new(#2a2e39, 50), 'Fill - Weekend', group=groupFill)
 nyPremarketFillColor = input(color.new(#0097a7, 80), 'Fill - NY Premarket', group=groupFill)

@@ -11,7 +11,7 @@ groupMCandles = '---- M Candles ----'
 
 mCandlesActive = input(true, 'M Candles Active', group=groupMCandles)
 usePvsraColorForMCandles = input(true, 'Use PVSRA Colors (for M Candles)', group=groupMCandles)
-showGapBetweenBars = input(true, 'Show Gap Between Bars', group=groupMCandles)
+showGapBetweenBars = input(false, 'Show Gap Between Bars', group=groupMCandles)
 showBorder = input(true, 'Show Border', group=groupMCandles)
 fillBody = input(true, 'Fill Body', group=groupMCandles)
 useAutoResolution = input(true, 'Use Auto Resolution?', group=groupMCandles, tooltip='Auto-adjust the higher timeframe resolution based on the current timeframe')
