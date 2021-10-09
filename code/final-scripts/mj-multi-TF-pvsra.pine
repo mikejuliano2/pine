@@ -1,6 +1,8 @@
 //@version=4
 study("MJ - Multi-TF PVSRA", overlay=true)
 
+COLOR_PINKISH_RED = #e91e63
+
 //////////////////////////////////////////////////////////
 // 
 // === M CANDLES INPUTS ===
@@ -276,7 +278,7 @@ meterLabelSize = input(size.large, 'Meter Label Size', options=[size.auto, size.
 meterLabelStyle = input(label.style_none, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle], group=groupMeter)
 
 meterClimaxBullColor = input(color.lime, 'Climax Bull Color', group=groupMeter)
-meterClimaxBearColor = input(color.red, 'Climax Bear Color', group=groupMeter)
+meterClimaxBearColor = input(COLOR_PINKISH_RED, 'Climax Bear Color', group=groupMeter)
 meterRisingBullColor = input(color.blue, 'Above Average Volume Bull Color', group=groupMeter)
 meterRisingBearColor = input(color.fuchsia, 'Above Average Volume Bear Color', group=groupMeter)
 meterStandardBullColor = input(#999999, 'Standard Volume Bull Color', group=groupMeter)
