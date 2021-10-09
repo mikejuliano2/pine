@@ -47,7 +47,7 @@ ssLabelSize = input(size.large, 'Label Size', options=[size.auto, size.tiny, siz
 COLOR_PEACH = #e57373
 
 ssUseSingleColor = input(true, 'Use Single Color?', group=groupColors)
-masterColor = input(color.new(color.yellow, 30), 'Master Color', group=groupColors, tooltip='This is the color that will be used if Use Single Color is checked.')
+masterColor = input(color.new(#5549cd, 30), 'Master Color', group=groupColors, tooltip='This is the color that will be used if Use Single Color is checked.')
 wholeColor = input(color.new(COLOR_PEACH, 30), 'Whole Color', group=groupColors)
 halfColor = input(color.new(COLOR_PEACH, 50), 'Half Color', group=groupColors)
 quarterColor = input(color.new(COLOR_PEACH, 70), 'Quarter Color', group=groupColors)

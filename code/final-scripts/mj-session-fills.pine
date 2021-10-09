@@ -69,7 +69,7 @@ groupOffset = 'Offset'
 groupFill = 'Fill'
 groupPlotSwitches = 'Plot Switches'
 groupLineSwitches = 'Line Switches'
-groupBorders = 'Colors'
+groupBorders = 'Borders'
 groupTimeRanges = 'Time Ranges'
 groupLineStyle = 'Line Style'
 groupLabels = 'Labels'
@@ -78,91 +78,26 @@ groupMarkers='Markers'
 groupExtend='Extend Vertically'
 
 // ----------------------------------------------------------------------------------
+
 // tooltips
+
 string TT_PR = "Final time to which the High and Low of the session will be held"
 string TT_TZ = "Offsets all time inputs together to help align to preferred timezone"
 string TT_LB = "The number of days back to plot the session levels"
 
+
+maxTimeframeFill = input(title='Max Timeframe - Session Fill', defval=15, maxval=240, minval=1)
+maxTimeframeBackgroundShading = input(60, 'Max Timeframe - Background Shading', maxval=240, minval=1)
+
 // switches
 
-maxTimeframeFill = input(title='Max Timeframe - Session Fill', defval=15, maxval=240, minval=1, group=groupPlotSwitches)
-maxTimeframeBackgroundShading = input(60, 'Max Timeframe - Background Shading', maxval=240, minval=1, group=groupPlotSwitches)
-
 fillsActive = input(true, 'Fills Active', group=groupPlotSwitches)
-fillAsianSession = input(true, 'Fill - Asian Session', group=groupPlotSwitches)
-fillLondonSession = input(true, 'Fill - London Session', group=groupPlotSwitches)
-fillNySession = input(true, 'Fill - NY Session', group=groupPlotSwitches)
-fillEuBrinks = input(true, 'Fill - EU Brinks', group=groupPlotSwitches)
-fillUsaBrinks = input(true, 'Fill - USA Brinks', group=groupPlotSwitches)
-fillLast15 = input(false, 'Fill - Last 15 min of day', group=groupPlotSwitches)
-fillWeekend = input(true, 'Fill - Weekend', group=groupPlotSwitches)
-fillNyPremarket = input(true, 'Fill - NY Premarket', group=groupPlotSwitches)
-
-// extend vertically
-
-extendAsia = input(false, 'Extend - Asia', group=groupExtend)
-extendNy = input(false, 'Extend - NY', group=groupExtend)
-extendLondon = input(false, 'Extend - London', group=groupExtend)
-extendBrinks = input(false, 'Extend - Brinks', group=groupExtend)
-extendLast15 = input(true, 'Extend - Last 15 min', group=groupExtend)
-extendNyPremarket = input(false, 'Extend - NY Premarket', group=groupExtend)
-
-// fill colors
-
-// ny marooon #880e4f
-// ny blue #0c3299
-// ny bright red #ad0c0c
-// london purple 1 #1a1736
-// london purple 2 #151048
-// eu brinks white #b2b5be
-// eu brinks purple #9c27b0
-// us brinks orange #ffa726
-
-asiaFillColor = input(color.new(#043c36, 60), 'Fill - Asia', input.color, group=groupFill)
-londonFillColor = input(color.new(#151048, 40), 'Fill - London', input.color, group=groupFill)
-nyFillColor = input(color.new(#ad0c0c, 85), 'Fill - New York', input.color, group=groupFill)
-euBrinksFillColor = input(color.new(#9c27b0, 80), 'Fill - EU Brinks', group=groupFill)
-usaBrinksFillColor = input(color.new(#ffa726, 75), 'Fill - USA Brinks', group=groupFill)
-last15FillColor = input(color.new(#f57f17, 90), 'Fill - Last 15 min of day', group=groupFill)
-weekendFillColor = input(color.new(#2a2e39, 50), 'Fill - Weekend', group=groupFill)
-nyPremarketFillColor = input(color.new(#0097a7, 80), 'Fill - NY Premarket', group=groupFill)
-
-sessionFillOpacity = input(60, 'Opacity - Session Fill', minval=0, maxval=100, group=groupFill)
-overrideFillOpacity = input(false, 'Override Fill Opacity', group=groupFill, tooltip='If true, use a consistent opacity for all session fills.')
 
 // borders
 
-asiaBorderColor = input(color.new(#0b3d37, 90), 'Border - Asia', input.color, group=groupBorders)
-londonBorderColor = input(color.new(#1a1736, 90), 'Border - London', input.color, group=groupBorders)
-nyBorderColor = input(color.new(#880e4f, 90), 'Border - New York', input.color, group=groupBorders)
-brinksBorderColor = input(color.new(#b2b5be, 90), 'Border - Brinks', group=groupBorders)
-last15BorderColor = input(color.new(#f57f17, 90), 'Border - Last 15 min of day', group=groupBorders)
-weekendBorderColor = input(color.new(#434651, 90), 'Border - Weekend', group=groupBorders)
-nyPremarketBorderColor = input(color.new(#0097a7, 90), 'Border - NY Premarket', group=groupBorders)
+sessionLevelsBorderPlotStyle = input(plot.style_stepline, 'Border - Plot Style', group=groupBorders, options=[plot.style_circles, plot.style_cross, plot.style_stepline])
+borderLineWidth = input(2, 'Border - Line Width', group=groupBorders, options=[1,2,3,4])
 
-sessionLevelsBorderPlotStyle = input(plot.style_stepline, 'Plot Style - H/L', group=groupBorders, options=[plot.style_circles, plot.style_cross, plot.style_stepline])
-borderLineWidth = input(2, 'Line Width', group=groupBorders, options=[1,2,3,4])
-
-// time ranges
-
-asiaTimeRange = input('2100-0500:23456', 'Asia', group=groupTimeRanges, type=input.session)
-londonTimeRange = input('0700-1630:23456', 'London', group=groupTimeRanges, type=input.session)
-nyTimeRange = input('1300-2100:23456', 'New York', group=groupTimeRanges, type=input.session)
-nyPreMarketTimeRange = input('1200-1301:23456', 'NY Premarket', group=groupTimeRanges, type=input.session)
-usaBrinksTimeRange = input('1300-1401:23456', 'USA Brinks', group=groupTimeRanges, type=input.session)
-euBrinksTimeRange = input('0700-0801:23456', 'EU Brinks', group=groupTimeRanges, type=input.session)
-last15TimeRange = input('2345-0001:1234567', 'Last 15min of day', group=groupTimeRanges, type=input.session)
-weekendTimeRange = input('2100-2100:17', group=groupTimeRanges, type=input.session)
-
-// NY Pre-market 8am-9am
-// Frankfurt 2am-10am
-// EU Brinks 3am-4am
-// London 3am-11am
-// New York 8am-4pm
-// US Brinks 9am-10am
-// Sydney 5pm-1am
-// Tokyo 7pm-3am
-// Hong Kong 
 
 _captureSessionLevels(timeRange) => 
     _inSession = _isInSession(timeRange)
@@ -195,10 +130,7 @@ _captureSessionLevels(timeRange) =>
 
 _getLevelsColors(borderColor, inSession, fillColor) => 
     highLowLineColor = inSession ? borderColor : na
-            
-    fc = overrideFillOpacity ? color.new(fillColor, sessionFillOpacity) : fillColor
-    _fillColor = inSession and inSession[1] ? fc : na
-
+    _fillColor = inSession and inSession[1] ? fillColor : na
     [highLowLineColor, _fillColor]    
 
 _getValuesForSessionFillPlotting(timeRange, borderColor, fillColor) => 
@@ -207,27 +139,71 @@ _getValuesForSessionFillPlotting(timeRange, borderColor, fillColor) =>
     [highLowLineColor, _fillColor] = _getLevelsColors(borderColor, isInSession, fillColor)
     [sessionHigh, sessionLow, highLowLineColor, _fillColor]
 
-
 _isValidTF(maxTF) => timeframe.isminutes and timeframe.multiplier <= maxTF
 isValidFillTF = _isValidTF(maxTimeframeFill)
 isValidBgShadeTF = _isValidTF(maxTimeframeBackgroundShading)
 
+_getBgColorForTimeRange(timeRange, isActive, fillColor) => 
+    isInSession = _isInSession(timeRange)
+    bgColor = isInSession and isActive and isValidBgShadeTF ? fillColor : na
+
 /////////////////////////////////////////////////////////
 // 
-// --- Session Levels using plot ---
+// --- NOTES ---
 // 
 /////////////////////////////////////////////////////////
 
+// *** IMPORTANT ***
+// the order of fills matters, the last one in gets placed on top (z-index)
+    // asia
+    // frankfut
+    // tokyo
+    // hong kong
+    // london
+    // ny
+    // ny premarket
+    // brinks shared
+    // usa brinks
+    // eu brinks
+    // last 15
+    // weekend
+
+
+// NY Pre-market 8am-9am
+// EU Brinks 3am-4am
+// London 3am-11am
+// New York 8am-4pm
+// US Brinks 9am-10am
+
+// Sydney 5pm-1am (2100-0500)
+// Tokyo 7pm-3am (0000-0600)
+// Hong Kong (0130-0800)
+// Frankfurt 2am-10am (0630-1500)
+
+// fill colors
+    // ny marooon #880e4f
+    // ny blue #0c3299
+    // ny bright red #ad0c0c
+    // london purple 1 #1a1736
+    // london purple 2 #151048
+    // eu brinks white #b2b5be
+    // eu brinks purple #9c27b0
+    // us brinks orange #ffa726
+    // us brinks charcoal #0e1016 100
+    // us brinks amber #f57f17 85
+
+/////////////////////////////////////////////////////////
+// 
+// --- ASIA ---
+// 
+/////////////////////////////////////////////////////////
+
+fillAsiaSession = input(true, 'Fill - Asia', group=groupPlotSwitches)
+extendAsia = input(false, 'Extend - Asia', group=groupExtend)
+asiaFillColor = input(color.new(#043c36, 60), 'Fill - Asia', input.color, group=groupFill)
+asiaBorderColor = input(color.new(#0b3d37, 90), 'Border - Asia', input.color, group=groupBorders)
+asiaTimeRange = input('2100-0500:23456', 'Asia', group=groupTimeRanges, type=input.session)
 _asiaInSession = _isInSession(asiaTimeRange)
-_londonInSession = _isInSession(londonTimeRange)
-_nyInSession = _isInSession(nyTimeRange)
-_usaBrinksInSession = _isInSession(usaBrinksTimeRange)
-_nyPremarketInSession = _isInSession(nyPreMarketTimeRange)
-_euBrinksInSession = _isInSession(euBrinksTimeRange)
-_last15InSession = _isInSession(last15TimeRange)
-_weekendInSession = _isInSession(weekendTimeRange)
-
-// ---- asia ----
 
 [asiaHigh, asiaLow, _asiaBorderColor, _asiaFillColor] = _getValuesForSessionFillPlotting(
      asiaTimeRange, 
@@ -235,20 +211,81 @@ _weekendInSession = _isInSession(weekendTimeRange)
      asiaFillColor)
 
 asiaPlotHigh = plot(
-      fillsActive and fillAsianSession and isValidFillTF and _asiaInSession ? asiaHigh : na, 
+      fillsActive and fillAsiaSession and isValidFillTF and _asiaInSession ? asiaHigh : na, 
       "Asia High", 
       _asiaBorderColor, 
       borderLineWidth, 
       sessionLevelsBorderPlotStyle)
 
 asiaPlotLow  = plot(
-      fillsActive and fillAsianSession and isValidFillTF and _asiaInSession? asiaLow : na, 
+      fillsActive and fillAsiaSession and isValidFillTF and _asiaInSession ? asiaLow : na, 
       "Asia Low",  
       _asiaBorderColor,  
       borderLineWidth, 
       sessionLevelsBorderPlotStyle)
 
-// ---- london ----
+fill(asiaPlotHigh, asiaPlotLow, _asiaFillColor)
+bgcolor(_getBgColorForTimeRange(asiaTimeRange, extendAsia, asiaFillColor))
+
+// ---- frankfurt ----
+
+// frankfurtTimeRange = input('0630-1500:23456', group=groupTimeRanges, type=input.session)
+
+/////////////////////////////////////////////////////////
+// 
+// --- TOKYO ---
+// 
+/////////////////////////////////////////////////////////
+
+fillTokyoSession = input(true, 'Fill - Tokyo', group=groupPlotSwitches)
+extendTokyo = input(false, 'Extend - Tokyo', group=groupExtend)
+tokyoFillColor = input(color.new(#7e57c2, 80), 'Fill - Tokyo', input.color, group=groupFill)
+tokyoBorderColor = input(color.new(#7e57c2, 90), 'Border - Tokyo', input.color, group=groupBorders)
+tokyoTimeRange = input('0000-0130:23456', 'Tokyo', group=groupTimeRanges, type=input.session)
+_tokyoInSession = _isInSession(tokyoTimeRange)      
+
+[tokyoHigh, tokyoLow, _tokyoBorderColor, _tokyoFillColor] = _getValuesForSessionFillPlotting(
+     tokyoTimeRange, 
+     tokyoBorderColor, 
+     tokyoFillColor)
+
+tokyoPlotHigh = plot(
+      fillsActive and fillTokyoSession and isValidFillTF and _tokyoInSession ? tokyoHigh : na, 
+      "Tokyo High", 
+      _tokyoBorderColor, 
+      borderLineWidth, 
+      sessionLevelsBorderPlotStyle)
+
+tokyoPlotLow  = plot(
+      fillsActive and fillTokyoSession and isValidFillTF and _tokyoInSession ? tokyoLow : na, 
+      "Tokyo Low",  
+      _tokyoBorderColor,  
+      borderLineWidth, 
+      sessionLevelsBorderPlotStyle)
+
+fill(tokyoPlotHigh, tokyoPlotLow, _tokyoFillColor)
+bgcolor(_getBgColorForTimeRange(tokyoTimeRange, extendTokyo, tokyoFillColor))
+
+/////////////////////////////////////////////////////////
+// 
+// --- HONG KONG ---
+// 
+/////////////////////////////////////////////////////////
+
+// hongKongTimeRange = input('0130-0800:23456', group=groupTimeRanges, type=input.session)
+
+/////////////////////////////////////////////////////////
+// 
+// --- LONDON ---
+// 
+/////////////////////////////////////////////////////////
+
+fillLondonSession = input(true, 'Fill - London', group=groupPlotSwitches)
+extendLondon = input(false, 'Extend - London', group=groupExtend)
+londonFillColor = input(color.new(#261d80, 70), 'Fill - London', input.color, group=groupFill)
+londonBorderColor = input(color.new(#1a1736, 90), 'Border - London', input.color, group=groupBorders)
+londonTimeRange = input('0700-1630:23456', 'London', group=groupTimeRanges, type=input.session)
+_londonInSession = _isInSession(londonTimeRange)
 
 [londonHigh, londonLow, _londonBorderColor, _londonFillColor] = _getValuesForSessionFillPlotting(
      londonTimeRange, 
@@ -269,7 +306,21 @@ londonPlotLow  = plot(
       borderLineWidth, 
       sessionLevelsBorderPlotStyle)
 
-// ---- new york ----
+fill(londonPlotHigh, londonPlotLow, _londonFillColor)
+bgcolor(_getBgColorForTimeRange(londonTimeRange, extendLondon, londonFillColor))
+
+/////////////////////////////////////////////////////////
+// 
+// --- NEW YORK ---
+// 
+/////////////////////////////////////////////////////////
+
+fillNySession = input(true, 'Fill - NY', group=groupPlotSwitches)
+extendNy = input(false, 'Extend - NY', group=groupExtend)
+nyFillColor = input(color.new(#ad0c0c, 90), 'Fill - New York', input.color, group=groupFill)
+nyBorderColor = input(color.new(#880e4f, 90), 'Border - New York', input.color, group=groupBorders)
+nyTimeRange = input('1300-2100:23456', 'New York', group=groupTimeRanges, type=input.session)
+_nyInSession = _isInSession(nyTimeRange)
 
 [nyHigh, nyLow, _nyBorderColor, _nyFillColor] = _getValuesForSessionFillPlotting(
       nyTimeRange, 
@@ -290,8 +341,28 @@ nyPlotLow  = plot(
       borderLineWidth, 
       sessionLevelsBorderPlotStyle)
 
+bgcolor(_getBgColorForTimeRange(nyTimeRange, extendNy, nyFillColor))
+fill(nyPlotHigh, nyPlotLow, _nyFillColor)
 
-// ---- eu brinks ----
+/////////////////////////////////////////////////////////
+// 
+// --- BRINKS SHARED ---
+// 
+/////////////////////////////////////////////////////////
+
+extendBrinks = input(false, 'Extend - Brinks', group=groupExtend)
+brinksBorderColor = input(color.new(#b2b5be, 90), 'Border - Brinks', group=groupBorders)
+
+/////////////////////////////////////////////////////////
+// 
+// --- EU BRINKS ---
+// 
+/////////////////////////////////////////////////////////
+
+fillEuBrinks = input(true, 'Fill - EU Brinks', group=groupPlotSwitches)
+euBrinksFillColor = input(color.new(#9c27b0, 80), 'Fill - EU Brinks', group=groupFill)
+euBrinksTimeRange = input('0700-0801:23456', 'EU Brinks', group=groupTimeRanges, type=input.session)
+_euBrinksInSession = _isInSession(euBrinksTimeRange)
 
 [euBrinksHigh, euBrinksLow, _euBrinksBorderColor, _euBrinksFillColor] = _getValuesForSessionFillPlotting(
       euBrinksTimeRange, 
@@ -312,7 +383,19 @@ euBrinksPlotLow  = plot(
       borderLineWidth, 
       sessionLevelsBorderPlotStyle)
 
-// ---- usa brinks ----
+bgcolor(_getBgColorForTimeRange(euBrinksTimeRange, extendBrinks, euBrinksFillColor))
+fill(euBrinksPlotHigh, euBrinksPlotLow, _euBrinksFillColor)
+
+/////////////////////////////////////////////////////////
+// 
+// --- USA BRINKS ---
+// 
+/////////////////////////////////////////////////////////
+
+fillUsaBrinks = input(true, 'Fill - USA Brinks', group=groupPlotSwitches)
+usaBrinksFillColor = input(color.new(#f57f17, 85), 'Fill - USA Brinks', group=groupFill)
+usaBrinksTimeRange = input('1300-1401:23456', 'USA Brinks', group=groupTimeRanges, type=input.session)
+_usaBrinksInSession = _isInSession(usaBrinksTimeRange)
 
 [usaBrinksHigh, usaBrinksLow, _usaBrinksBorderColor, _usaBrinksFillColor] = _getValuesForSessionFillPlotting(
       usaBrinksTimeRange, 
@@ -333,7 +416,21 @@ usaBrinksPlotLow  = plot(
       borderLineWidth, 
       sessionLevelsBorderPlotStyle)
 
-// ---- ny premarket ----
+fill(usaBrinksPlotHigh, usaBrinksPlotLow, _usaBrinksFillColor)
+bgcolor(_getBgColorForTimeRange(usaBrinksTimeRange, extendBrinks, usaBrinksFillColor))
+
+/////////////////////////////////////////////////////////
+// 
+// --- NEW YORK PREMARKET ---
+// 
+/////////////////////////////////////////////////////////
+
+fillNyPremarket = input(true, 'Fill - NY Premarket', group=groupPlotSwitches)
+extendNyPremarket = input(false, 'Extend - NY Premarket', group=groupExtend)
+nyPremarketFillColor = input(color.new(#0097a7, 80), 'Fill - NY Premarket', group=groupFill)
+nyPremarketBorderColor = input(color.new(#0097a7, 90), 'Border - NY Premarket', group=groupBorders)
+nyPreMarketTimeRange = input('1200-1301:23456', 'NY Premarket', group=groupTimeRanges, type=input.session)
+_nyPremarketInSession = _isInSession(nyPreMarketTimeRange)
 
 [nyPremarketHigh, nyPremarketLow, _nyPremarketBorderColor, _nyPremarketFillColor] = _getValuesForSessionFillPlotting(
       nyPreMarketTimeRange, 
@@ -354,7 +451,21 @@ nyPremarketPlotLow = plot(
       borderLineWidth, 
       sessionLevelsBorderPlotStyle)
 
-// ---- last 15 minutes of the day ----
+fill(nyPremarketPlotHigh, nyPremarketPlotLow, _nyPremarketFillColor)
+bgcolor(_getBgColorForTimeRange(nyPreMarketTimeRange, extendNyPremarket, nyPremarketFillColor))      
+
+/////////////////////////////////////////////////////////
+// 
+// --- LAST 15 MINUTES OF THE DAY ---
+// 
+/////////////////////////////////////////////////////////
+
+extendLast15 = input(true, 'Extend - Last 15 min', group=groupExtend)
+fillLast15 = input(false, 'Fill - Last 15 min of day', group=groupPlotSwitches)
+last15FillColor = input(color.new(#f57f17, 90), 'Fill - Last 15 min of day', group=groupFill)
+last15BorderColor = input(color.new(#f57f17, 90), 'Border - Last 15 min of day', group=groupBorders)
+last15TimeRange = input('2345-0001:1234567', 'Last 15min of day', group=groupTimeRanges, type=input.session)
+_last15InSession = _isInSession(last15TimeRange)
 
 [last15High, last15Low, _last15BorderColor, _last15FillColor] = _getValuesForSessionFillPlotting(
       last15TimeRange, 
@@ -375,7 +486,20 @@ last15PlotLow  = plot(
       borderLineWidth, 
       sessionLevelsBorderPlotStyle)
 
-// ---- weekend ----
+fill(last15PlotHigh, last15PlotLow, _last15FillColor)
+bgcolor(_getBgColorForTimeRange(last15TimeRange, extendLast15, last15FillColor))
+
+/////////////////////////////////////////////////////////
+// 
+// --- WEEKEND ---
+// 
+/////////////////////////////////////////////////////////
+
+fillWeekend = input(true, 'Fill - Weekend', group=groupPlotSwitches)
+weekendFillColor = input(color.new(#2c323a, 70), 'Fill - Weekend', group=groupFill)
+weekendBorderColor = input(color.new(#434651, 90), 'Border - Weekend', group=groupBorders)
+weekendTimeRange = input('2100-2100:17', 'Weekend', group=groupTimeRanges, type=input.session)
+_weekendInSession = _isInSession(weekendTimeRange)
 
 [weekendHigh, weekendLow, _weekendBorderColor, _weekendFillColor] = _getValuesForSessionFillPlotting(
       weekendTimeRange, 
@@ -396,32 +520,4 @@ weekendPlotLow  = plot(
       borderLineWidth, 
       sessionLevelsBorderPlotStyle)
 
-// *** IMPORTANT ***
-// the order of fills matters, the last one in gets placed on top (z-index)
-
-fill(asiaPlotHigh, asiaPlotLow, _asiaFillColor)
-fill(londonPlotHigh, londonPlotLow, _londonFillColor)
-fill(nyPlotHigh, nyPlotLow, _nyFillColor)
-fill(usaBrinksPlotHigh, usaBrinksPlotLow, _usaBrinksFillColor)
-fill(euBrinksPlotHigh, euBrinksPlotLow, _euBrinksFillColor)
-fill(last15PlotHigh, last15PlotLow, _last15FillColor)
 fill(weekendPlotHigh, weekendPlotLow, _weekendFillColor)
-fill(nyPremarketPlotHigh, nyPremarketPlotLow, _nyPremarketFillColor)
-
-/////////////////////////////////////////////////////////
-// 
-// --- EXTENDING VERTICALLY (set background color instead of plotting) ---
-// 
-/////////////////////////////////////////////////////////
-
-_getBgColorForTimeRange(timeRange, isActive, fillColor) => 
-    isInSession = _isInSession(timeRange)
-    bgColor = isInSession and isActive and isValidBgShadeTF ? fillColor : na
-
-bgcolor(_getBgColorForTimeRange(asiaTimeRange, extendAsia, asiaFillColor))
-bgcolor(_getBgColorForTimeRange(londonTimeRange, extendLondon, londonFillColor))
-bgcolor(_getBgColorForTimeRange(nyTimeRange, extendNy, nyFillColor))
-bgcolor(_getBgColorForTimeRange(euBrinksTimeRange, extendBrinks, usaBrinksFillColor))
-bgcolor(_getBgColorForTimeRange(usaBrinksTimeRange, extendBrinks, usaBrinksFillColor))
-bgcolor(_getBgColorForTimeRange(last15TimeRange, extendLast15, last15FillColor))
-bgcolor(_getBgColorForTimeRange(nyPreMarketTimeRange, extendNyPremarket, nyPremarketFillColor))

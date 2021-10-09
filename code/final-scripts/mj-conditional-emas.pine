@@ -44,6 +44,7 @@ emaConditional1hColor = input(color.new(#e65100, 15), 'EMA Conditional 1h Color'
 emaConditional15mColor = input(color.new(COLOR_MAGENTA, 40), 'EMA Conditional 15m Color', group=groupColors)
 emaConditional5mColor = input(color.new(COLOR_LIME, 40), 'EMA Conditional 5m Color', group=groupColors)
 emaConditional30mColor = input(color.new(COLOR_LIGHT_BLUE, 40), 'EMA Conditional 30m Color', group=groupColors)
+fifty200DeviationLabelColor = input(color.new(#1684b8, 10), '50/200 Deviation Label Color', group=groupColors)
 
 // --------------------------
 // Switches
@@ -245,7 +246,7 @@ _drawFifty200DeviationLabel() =>
              y=y, 
              text=text, 
              style=label.style_none, 
-             textcolor=color.new(COLOR_TEAL, 0), 
+             textcolor=fifty200DeviationLabelColor, 
              color=color.red, 
              size=deviationLabelSize, 
              tooltip=text,
