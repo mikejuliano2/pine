@@ -8,6 +8,7 @@ COLOR_PINK = #e63a97
 COLOR_RED = #f21616
 COLOR_LIGHT_BLUE = #3179f5
 COLOR_MAGENTA = #d612f8
+COLOR_MAGENTA_WEAK = #ab47bc
 COLOR_ORANGE = #f57f17
 COLOR_GOLD = #ffb74d
 COLOR_YELLOW = #ffeb3b
@@ -177,7 +178,7 @@ lineDailyOpenActive = input(true, 'Line - Daily Open', group=groupLineSwitches)
 dailyOpenColor = input(color.new(#2962ff, 0), 'Daily Open Color', input.color, group=groupColors)
 asiaLineColor = input(COLOR_ELECTRIC_GREEN, 'Line - Asia', input.color, group=groupColors)
 nyLineColor = input(#880e4f, 'Line - New York', input.color, group=groupColors)
-londonLineColor = input(COLOR_LIGHT_PURPLE, 'Line - London', input.color, group=groupColors)
+londonLineColor = input(COLOR_MAGENTA_WEAK, 'Line - London', input.color, group=groupColors)
 
 // session levels line style
 
