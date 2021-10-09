@@ -29,7 +29,7 @@ study("MJ - PVSRA", overlay=true, precision=0, scale=scale.none)
 // 
 //////////////////////////////////////////////////
 
-groupOverlay = 'Overlay'
+groupOverlay = 'Volume Overlay'
 groupColors = 'Colors'
 groupSymbol = 'Symbol'
 groupCalc = 'Calculation'
@@ -37,16 +37,16 @@ groupCalc = 'Calculation'
 // CALCULATION
 volPeriodLength = input(10, 'Volume Period Length', tooltip='Used in the PVSRA calculation in 2 places', group=groupCalc, minval=1, maxval=20)
 
-// OVERLAY
+// VOLUME OVERLAY
 overlayEnabled = input(true, 'Enabled', group=groupOverlay)
-overlayScreenPercentage = input(10, 'Screen %', minval=1, maxval=100, group=groupOverlay)
+overlayScreenPercentage = input(5, 'Screen %', minval=1, maxval=100, group=groupOverlay)
 overlayOpacity = input(20, 'Opacity', minval=0, maxval=100, group=groupOverlay)
-overlayStyle = input(plot.style_columns, 'Plot Style', group=groupOverlay, options=[plot.style_columns, plot.style_histogram])
-overlayLineWidth = input(4, 'Line Width', group=groupOverlay)
+overlayStyle = input(plot.style_histogram, 'Plot Style', group=groupOverlay, options=[plot.style_columns, plot.style_histogram])
+overlayLineWidth = input(2, 'Line Width', group=groupOverlay, options=[1,2,3,4])
 
 // COLORS
 climaxVolBullColor = input(color.lime, 'Climax Bull Color', group=groupColors)
-climaxVolBearColor = input(color.red, 'Climax Bear Color', group=groupColors)
+climaxVolBearColor = input(#e91e63, 'Climax Bear Color', group=groupColors)
 aboveAvgVolBullColor = input(color.blue, 'Above Average Volume Bull Color', group=groupColors)
 aboveAvgVolBearColor = input(color.fuchsia, 'Above Average Volume Bear Color', group=groupColors)
 standardVolBullColor = input(#999999, 'Standard Volume Bull Color', group=groupColors)
