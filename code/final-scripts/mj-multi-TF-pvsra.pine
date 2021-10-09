@@ -331,15 +331,17 @@ _getMeterColorAtResolution(_resolution) =>
     _volWeight = _getPvsraVolumeWeightAtResolution(_resolution)
     _getMeterColorByVolWeight(_volWeight)
 
-_drawMeterLabel(_resolution, index, labelsArray, isNew) => 
-    _isValidTF = _isValidTimeframeForMeterLabel(_resolution, _getTimeframeMultiplier())
-    _meterTextColor = _isValidTF ? _getMeterColorAtResolution(_resolution) : meterDisabledColor
-    
-    // _initialOffest = meterLabelOffset
-    // _currentOffset = index * meterLabelWidthInBars
-    // _totalOffset = meterLabelOffset + _currentOffset
-    // _labelTime = _getTimeNBarsFromNow(_totalOffset)
+_calcLabelVerticalMargin(marginMultiple) =>
+    _avgRangeOfHigherTFCandles = _security(sma(high - low, 50),_mCandleResolution)
+    _verticalMargin = abs(_avgRangeOfHigherTFCandles * marginMultiple)
 
+_calcYPositionForMeterLabel(marginMultiple) => 
+    _verticalMargin = _calcLabelVerticalMargin(marginMultiple)
+    _y = marginMultiple > 0 
+      ? _high + _verticalMargin 
+      : _low - _verticalMargin
+
+_calcXPositionForMeterLabel(index) => 
     _msPerBar = time[0] - time[1]
 
     _initialTime = _wickTime
@@ -350,17 +352,13 @@ _drawMeterLabel(_resolution, index, labelsArray, isNew) =>
 
     _labelTime = _initialTime + _currentOffsetInMS + _fixedOffsetInMs
 
-    _avgRangeOfHigherTFCandles = _security(sma(high - low, 50),_mCandleResolution)
-    _verticalMargin = abs(_avgRangeOfHigherTFCandles * meterVerticalMarginMultiple)
-    _y = meterVerticalMarginMultiple > 0 
-      ? _high + _verticalMargin 
-      : _low - _verticalMargin
+_drawMeterLabel(_resolution, index, labelsArray, isNew) => 
+    _isValidTF = _isValidTimeframeForMeterLabel(_resolution, _getTimeframeMultiplier())
+    _meterTextColor = _isValidTF ? _getMeterColorAtResolution(_resolution) : meterDisabledColor
 
-    // _avgRange = sma(high - low, 20)
-    // _verticalMargin = _avgRange * meterVerticalMarginMultiple
-    // _y = highest(high, 100) + _verticalMargin
-    
-    // _y = ema(close, 50)
+    _labelTime = _calcXPositionForMeterLabel(index)
+
+    _y = _calcYPositionForMeterLabel(meterVerticalMarginMultiple)
 
     labelId = label.new(
          x=_labelTime,
@@ -390,7 +388,106 @@ _drawMeterLines() =>
     _drawMeterLabel('D', 7, meterLabels, isNew)
     _drawMeterLabel('W', 8, meterLabels, isNew)
     _drawMeterLabel('M', 9, meterLabels, isNew)
+    _drawMeterLabel('M', 9, meterLabels, isNew)
 
 if meterActive
     _drawMeterLines()
 
+
+//////////////////////////////////////////////////
+// 
+// === PREDICTED COLOR ===
+// 
+//////////////////////////////////////////////////
+
+groupPrediction = 'Color Prediction'
+
+showPrediction = input(true, 'Show Predicted Bar Color', group=groupPrediction)
+useAdjustedSpreadForPrediction = input(false, 'Use Adjusted Spread', group=groupPrediction)
+volPeriodLength = input(10, 'Volume Period Length', tooltip='Used in the PVSRA calculation in 2 places', group=groupPrediction, minval=1, maxval=20)
+predictionLabelOffset = input(10, 'Label Offset', group=groupPrediction)
+predictionLabelSize = input(size.large, 'Prediction Label Size', group=groupPrediction, options=[size.auto, size.tiny, size.small, size.normal, size.large])
+
+int SECONDS_PER_HOUR = 60 * 60
+int SECONDS_PER_DAY = 60 * 60 * 24
+int SECONDS_PER_WEEK = SECONDS_PER_DAY * 7
+int SECONDS_PER_MONTH = SECONDS_PER_DAY * 30 // not perfect, but whatever
+
+_toDecimalPlaces(numDecimals, value) =>
+    // truncates a given number to a certain number of decimals
+    factor = pow(10, numDecimals)
+    int(value * factor) / factor
+
+_secondsPerBar() => round((time[1] - time[2]) / 1000)
+_secondsElapsedThisBar() => round((timenow - time[0]) / 1000)
+_percentElapsed() => _secondsElapsedThisBar() / _secondsPerBar()
+_adjuster() => 1 / _percentElapsed()
+_percentDisplay(numDecimals, value) => tostring(_toDecimalPlaces(numDecimals, value * 100)) + '%'
+_percentElapsedText() => 'P(' + _percentDisplay(0, _percentElapsed()) + ')'
+
+_getBarColorByVolWeight(volWeight, _open, _close) => 
+    if _close > _open
+        volWeight == 1 
+          ? meterClimaxBullColor 
+          : volWeight == 2 
+              ? meterRisingBullColor 
+              : meterStandardBullColor
+    else
+        volWeight == 1 
+          ? meterClimaxBearColor 
+          : volWeight == 2 
+              ? meterRisingBearColor 
+              : meterStandardBearColor
+
+_getVolWeightForPrediction(adjustedSpread, adjustedVol) => 
+    avgVol = sma(volume, volPeriodLength) // use regular volume here for comparison
+    volWeightedPriceSpread = volume * (high - low) // climax volume on the current candle
+    highestVolWeightedPriceSpread = highest(volWeightedPriceSpread, volPeriodLength) // highest climax volume of the last 10 candles
+
+    adjustedVolWeightedPriceSpread = adjustedSpread * adjustedVol
+
+    isClimaxVolume = adjustedVol >= (avgVol * 2) or adjustedVolWeightedPriceSpread >= highestVolWeightedPriceSpread
+    isAboveAvgVolume = adjustedVol >= avgVol * 1.5 and not isClimaxVolume
+    volWeight = isClimaxVolume ? 1 : isAboveAvgVolume ? 2 : 0
+
+_getPredictedPvsraColor() => 
+    // this is in an effort to predict the PVSRA color early
+    // we multiply the current volume and (optionally) spread
+    // to make up for the portion of the bar that has not elapsed yet
+    spread = high - low
+    adjuster = _adjuster()
+    adjustedSpread = useAdjustedSpreadForPrediction ? (adjuster * spread) : spread
+    adjustedVol = adjuster * volume
+
+    volWeight = _getVolWeightForPrediction(adjustedSpread, adjustedVol)
+    _getBarColorByVolWeight(volWeight, open, close)
+
+_drawLabel(text, textColor, offset) => 
+    x = _calcXPositionForMeterLabel(index=0)
+
+    // marginMultiple = meterVerticalMarginMultiple >= 0 ? meterVerticalMarginMultiple + 0.1 : meterVerticalMarginMultiple - 0.1
+    // y = _calcYPositionForMeterLabel(marginMultiple)
+    y = _calcYPositionForMeterLabel(meterVerticalMarginMultiple)
+
+    if barstate.islast
+        y ? label.new(
+             x=x, 
+             y=y, 
+             text=text, 
+             style=label.style_none, 
+             textcolor=textColor, 
+             color=na, 
+             size=predictionLabelSize, 
+             tooltip=text,
+             xloc=xloc.bar_time) : na
+
+predictionLabel = showPrediction ? _drawLabel(
+     _percentElapsedText(), 
+     _getPredictedPvsraColor(),
+     predictionLabelOffset
+     ) : na
+
+label.delete(predictionLabel[1])
+
+// _printNum(_secondsPerBar())
+// _printNum(_secondsElapsedThisBar())
