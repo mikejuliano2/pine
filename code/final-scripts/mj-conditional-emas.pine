@@ -90,7 +90,7 @@ labelSize = input(size.auto, 'Label Size', options=[size.auto, size.tiny, size.s
 
 deviationLabelSize = input(size.large, 'Deviation Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupDeviationLabels)
 showFifty200DeviationLabel = input(true, 'Show 50/200 Deviation Label', group=groupDeviationLabels, tooltip='The % difference between the 50 and 200 EMA.  To determine if there is enough volatility to trade')
-labelOffsetFifty200Deviation = input(19, 'Offset - 50/200 Deviation', group=groupDeviationLabels)
+labelOffsetFifty200Deviation = input(24, 'Offset - 50/200 Deviation', group=groupDeviationLabels)
 
 showDeviationLabels = input(true, 'Show Deviation % Labels', group=groupDeviationLabels, tooltip='Show the percentage away from price as the label.')
 deviationLabel5Active = input(false, 'Deviation Label - 5', group=groupDeviationLabels)

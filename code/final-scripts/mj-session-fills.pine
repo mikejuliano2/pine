@@ -462,7 +462,7 @@ bgcolor(_getBgColorForTimeRange(nyPreMarketTimeRange, extendNyPremarket, nyPrema
 
 extendLast15 = input(true, 'Extend - Last 15 min', group=groupExtend)
 fillLast15 = input(false, 'Fill - Last 15 min of day', group=groupPlotSwitches)
-last15FillColor = input(color.new(#f57f17, 90), 'Fill - Last 15 min of day', group=groupFill)
+last15FillColor = input(color.new(#0c3299, 90), 'Fill - Last 15 min of day', group=groupFill)
 last15BorderColor = input(color.new(#f57f17, 90), 'Border - Last 15 min of day', group=groupBorders)
 last15TimeRange = input('2345-0001:1234567', 'Last 15min of day', group=groupTimeRanges, type=input.session)
 _last15InSession = _isInSession(last15TimeRange)

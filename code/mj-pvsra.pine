@@ -41,12 +41,12 @@ volPeriodLength = input(10, 'Volume Period Length', tooltip='Used in the PVSRA c
 overlayEnabled = input(true, 'Enabled', group=groupOverlay)
 overlayScreenPercentage = input(5, 'Screen %', minval=1, maxval=100, group=groupOverlay)
 overlayOpacity = input(20, 'Opacity', minval=0, maxval=100, group=groupOverlay)
-overlayStyle = input(plot.style_histogram, 'Plot Style', group=groupOverlay, options=[plot.style_columns, plot.style_histogram])
+overlayStyle = input(plot.style_columns, 'Plot Style', group=groupOverlay, options=[plot.style_columns, plot.style_histogram])
 overlayLineWidth = input(2, 'Line Width', group=groupOverlay, options=[1,2,3,4])
 
 // COLORS
 climaxVolBullColor = input(color.lime, 'Climax Bull Color', group=groupColors)
-climaxVolBearColor = input(#e91e63, 'Climax Bear Color', group=groupColors)
+climaxVolBearColor = input(color.red, 'Climax Bear Color', group=groupColors)
 aboveAvgVolBullColor = input(color.blue, 'Above Average Volume Bull Color', group=groupColors)
 aboveAvgVolBearColor = input(color.fuchsia, 'Above Average Volume Bear Color', group=groupColors)
 standardVolBullColor = input(#999999, 'Standard Volume Bull Color', group=groupColors)
