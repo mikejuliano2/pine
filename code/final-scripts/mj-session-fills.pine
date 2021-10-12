@@ -317,7 +317,7 @@ bgcolor(_getBgColorForTimeRange(londonTimeRange, extendLondon, londonFillColor))
 
 fillNySession = input(true, 'Fill - NY', group=groupPlotSwitches)
 extendNy = input(false, 'Extend - NY', group=groupExtend)
-nyFillColor = input(color.new(#ad0c0c, 90), 'Fill - New York', input.color, group=groupFill)
+nyFillColor = input(color.new(#c2185b, 90), 'Fill - New York', input.color, group=groupFill)
 nyBorderColor = input(color.new(#880e4f, 90), 'Border - New York', input.color, group=groupBorders)
 nyTimeRange = input('1300-2100:23456', 'New York', group=groupTimeRanges, type=input.session)
 _nyInSession = _isInSession(nyTimeRange)
