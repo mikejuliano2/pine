@@ -360,7 +360,7 @@ brinksBorderColor = input(color.new(#b2b5be, 90), 'Border - Brinks', group=group
 /////////////////////////////////////////////////////////
 
 fillEuBrinks = input(true, 'Fill - EU Brinks', group=groupPlotSwitches)
-euBrinksFillColor = input(color.new(#9c27b0, 80), 'Fill - EU Brinks', group=groupFill)
+euBrinksFillColor = input(color.new(#f57f17, 80), 'Fill - EU Brinks', group=groupFill)
 euBrinksTimeRange = input('0700-0801:23456', 'EU Brinks', group=groupTimeRanges, type=input.session)
 _euBrinksInSession = _isInSession(euBrinksTimeRange)
 
