@@ -135,7 +135,7 @@ lineWidth = input(1, 'Line Width', group=groupLines, options=[1, 2, 3, 4])
 // LABELS
 showLabels = input(true, 'Show Labels?', group=groupLabels)
 labelSize = input(size.normal, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large, size.huge], group=groupLabels)
-labelColor = input(color.new(#031020, 0), 'Label Color', group=groupLabels)
+labelColor = input(color.new(#ffb74d, 0), 'Label Color', group=groupLabels)
 labelTextColor = input(COLOR_PINKISH_RED, 'Label Text Color', group=groupLabels)
 labelStyle = input(label.style_label_center, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_center], group=groupLabels)
 labelLocation = input(yloc.belowbar, 'Label Location', options=[yloc.price, yloc.abovebar, yloc.belowbar], group=groupLabels)
