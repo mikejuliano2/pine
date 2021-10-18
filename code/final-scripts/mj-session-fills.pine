@@ -495,7 +495,7 @@ bgcolor(_getBgColorForTimeRange(last15TimeRange, extendLast15, last15FillColor))
 // 
 /////////////////////////////////////////////////////////
 
-fillWeekend = input(true, 'Fill - Weekend', group=groupPlotSwitches)
+fillWeekend = input(false, 'Fill - Weekend', group=groupPlotSwitches)
 weekendFillColor = input(color.new(#2c323a, 70), 'Fill - Weekend', group=groupFill)
 weekendBorderColor = input(color.new(#434651, 90), 'Border - Weekend', group=groupBorders)
 weekendTimeRange = input('2100-2100:17', 'Weekend', group=groupTimeRanges, type=input.session)
