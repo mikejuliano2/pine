@@ -18,6 +18,7 @@ COLOR_PURPLE = #3e31c4
 COLOR_GREY_ONE = #9598a1
 COLOR_GREEN = #4caf50
 COLOR_ROYAL_BLUE = #1848cc
+COLOR_ROYAL_BLUE_TWO = #052bec
 COLOR_TURQUOISE = #00897b
 COLOR_PEACH = #e57373
 
@@ -75,7 +76,7 @@ dailyOpenPlotStyle = input(plot.style_stepline, 'Plot Style - Daily Open', group
 // london magenta #ab47bc
 
 asiaColor = input(color.new(#00e676, 30), 'Asia', input.color, group=groupColors)
-dailyOpenColor = input(color.new(#2196f3, 10), 'Daily Open', input.color, group=groupColors)
+dailyOpenColor = input(color.new(COLOR_ROYAL_BLUE_TWO, 10), 'Daily Open', input.color, group=groupColors)
 londonColor = input(color.new(#ab47bc, 10), 'London', input.color, group=groupColors)
 nyColor = input(color.new(#880e4f, 10), 'New York', input.color, group=groupColors)
 

@@ -282,7 +282,7 @@ bgcolor(_getBgColorForTimeRange(tokyoTimeRange, extendTokyo, tokyoFillColor))
 
 fillLondonSession = input(true, 'Fill - London', group=groupPlotSwitches)
 extendLondon = input(false, 'Extend - London', group=groupExtend)
-londonFillColor = input(color.new(#261d80, 70), 'Fill - London', input.color, group=groupFill)
+londonFillColor = input(color.new(#261d80, 85), 'Fill - London', input.color, group=groupFill)
 londonBorderColor = input(color.new(#1a1736, 90), 'Border - London', input.color, group=groupBorders)
 londonTimeRange = input('0700-1630:23456', 'London', group=groupTimeRanges, type=input.session)
 _londonInSession = _isInSession(londonTimeRange)
@@ -393,7 +393,7 @@ fill(euBrinksPlotHigh, euBrinksPlotLow, _euBrinksFillColor)
 /////////////////////////////////////////////////////////
 
 fillUsaBrinks = input(true, 'Fill - USA Brinks', group=groupPlotSwitches)
-usaBrinksFillColor = input(color.new(#f57f17, 85), 'Fill - USA Brinks', group=groupFill)
+usaBrinksFillColor = input(color.new(#f57f17, 95), 'Fill - USA Brinks', group=groupFill)
 usaBrinksTimeRange = input('1300-1401:23456', 'USA Brinks', group=groupTimeRanges, type=input.session)
 _usaBrinksInSession = _isInSession(usaBrinksTimeRange)
 
