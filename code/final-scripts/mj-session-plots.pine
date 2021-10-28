@@ -132,7 +132,7 @@ _captureSessionLevels(timeRange, holdActive) =>
 // 
 /////////////////////////////////////////////////////////
 
-_isValidTF(maxTF) => timeframe.isminutes and timeframe.multiplier <= maxTF
+_isValidTF(maxTF) => timeframe.isseconds or (timeframe.isminutes and timeframe.multiplier <= maxTF)
 
 [asiaHigh, asiaLow, asiaOpen] = _captureSessionLevels(asiaOpenTimeRange, false)
 [londonHigh, londonLow, londonOpen] = _captureSessionLevels(londonTimeRange, false)

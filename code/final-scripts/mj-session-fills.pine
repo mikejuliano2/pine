@@ -139,7 +139,7 @@ _getValuesForSessionFillPlotting(timeRange, borderColor, fillColor) =>
     [highLowLineColor, _fillColor] = _getLevelsColors(borderColor, isInSession, fillColor)
     [sessionHigh, sessionLow, highLowLineColor, _fillColor]
 
-_isValidTF(maxTF) => timeframe.isminutes and timeframe.multiplier <= maxTF
+_isValidTF(maxTF) => timeframe.isseconds or (timeframe.isminutes and timeframe.multiplier <= maxTF)
 isValidFillTF = _isValidTF(maxTimeframeFill)
 isValidBgShadeTF = _isValidTF(maxTimeframeBackgroundShading)
 

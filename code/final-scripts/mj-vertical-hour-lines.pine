@@ -158,7 +158,7 @@ _isWithinVerticalHourLineLookbackPeriod() =>
 _plotVerticalLineAtIndex(BarIndex, Color, LineStyle, LineWidth) => // Verticle Line Function, ≈50-54 lines maximum allowable per indicator
     return = line.new(BarIndex, low - tr, BarIndex, high + tr, xloc.bar_index, extend.both, Color, LineStyle, LineWidth) // Suitable for study(overlay=true)
 
-_isAtOrBelowMaxTimeframe() => timeframe.multiplier <= maxTimeframe
+_isAtOrBelowMaxTimeframe() => timeframe.isseconds or (timeframe.isminutes and timeframe.multiplier <= maxTimeframe)
 
 _conditionsMet() => 
     _isFirstBarForCurrentTimeframeAtResolution('60')  

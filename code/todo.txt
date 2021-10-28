@@ -6,6 +6,8 @@
 DAD WIFI e7500dc77b
 
 
+make the vertical hour lines visible on seconds charts
+
 get conditional emas to show on all TFs
 optionally set ema line opacity individually
 
