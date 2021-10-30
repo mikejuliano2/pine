@@ -1,6 +1,6 @@
 //@version=4
 
-study("MJ - TDI", shorttitle="MJ - TDI")
+study("MJ - TDI", shorttitle="MJ - TDI", precision=0)
 
 groupTDI = 'TDI'
 groupDivergence = 'Divergence'

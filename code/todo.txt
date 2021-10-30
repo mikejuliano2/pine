@@ -7,6 +7,8 @@ DAD WIFI e7500dc77b
 
 
 make the vertical hour lines visible on seconds charts
+display price in all lines.  change formatting.  increase label size to large.
+add distance percentages to sweet spot lines
 
 get conditional emas to show on all TFs
 optionally set ema line opacity individually
