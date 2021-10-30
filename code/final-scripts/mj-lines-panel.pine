@@ -177,7 +177,7 @@ lineDailyOpenActive = input(true, 'Line - Daily Open', group=groupLineSwitches)
 // colors
 
 dailyOpenColor = input(color.new(COLOR_ROYAL_BLUE_TWO, 0), 'Daily Open Color', input.color, group=groupColors)
-asiaLineColor = input(COLOR_ELECTRIC_GREEN, 'Line - Asia', input.color, group=groupColors)
+asiaLineColor = input(#00796b, 'Line - Asia', input.color, group=groupColors)
 nyLineColor = input(#880e4f, 'Line - New York', input.color, group=groupColors)
 londonLineColor = input(COLOR_MAGENTA_WEAK, 'Line - London', input.color, group=groupColors)
 

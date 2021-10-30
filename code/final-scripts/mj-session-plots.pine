@@ -20,6 +20,7 @@ COLOR_GREEN = #4caf50
 COLOR_ROYAL_BLUE = #1848cc
 COLOR_ROYAL_BLUE_TWO = #052bec
 COLOR_TURQUOISE = #00897b
+COLOR_TURQUOISE_TWO = #00796b
 COLOR_PEACH = #e57373
 
 //////////////////////////////////////////////////////////////////
@@ -51,10 +52,10 @@ plotDailyOpenActive = input(true, 'Plot - Daily Open', group=groupSwitches)
 
 // line width
 
-lineWidthAsiaOpen = input(2, 'Line Width - Asia Open', group=groupLineWidth, options=[1,2,3,4])
+lineWidthAsiaOpen = input(3, 'Line Width - Asia Open', group=groupLineWidth, options=[1,2,3,4])
 lineWidthLondonOpen = input(2, 'Line Width - London Open', group=groupLineWidth, options=[1,2,3,4])
 lineWidthNyOpen = input(2, 'Line Width - NY Open', group=groupLineWidth, options=[1,2,3,4])
-lineWidthDailyOpen = input(2, 'Line Width - Daily Open', group=groupLineWidth, options=[1,2,3,4])
+lineWidthDailyOpen = input(3, 'Line Width - Daily Open', group=groupLineWidth, options=[1,2,3,4])
 
 // plot style
 
@@ -75,8 +76,8 @@ dailyOpenPlotStyle = input(plot.style_stepline, 'Plot Style - Daily Open', group
 // london purple 2 #151048
 // london magenta #ab47bc
 
-asiaColor = input(color.new(#00e676, 30), 'Asia', input.color, group=groupColors)
-dailyOpenColor = input(color.new(COLOR_ROYAL_BLUE_TWO, 10), 'Daily Open', input.color, group=groupColors)
+asiaColor = input(color.new(#00796b, 0), 'Asia', input.color, group=groupColors)
+dailyOpenColor = input(color.new(COLOR_ROYAL_BLUE_TWO, 00), 'Daily Open', input.color, group=groupColors)
 londonColor = input(color.new(#ab47bc, 10), 'London', input.color, group=groupColors)
 nyColor = input(color.new(#880e4f, 10), 'New York', input.color, group=groupColors)
 
