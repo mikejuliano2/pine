@@ -18,6 +18,7 @@ ssLineExtendHalf = input(extend.none, 'Extend - Half', options=[extend.none, ext
 ssLineExtendQuarter = input(extend.none, 'Extend - Quarter', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
 
 ssActive = input(true, 'Sweet Spot Active', group=groupSwitches)
+showPercentageAwayFromPrice = input(true, 'Show Deviation Percentages', group=groupSwitches, tooltip='Show the percentage distance away from price in the label')
 ssShowLabels = input(true, 'Show Labels?', group=groupSwitches)
 ssShowWhole = input(true, 'Show Whole', group=groupSwitches)
 ssShowHalf = input(true, 'Show Half', group=groupSwitches)
@@ -38,7 +39,7 @@ ssLineLength = input(20, 'Line Length (in bars)', group=groupLinesAndLabels)
 ssLabelOffset = input(-4, 'Label Offset (in bars)', group=groupLinesAndLabels)
 
 ssLineWidth = input(2, 'Line Width', options=[1,2,3,4], group=groupLinesAndLabels)
-ssLineStyle = input(line.style_solid, 'Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLinesAndLabels)
+ssLineStyle = input(line.style_dotted, 'Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLinesAndLabels)
 
 ssLabelStyle = input(label.style_none, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle], group=groupLinesAndLabels)
 ssLabelTextColor = input(color.white, 'Label Text Color', group=groupLinesAndLabels)
@@ -47,7 +48,7 @@ ssLabelSize = input(size.large, 'Label Size', options=[size.auto, size.tiny, siz
 COLOR_PEACH = #e57373
 
 ssUseSingleColor = input(true, 'Use Single Color?', group=groupColors)
-masterColor = input(color.new(#5549cd, 30), 'Master Color', group=groupColors, tooltip='This is the color that will be used if Use Single Color is checked.')
+masterColor = input(color.new(#434651, 30), 'Master Color', group=groupColors, tooltip='This is the color that will be used if Use Single Color is checked.')
 wholeColor = input(color.new(COLOR_PEACH, 30), 'Whole Color', group=groupColors)
 halfColor = input(color.new(COLOR_PEACH, 50), 'Half Color', group=groupColors)
 quarterColor = input(color.new(COLOR_PEACH, 70), 'Quarter Color', group=groupColors)
@@ -141,6 +142,18 @@ _getSweetSpotLinePlotValues(ssLineOffset, ssLineLength, ssLabelOffset) =>
     labelTime = x2 + (ssLabelOffset * timePerBar)
     [x1, x2, labelTime]
 
+_toDecimalPlaces(numDecimals, value) =>
+    // truncates a given number to a certain number of decimals
+    factor = pow(10, numDecimals)
+    int(value * factor) / factor
+
+_deviationDisplay(_price) => 
+    difference = _price - close
+    higherVal = max(_price, close)
+    percentage = _toDecimalPlaces(2, abs((difference) / higherVal) * 100)    
+    priceDisplay = tostring(_price) + ' (' + tostring(percentage) + '%)'
+
+
 var line[] wholeLines = array.new_line(0)
 var line[] halfLines = array.new_line(0)
 var line[] quarterLines = array.new_line(0)
@@ -177,7 +190,7 @@ _drawSweetSpotLinesAndLabels(linesArray, labelsArray, valuesArray, _color, lineE
         labelId = label.new(
              x=labelTime,
              y=_price,
-             text=tostring(_price),
+             text=showPercentageAwayFromPrice ? _deviationDisplay(_price) : tostring(_price),
              textcolor=ssLabelTextColor,
              style=ssLabelStyle,
              size=ssLabelSize,

@@ -5,6 +5,7 @@
 //////////////////////////////////////////////////////////////////
 DAD WIFI e7500dc77b
 
+retry vector candles on TL
 
 make the vertical hour lines visible on seconds charts
 display price in all lines.  change formatting.  increase label size to large.
