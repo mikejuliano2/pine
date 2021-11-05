@@ -5,6 +5,7 @@
 //////////////////////////////////////////////////////////////////
 DAD WIFI e7500dc77b
 
+*** optional background shading if 50/200 deviation above some percentage.  only activate on the finder template
 retry vector candles on TL
 
 make the vertical hour lines visible on seconds charts
