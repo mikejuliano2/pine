@@ -346,8 +346,8 @@ if not na(fifty200DeviationLabel[1])
 //////////////////////////////////////////////////////////////////
 groupHighVolatilityShading = 'High Volatility Background Shading'
 
-highVolatilityBgColor = input(color.new(color.yellow, 90), group=groupHighVolatilityShading)
-highVolatilityMaxLookbackInMinutes = input(20, minval=0, maxval=100, group=groupHighVolatilityShading)
+highVolatilityBgColor = input(color.new(color.yellow, 50), group=groupHighVolatilityShading)
+highVolatilityMaxLookbackInMinutes = input(1, minval=0, maxval=100, group=groupHighVolatilityShading)
 
 highVolatilityShadingMinimum = input(0, 'High Volatility Shading Minimum', 
  step=0.05, minval=0, maxval=10, group=groupHighVolatilityShading,
