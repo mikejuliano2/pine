@@ -71,7 +71,7 @@ _getSweetSpotLevels() =>
          open > 25 ? 5 :
          open > 20 ? 1 : 
          open > 7 ? 0.5 :
-         open > 2 ? 0.5 :
+         open > 2 ? 0.1 :
          open > 1.5 ? 0.1 : 
          open > 0.15 ? 0.05 :
          open > 0.1 ? 0.01 :

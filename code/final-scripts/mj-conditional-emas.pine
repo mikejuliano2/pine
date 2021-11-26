@@ -346,10 +346,16 @@ if not na(fifty200DeviationLabel[1])
 //////////////////////////////////////////////////////////////////
 groupHighVolatilityShading = 'High Volatility Background Shading'
 
-highVolatilityBgColor = input(color.new(color.yellow, 50), group=groupHighVolatilityShading)
-highVolatilityMaxLookbackInMinutes = input(1, minval=0, maxval=100, group=groupHighVolatilityShading)
+highVolatilityBgColorFifty200Only = input(color.new(color.yellow, 50), group=groupHighVolatilityShading)
+highVolatilityBgColorFiftyOnly = input(color.new(color.blue, 50), group=groupHighVolatilityShading)
+highVolatilityBgColorBoth = input(color.new(color.red, 50), group=groupHighVolatilityShading)
+highVolatilityMaxLookbackMinutes = input(1, minval=0, maxval=100, group=groupHighVolatilityShading, tooltip='In Minutes')
 
-highVolatilityShadingMinimum = input(0, 'High Volatility Shading Minimum', 
+highVolatilityShadingMinimumFifty = input(0, 'High Volatility Shading Minimum 50', 
+ step=0.05, minval=0, maxval=10, group=groupHighVolatilityShading,
+ tooltip='Background shading if 50 deviation % is greater than or equal to this amount. Ignored if zero. Value is in percentage, so a value of 1 means 1% or 0.01.')
+
+highVolatilityShadingMinimumFifty200 = input(0, 'High Volatility Shading Minimum 50/200', 
  step=0.05, minval=0, maxval=10, group=groupHighVolatilityShading,
  tooltip='Background shading if 50/200 deviation % is greater than or equal to this amount. Ignored if zero. Value is in percentage, so a value of 1 means 1% or 0.01.')
 
@@ -360,12 +366,28 @@ _isWithinLookbackPeriod(numMinutes) =>
     currentBarTime = time(timeframe.period)
     currentBarTime > (timenow - lookbackTimeInMs)
 
-isAboveVolatilityMin = highVolatilityShadingMinimum > 0 
- and _isWithinLookbackPeriod(highVolatilityMaxLookbackInMinutes)
-  and _percentDifference(ema50, ema200) >= highVolatilityShadingMinimum
+isAboveVolatilityMinFifty = highVolatilityShadingMinimumFifty > 0 
+ and _isWithinLookbackPeriod(highVolatilityMaxLookbackMinutes)
+  and _percentDifference(ema50, close) >= highVolatilityShadingMinimumFifty
 
+isAboveVolatilityMinFifty200 = highVolatilityShadingMinimumFifty200 > 0 
+ and _isWithinLookbackPeriod(highVolatilityMaxLookbackMinutes)
+  and _percentDifference(ema50, ema200) >= highVolatilityShadingMinimumFifty200
 
-bgcolor(isAboveVolatilityMin ? highVolatilityBgColor : na)
+var color bgColor = na
+
+if isAboveVolatilityMinFifty and isAboveVolatilityMinFifty200
+    bgColor := highVolatilityBgColorBoth
+else if isAboveVolatilityMinFifty200
+    bgColor := highVolatilityBgColorFifty200Only
+else if isAboveVolatilityMinFifty
+    bgColor := highVolatilityBgColorFiftyOnly
+
+// 50/200 and 50 => red
+// 50/200 only => yellow
+// 50 only => blue
+
+bgcolor(bgColor)
 
 
 // _printNum(bar_index)

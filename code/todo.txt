@@ -5,58 +5,24 @@
 //////////////////////////////////////////////////////////////////
 DAD WIFI e7500dc77b
 
-*** optional background shading if 50/200 deviation above some percentage.  only activate on the finder template
 retry vector candles on TL
 
 make the vertical hour lines visible on seconds charts
 display price in all lines.  change formatting.  increase label size to large.
-add distance percentages to sweet spot lines
-color and line presets for sweet spot
-
 
 get conditional emas to show on all TFs
 optionally set ema line opacity individually
 
-
-fill NY #880e4f
-plot london #7e57c2
-plot NY #880e4f
-plot asia open #00e676
-
-
-option to color frankfurt
-option to color Tokyo, HongKong, Syndey, Full Asian Session
-
-
-*** print the % difference between the 50 and the 200. Color Code it.  Consider doing it on all timeframes like the candle meter
-
 plot TDI divergence on price panel
 
-
-
-
-
-fill the dead gap time + weekend time instead of NY/London sessions
-it would be nice to have sidebar lines all in one place and separate from plotting
-
 plot ADR Hi/Low
-
 RDH/RDL
-marker for end of week/month
 
-move brinks to session levels
+marker for end of month
+
 add brinks high/low to lines
-
-list out alerts for all scripts
-
-
-alert conditions for asia high/low
-
 camarilla alert condition for level 4 breakout
-some way to indicate that we are in high/low volume time
-SV marker
-pins marker
-make the pvsra average input (10) tweakable
+
 
 
 IDEA: Entry Condition Builder
@@ -69,14 +35,6 @@ IDEA: Entry Condition Builder
 - alertcondition when all long conditions met
 
 
-
-
-
-NON-CODE
-- compile a bundle of entry signal screenshots based on the TDI. Use vertical line to mark entry/exit.  Use date/price range
-- study how many candles is a valid retrace
-- analyze best times of day
-
 ALERTS
 - think carefully about alert management.  Times of day that would be good to get alerts.
 - alert when open interest shifts >= some percentage
@@ -84,64 +42,3 @@ ALERTS
 - add an alert for MCB divergence on the 15 min
 - on vector candle that has a body some percentage above the average body size
 - on TDI divergence
-
-/////////////////////////
-// WEEKEND TASKS
-/////////////////////////
-
-- review trade journal
-- make a trade calendar with the best times to trade
-
-////////////////////////////
-// HIGH ACTIVITY TIMES
-////////////////////////////
-7:45-8:00
-8:45-9:00
-10:30-11
-12:00 London Close
-
-
-///////////////////////////
-// NOTES
-///////////////////////////
-
-
-GET LIQUIDITY POOLS
-- get all past candles
-- split into { coveredRanges: [{high, low}], uncoveredRanges: [{high, low}] }
-- get all vector candles
-- filter out any that are engulfed by any coveredRange
-- trim any that overlap coveredRange
-- merge vector candles together so that no vectors overlap each other - each range only covered once
-- save to db
-- method to add 1 candle which recalculates all
-- 
-
-
-
-
-Guaging a retrace back to the 50
-- 13 support broken
-- 5 cross 13 down
-- retrace to 50
-
-Trading the retrace to the 50 would be considered trading into the peak formation (and a no no)
-
-
-
-
-
-
-
-////////////////////////////////
-// IDEAL MONITOR SETUP
-////////////////////////////////
-Trading View
-Binance
-TradingLite
-screenshots
-Browser
-Browser
-Discord
-Youtube
-
