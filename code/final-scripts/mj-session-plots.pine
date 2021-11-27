@@ -50,6 +50,7 @@ plotLondonOpenActive = input(true, 'Plot - London Open', group=groupSwitches)
 plotNyOpenActive = input(true, 'Plot - NY Open', group=groupSwitches)
 plotDailyOpenActive = input(true, 'Plot - Daily Open', group=groupSwitches)
 plotPsyActive = input(true, 'Plot - Psy Levels', group=groupSwitches)
+plotAthActive = input(true, 'Plot - ATH', group=groupSwitches)
 
 // line width
 
@@ -58,6 +59,7 @@ lineWidthLondonOpen = input(2, 'Line Width - London Open', group=groupLineWidth,
 lineWidthNyOpen = input(2, 'Line Width - NY Open', group=groupLineWidth, options=[1,2,3,4])
 lineWidthDailyOpen = input(3, 'Line Width - Daily Open', group=groupLineWidth, options=[1,2,3,4])
 lineWidthPsy = input(2, 'Line Width - Psy Levels', group=groupLineWidth, options=[1,2,3,4])
+lineWidthAth = input(4, 'Line Width - ATH', group=groupLineWidth, options=[1,2,3,4])
 
 // plot style
 
@@ -66,6 +68,7 @@ londonOpenPlotStyle = input(plot.style_stepline, 'Plot Style - London Open', gro
 nyOpenPlotStyle = input(plot.style_stepline, 'Plot Style - NY Open', group=groupPlotStyle, options=[plot.style_circles, plot.style_cross, plot.style_stepline])
 dailyOpenPlotStyle = input(plot.style_stepline, 'Plot Style - Daily Open', group=groupPlotStyle, options=[plot.style_circles, plot.style_cross, plot.style_stepline])
 psyPlotStyle = input(plot.style_stepline, 'Plot Style - Psy Levels', group=groupPlotStyle, options=[plot.style_circles, plot.style_cross, plot.style_stepline])
+athPlotStyle = input(plot.style_circles, 'Plot Style - ATH', group=groupPlotStyle, options=[plot.style_circles, plot.style_cross, plot.style_stepline])
 
 // colors
 
@@ -84,6 +87,7 @@ dailyOpenColor = input(color.new(COLOR_ROYAL_BLUE_TWO, 00), 'Daily Open', input.
 londonColor = input(color.new(#ab47bc, 10), 'London', input.color, group=groupColors)
 nyColor = input(color.new(#880e4f, 10), 'New York', input.color, group=groupColors)
 psyColor = input(color.new(COLOR_GOLD, 10), 'Psy Levels', input.color, group=groupColors)
+athColor = input(color.new(COLOR_GOLD, 10), 'ATH', input.color, group=groupColors)
 
 // max timeframe
 
@@ -92,6 +96,7 @@ maxTimeframeLondonOpen = input(5, 'Max TF - London Open', maxval=240, minval=1, 
 maxTimeframeNyOpen = input(5, 'Max TF - NY Open', maxval=240, minval=1, group=groupMaxTF)
 maxTimeframeDailyOpen = input(15, 'Max TF - Daily Open', maxval=240, minval=1, group=groupMaxTF)
 maxTimeframePsy = input(15, 'Max TF - Psy Levels', maxval=240, minval=1, group=groupMaxTF)
+maxTimeframeAth = input(240, 'Max TF - ATH', maxval=240, minval=1, group=groupMaxTF)
 
 // time ranges
 
@@ -170,6 +175,20 @@ calc_psy_hilo(gmtoffsetPsy) =>
 
 /////////////////////////////////////////////////////////
 // 
+// --- ALL TIME HIGH ---
+// 
+/////////////////////////////////////////////////////////
+
+g=bar_index==1
+
+ath()=>
+    a=0.0
+    a:=g ? high : high>a[1] ? high:a[1]
+    
+allTimeHigh = security(syminfo.tickerid, 'M', ath(),lookahead=barmerge.lookahead_on)
+
+/////////////////////////////////////////////////////////
+// 
 // --- LINE PLOTS ---
 // 
 /////////////////////////////////////////////////////////
@@ -222,6 +241,15 @@ psyLowPlot = plot(
      plotPsyActive ? psyColor : na,  
      lineWidthPsy, 
      psyPlotStyle)
+
+allTimeHighPlot = plot(
+     plotAthActive and _isValidTF(maxTimeframeAth) ? allTimeHigh : na,  
+     "ATH",  
+     plotAthActive ? athColor : na,  
+     lineWidthAth, 
+     athPlotStyle,
+     offset=-9999,
+     trackprice=true)
 
 /////////////////////////////////////////////////////////////
 // 
