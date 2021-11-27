@@ -1,0 +1,182 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/ 
+// Original pattern formation by plasmapug, rise retrace continuation to the upside by infernix and peshocore
+// INSECURITY() from @JayRogers (enhanced for gmt offset)
+// Use at your own risk. Use at your own risk and your own responsibility. No guarantees are provided and no responsibility is assumed by the developers of this script.
+// Psy levels works only on exchanges that are open on the weekends.
+// The GMT offset puts the calculation in the correct place regardless of exchange timezone as long as the exchange provides 24x7 data. 
+
+//@version=5
+indicator('Traders Reality Psy Levels/Daily Open GMT Aware', overlay=true)
+
+// Config
+int chart_gmt = input.int(group='Day start hour offset', title='Offset hours (For exchanges that have weekend data - set to 3 for Sydney open in DST and set to 2 for Sydney open out of DST. Note: Sydney is in the southern hemisphere which means DST is on during the winter in the the northern hemisphere.) ', defval=3, minval=-12, maxval=14, step=1, tooltip='This allows you to move the daily open/Psy Levels to some desired time like for example the start of Sydney as oposed to exchange midnight. Negative values move line to the right, positive values move line to the left. For exchanges not using UTC+0 simply adjust the offset such that the daily open/psy level calculation start at some desired time. default is set to 3.')
+label_offset_input = input.int(group='Label Offsets', title='Label Offset', defval=5, inline='labeloffset')
+
+
+bool show_dly = timeframe.isminutes  //and timeframe.multiplier < 240
+bool show_rectangle9 = input.bool(group='Daily Open', defval=true, title='Show: line ?', inline='dopenconf') and show_dly
+bool show_label9 = input.bool(group='Daily Open', defval=true, title='Label?', inline='dopenconf') and show_rectangle9 and show_dly
+bool showallDly = input.bool(group='Daily Open', defval=false, title='Show historical daily opens?', inline='dopenconf')
+color sess9col = input.color(group='Daily Open', title='Daily Open Color', defval=color.new(color.orange, 0), inline='dopenconf1')
+
+bool showPsy = timeframe.isminutes and timeframe.multiplier <= 240 and timeframe.multiplier >= 1
+bool show_psylevels = input.bool(group='Weekly Psy Levels', defval=true, title='Show: Levels?', inline='psyconf') and showPsy
+bool show_psylabel = input.bool(group='Weekly Psy Levels', defval=true, title='Labels?', inline='psyconf') and show_psylevels
+bool showallPsy = input.bool(group='Weekly Psy Levels', defval=false, title='Show historical psy levels?', inline='psyconf')
+color psycolH = input.color(group='Weekly Psy Levels', title='Psy Hi Color', defval=color.new(color.orange, 30), inline='psyconf1')
+color psycolL = input.color(group='Weekly Psy Levels', title='Psy Low Color', defval=color.new(color.orange, 30), inline='psyconf1')
+
+calc_gmt_offset(gmtOffsetVar) =>
+    gmtVar = 'GMT+0'
+    if gmtOffsetVar > -1
+        gmtVar := 'GMT+' + str.tostring(math.abs(gmtOffsetVar))
+        gmtVar
+    else
+        gmtVar := 'GMT-' + str.tostring(math.abs(gmtOffsetVar))
+        gmtVar
+    gmtVar
+
+// Basic vars (needed in functions)
+
+// Only render intraday
+validTimeFrame = timeframe.isintraday == true
+
+label_x_offset = timenow + chart_gmt + label_offset_input * timeframe.multiplier * 60 * 1000
+
+//Right_Label
+r_label(ry, rtext, rstyle, rcolor, valid) =>
+    if valid and barstate.isrealtime
+        rLabel = label.new(x=label_x_offset, y=ry, text=rtext, xloc=xloc.bar_time, style=rstyle, textcolor=rcolor, textalign=text.align_right)
+        label.delete(rLabel[1])
+
+draw_linelabel_gmt_custSession(pivot_level, res, sessionString, tag, pivotColor, pivotStyle, pivotWidth, pivotExtend, isLabelValid, label_offset, sessStartAdjustMilis) =>
+    var line pivot_line = na
+
+    gmtD = calc_gmt_offset(chart_gmt)
+    current_session = time(res, sessionString, gmtD) - sessStartAdjustMilis
+    if not na(current_session)
+        pivot_line = line.new(current_session, pivot_level, timenow, pivot_level, xloc=xloc.bar_time, extend=pivotExtend, color=pivotColor, style=pivotStyle, width=pivotWidth)
+        line.delete(pivot_line[1])
+    if isLabelValid
+        pivot_label = label.new(label_offset, pivot_level, tag, xloc=xloc.bar_time, style=label.style_none, textcolor=pivotColor, textalign=text.align_right)
+        label.delete(pivot_label[1])
+    pivot_line
+
+//TODO we can use defaults in pinescript version 5 so we will not need this function
+draw_linelabel_gmt(pivot_level, res, tag, pivotColor, pivotStyle, pivotWidth, pivotExtend, isLabelValid, label_offset) =>
+    pivot_line = draw_linelabel_gmt_custSession(pivot_level, res, '0000-0000:1234567', tag, pivotColor, pivotStyle, pivotWidth, pivotExtend, isLabelValid, label_offset, 0)
+    pivot_line
+
+
+
+// INSECURITY() @JayRogers
+//
+// -- get all our HTF values with just a time() reference!
+f_insecurity(_resolution, _session, _timezone) =>
+
+    //  init variables to carry our previous time reference window values.
+    var float _priorOpen = na
+    var float _priorHigh = na
+    var float _priorLow = na
+    var float _priorClose = na
+
+    //  init some variables to hold useful active reference window values.
+    var float _activeOpen = na
+    var float _activeHigh = na
+    var float _activeLow = na
+
+    //  so do we have a time change event for our reference window?
+    if ta.change(time(_resolution, _session, _timezone)) != 0
+
+        _priorOpen := _activeOpen[1]  // transfer last open value.
+        _priorHigh := _activeHigh[1]  // get the last cumulative high value.
+        _priorLow := _activeLow[1]  // get the last cumulative low value.
+        _priorClose := nz(close[1])  // get the very last close value.
+
+        _activeOpen := open  // very first open value of active window.
+        _activeHigh := high  // reset active high to first high value.
+        _activeLow := low  // reset active low to first low value.
+        _activeLow
+    else
+
+    //  if we do not have a time change event, then we need to do a bit of work.
+
+        //  if the new high|low is more significant than the previous high|low
+        //  then we use the new value, otherwise we keep current value using
+        //  self-referencing.
+        _activeHigh := high > nz(_activeHigh) ? high : _activeHigh
+        _activeLow := low < nz(_activeLow) ? low : _activeLow
+        _activeLow
+
+    //  return all of our results.
+    [_priorOpen, _priorHigh, _priorLow, _priorClose, _activeOpen, _activeHigh, _activeLow]
+
+
+dly_offset = calc_gmt_offset(chart_gmt)
+[_priorOpenDly, _priorHighDly, _priorLowDly, _priorCloseDly, _activeOpenDly, _activeHighDly, _activeLowDly] = f_insecurity('D', '0000-0000:1234567', dly_offset)
+
+
+
+//************//
+// Daily Open //
+//************//
+
+isDly = year(timenow, dly_offset) == year(time, dly_offset) and month(timenow, dly_offset) == month(time, dly_offset) and dayofmonth(timenow, dly_offset) == dayofmonth(time, dly_offset) ? true : false
+plot(show_rectangle9 and validTimeFrame and (showallDly ? true : isDly) ? _activeOpenDly : na, color=sess9col, style=plot.style_linebr, linewidth=1, editable=false)
+// Labels
+r_label(_activeOpenDly, 'Daily Open (offset)', label.style_none, sess9col, validTimeFrame and show_label9)
+
+
+//************//
+// Psy Levels //
+//************//
+calc_psy_hilo(gmtoffsetPsy) =>
+
+    //4 hour res based on how mt4 does it
+    //so basically because the session is 8 hours and we are liiking at a 4 hour resolution we only need to take the highest high an lowest low of 2 bars
+    //we use the gmt offset to adjust the 0000-0800 session to Sydney open which is at 2100 during dst and at 2000 otherwize. (dst - spring foward, fall back)
+    in_session = time('240', '0000-0800:1', gmtoffsetPsy)
+    new_session = in_session and not in_session[1]
+    float psy_high = 0.0
+    float psy_low = 100000000000.0
+
+    psy_high := new_session ? high : in_session ? math.max(high, psy_high[1]) : psy_high[1]
+    psy_low := new_session ? low : in_session ? math.min(low, psy_low[1]) : psy_low[1]
+    [psy_high, psy_low]
+
+[psy_high, psy_low] = calc_psy_hilo(dly_offset)
+isThisWeekPsy = year(timenow, dly_offset) == year(time, dly_offset) and weekofyear(timenow, dly_offset) == weekofyear(time, dly_offset)
+
+plot(showPsy and show_psylevels and showallPsy ? psy_high : na, color=psycolH, style=plot.style_line, linewidth=1, editable=false)  //, offset=psy_plot_offset)
+plot(showPsy and show_psylevels and showallPsy ? psy_low : na, color=psycolL, style=plot.style_line, linewidth=1, editable=false)  //, offset=psy_plot_offset)
+
+
+if barstate.isnew
+    psy_calc_start = timestamp(dly_offset, year, month, dayofweek.wednesday, 00, 00, 00)
+    psy_calc_end = timestamp(dly_offset, year, month, dayofweek.wednesday, 08, 00, 00)
+    time_now_gmt = time('D', '0000-0800:1', dly_offset)
+    psy_calc_inProgress = not na(time_now_gmt - psy_calc_start >= 0) and not na(time_now_gmt - psy_calc_end <= 0)
+
+
+
+    stylePsy = line.style_solid
+    psy_hi_label = 'Psy-Hi'  
+    psy_lo_label = 'Psy-Lo'
+
+    if psy_calc_inProgress
+        //stylePsy := line.style_dashed //this does not work for style correctly but it does for the label which is odd
+        psy_hi_label := 'Psy-Hi calculating...'
+        psy_lo_label := 'Psy-Lo calculating...'  
+        psy_lo_label
+
+    if showallPsy
+        r_label(psy_high, psy_hi_label, label.style_none, psycolH, validTimeFrame and show_psylabel)
+        r_label(psy_low, psy_lo_label, label.style_none, psycolL, validTimeFrame and show_psylabel)
+        showallPsy  //just here to trick if-else into working
+    else
+        if show_psylevels
+            draw_linelabel_gmt_custSession(psy_high, 'D', '0000-0800:1', psy_hi_label, psycolH, stylePsy, 1, extend.none, show_psylabel and show_psylevels, label_x_offset, 0)
+            draw_linelabel_gmt_custSession(psy_low, 'D', '0000-0800:1', psy_lo_label, psycolL, stylePsy, 1, extend.none, show_psylabel and show_psylevels, label_x_offset, 0)
+        showallPsy  //just here to trick if-else into working
+
+

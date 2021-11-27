@@ -174,12 +174,17 @@ lineNyHLActive = input(true, 'Line - NY HL', group=groupLineSwitches)
 
 lineDailyOpenActive = input(true, 'Line - Daily Open', group=groupLineSwitches)
 
+linePsyLevelsActive = input(true, 'Line - Psy Levels', group=groupLineSwitches)
+lineAthActive = input(true, 'Line - ATH', group=groupLineSwitches)
+
 // colors
 
-dailyOpenColor = input(color.new(COLOR_ROYAL_BLUE_TWO, 0), 'Daily Open Color', input.color, group=groupColors)
-asiaLineColor = input(#00796b, 'Line - Asia', input.color, group=groupColors)
-nyLineColor = input(#880e4f, 'Line - New York', input.color, group=groupColors)
-londonLineColor = input(COLOR_MAGENTA_WEAK, 'Line - London', input.color, group=groupColors)
+dailyOpenColor = input(color.new(COLOR_ROYAL_BLUE_TWO, 0), 'Daily Open', input.color, group=groupColors)
+asiaLineColor = input(#00796b, 'Asia', input.color, group=groupColors)
+nyLineColor = input(#880e4f, 'New York', input.color, group=groupColors)
+londonLineColor = input(COLOR_MAGENTA_WEAK, 'London', input.color, group=groupColors)
+psyColor = input(color.new(COLOR_GOLD, 10), 'Psy Levels', input.color, group=groupColors)
+athColor = input(color.new(COLOR_GOLD, 10), 'ATH', input.color, group=groupColors)
 
 // session levels line style
 
@@ -196,12 +201,16 @@ dailyOpenLineStyle = input(line.style_solid, 'Line Style - Daily Open', group=gr
 asiaOpenLineStyle = input(line.style_solid, 'Line Style - Asia Open', group=groupSessionLevelsLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 londonOpenLineStyle = input(line.style_solid, 'Line Style - London Open', group=groupSessionLevelsLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 nyOpenLineStyle = input(line.style_solid, 'Line Style - NY Open', group=groupSessionLevelsLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+psyLineStyle = input(line.style_solid, 'Line Style - Psy Levels', group=groupSessionLevelsLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+athLineStyle = input(line.style_dashed, 'Line Style - Psy Levels', group=groupSessionLevelsLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
 // extend
 
 groupExtend = 'Extend'
 dailyOpenLineExtend = input(extend.none, 'Extend - Daily Open', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
 sessionLevelsLineExtend = input(extend.none, 'Extend - Sessions Levels', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
+psyLineExtend = input(extend.none, 'Extend - Psy Levels', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
+athLineExtend = input(extend.both, 'Extend - ATH', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
 
 // labels
 
@@ -246,6 +255,56 @@ _captureSessionLevels(timeRange) =>
         _sessionOpen := na
 
     [_sessionHigh, _sessionLow, _sessionOpen]
+
+/////////////////////////////////////////////////////////
+// 
+// --- PSY LEVELS ---
+// 
+/////////////////////////////////////////////////////////
+
+int chart_gmt = input(group='Day start hour offset', title='Offset hours (For exchanges that have weekend data - set to 3 for Sydney open in DST and set to 2 for Sydney open out of DST. Note: Sydney is in the southern hemisphere which means DST is on during the winter in the the northern hemisphere.) ', defval=3, minval=-12, maxval=14, step=1, tooltip='This allows you to move the daily open/Psy Levels to some desired time like for example the start of Sydney as oposed to exchange midnight. Negative values move line to the right, positive values move line to the left. For exchanges not using UTC+0 simply adjust the offset such that the daily open/psy level calculation start at some desired time. default is set to 3.')
+
+calc_gmt_offset(gmtOffsetVar) =>
+    gmtVar = 'GMT+0'
+    if gmtOffsetVar > -1
+        gmtVar := 'GMT+' + tostring(abs(gmtOffsetVar))
+        gmtVar
+    else
+        gmtVar := 'GMT-' + tostring(abs(gmtOffsetVar))
+        gmtVar
+    gmtVar
+
+dly_offset = calc_gmt_offset(chart_gmt)
+
+calc_psy_hilo(gmtoffsetPsy) =>
+
+    //4 hour res based on how mt4 does it
+    //so basically because the session is 8 hours and we are liiking at a 4 hour resolution we only need to take the highest high an lowest low of 2 bars
+    //we use the gmt offset to adjust the 0000-0800 session to Sydney open which is at 2100 during dst and at 2000 otherwize. (dst - spring foward, fall back)
+    in_session = time('240', '0000-0800:1', gmtoffsetPsy)
+    new_session = in_session and not in_session[1]
+    float psyHigh = 0.0
+    float psyLow = 100000000000.0
+
+    psyHigh := new_session ? high : in_session ? max(high, psyHigh[1]) : psyHigh[1]
+    psyLow := new_session ? low : in_session ? min(low, psyLow[1]) : psyLow[1]
+    [psyHigh, psyLow]
+
+[psyHigh, psyLow] = calc_psy_hilo(dly_offset)
+
+/////////////////////////////////////////////////////////
+// 
+// --- ALL TIME HIGH ---
+// 
+/////////////////////////////////////////////////////////
+
+g=bar_index==1
+
+ath()=>
+    a=0.0
+    a:=g ? high : high>a[1] ? high:a[1]
+    
+allTimeHigh = security(syminfo.tickerid, 'M', ath(),lookahead=barmerge.lookahead_on)
 
 ////////////////////////////////////////////////////////
 // 
@@ -466,6 +525,57 @@ _drawSessionLines(linesArray) =>
          labelVisible, 
          sessionLabelOffsetInBars, 
          sessionLabelShowPrice)
+    
+    _psyHighLineId = _drawLabelledLine(
+         x1=x1, 
+         x2=x2, 
+         y=linePsyLevelsActive ? psyHigh : na, 
+         _color=_getLineColor(psyColor, 0, linePsyLevelsActive), 
+         _width=sessionLevelsLineWidth, 
+         _style=psyLineStyle, 
+         _extend=psyLineExtend, 
+         labelText='Psy High', 
+         labelStyle=sessionLabelStyle, 
+         labelColor=color.new(psyColor, sessionLabelOpacity), 
+         labelTextColor=labelTextColor, 
+         labelSize=labelSize, 
+         showLabel=labelVisible, 
+         labelOffsetInBars=sessionLabelOffsetInBars, 
+         showPrice=sessionLabelShowPrice)
+    
+    _psyLowLineId = _drawLabelledLine(
+         x1=x1, 
+         x2=x2, 
+         y=linePsyLevelsActive ? psyLow : na, 
+         _color=_getLineColor(psyColor, 0, linePsyLevelsActive), 
+         _width=sessionLevelsLineWidth, 
+         _style=psyLineStyle, 
+         _extend=psyLineExtend, 
+         labelText='Psy Low', 
+         labelStyle=sessionLabelStyle, 
+         labelColor=color.new(psyColor, sessionLabelOpacity), 
+         labelTextColor=labelTextColor, 
+         labelSize=labelSize, 
+         showLabel=labelVisible, 
+         labelOffsetInBars=sessionLabelOffsetInBars, 
+         showPrice=sessionLabelShowPrice)
+    
+    _athLineId = _drawLabelledLine(
+         x1=x1, 
+         x2=x2, 
+         y=lineAthActive ? allTimeHigh : na, 
+         _color=_getLineColor(athColor, 0, lineAthActive), 
+         _width=sessionLevelsLineWidth, 
+         _style=athLineStyle, 
+         _extend=athLineExtend, 
+         labelText='ATH', 
+         labelStyle=sessionLabelStyle, 
+         labelColor=color.new(athColor, sessionLabelOpacity), 
+         labelTextColor=labelTextColor, 
+         labelSize=labelSize, 
+         showLabel=labelVisible, 
+         labelOffsetInBars=sessionLabelOffsetInBars, 
+         showPrice=sessionLabelShowPrice)
 
     array.push(linesArray, _dailyOpenLineId)
     array.push(linesArray, _asianOpenLineId)
@@ -476,6 +586,9 @@ _drawSessionLines(linesArray) =>
     array.push(linesArray, _nyLowLineId)
     array.push(linesArray, _londonOpenLineId)
     array.push(linesArray, _londonHighLineId)
+    array.push(linesArray, _psyHighLineId)
+    array.push(linesArray, _psyLowLineId)
+    array.push(linesArray, _athLineId)
     
    
 
