@@ -6,7 +6,7 @@
 DAD WIFI e7500dc77b
 
 retry vector candles on TL
-
+rename vertical hour lines to "Time Markers"
 make the vertical hour lines visible on seconds charts
 display price in all lines.  change formatting.  increase label size to large.
 
@@ -42,3 +42,7 @@ ALERTS
 - add an alert for MCB divergence on the 15 min
 - on vector candle that has a body some percentage above the average body size
 - on TDI divergence
+
+
+
+
