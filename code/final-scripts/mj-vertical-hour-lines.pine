@@ -141,6 +141,7 @@ labelStyle = input(label.style_label_center, 'Label Style', options=[label.style
 labelLocation = input(yloc.belowbar, 'Label Location', options=[yloc.price, yloc.abovebar, yloc.belowbar], group=groupLabels)
 
 // DATE/TIME LABEL
+showDateTimeLabel = input(false, 'Show Date/Time Label', group=groupDateTimeLabel)
 dateTimeLabelMarginMultiple = input(0.4, 'Date/Time Label Margin Multiple', 
  group=groupDateTimeLabel, minval=-2, maxval=2, step=0.05, 
  tooltip='Use this to adjust the vertical positioning of the date/time label.  Positive values will place it above price. Negative values will place it below price.')
@@ -273,7 +274,10 @@ _print(_text, _color) =>
     label.set_textcolor(_label, _color)
 
 
-_print(_getDateTimeDisplay(), _getColorByDay())
+_print(
+     showDateTimeLabel ? _getDateTimeDisplay() : na, 
+     showDateTimeLabel ? _getColorByDay() : na
+     )
 
 
 //////////////////////////////////////////////////////////////////
