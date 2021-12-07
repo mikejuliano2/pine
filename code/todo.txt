@@ -5,6 +5,8 @@
 //////////////////////////////////////////////////////////////////
 DAD WIFI e7500dc77b
 
+allWhiteLabelText = input(false, 'All White Label Text', group=groupLabels)
+
 off switch for date/time thing
 retry vector candles on TL
 rename vertical hour lines to "Time Markers"
