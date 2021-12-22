@@ -212,9 +212,9 @@ fixedToPriceLinesStandard = input(false, 'Fix Standard Pivots to Current Price',
 fixedToPriceLinesCamarilla = input(false, 'Fix Camarilla Pivots to Current Price', group=groupSwitches)
 
 lineOffset = input(15, 'Line Offset (in bars)', tooltip='How many bars away from current price to shift x1', group=groupPositioning)
-lineLength = input(20, 'Line Length (in bars)', minval=0, group=groupPositioning)
-labelOffsetNotFixed = input(4, 'Label Offset when NOT fixed to price (in bars)', group=groupPositioning)
-labelOffsetFixed = input(4, 'Label Offset when fixed to price (in bars)', group=groupPositioning)
+lineLength = input(50, 'Line Length (in bars)', minval=0, group=groupPositioning)
+labelOffsetNotFixed = input(5, 'Label Offset when NOT fixed to price (in bars)', group=groupPositioning)
+labelOffsetFixed = input(5, 'Label Offset when fixed to price (in bars)', group=groupPositioning)
 
 lineStyle = input(line.style_dotted, 'Line Style', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLines)
 lineWidth = input(3, 'Line Width', options=[1,2,3,4], group=groupLines)
@@ -224,7 +224,7 @@ lineOpacity = input(50, 'Line Opacity', group=groupLines)
 
 labelVisible = input(true, 'Labels Visible', group=groupLabels)
 labelStyle = input(label.style_none, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle], group=groupLabels)
-labelSize = input(size.normal, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupLabels)
+labelSize = input(size.large, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupLabels)
 labelOpacity = input(50, 'Label Opacity', group=groupLabels)
 labelTextOpacity = input(0, 'Label Text Opacity', group=groupLabels)
 

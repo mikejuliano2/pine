@@ -5,13 +5,17 @@
 //////////////////////////////////////////////////////////////////
 DAD WIFI e7500dc77b
 
-allWhiteLabelText = input(false, 'All White Label Text', group=groupLabels)
-
+CVD divergence
+weekly open
+offset 50/200 deviation label = standard offset + 17
+update default colors for background shading for conditional emas
+13/50 deviation label
+Day HL and Week HL on lines panel
 off switch for date/time thing
+
 retry vector candles on TL
 rename vertical hour lines to "Time Markers"
 make the vertical hour lines visible on seconds charts
-display price in all lines.  change formatting.  increase label size to large.
 
 get conditional emas to show on all TFs
 optionally set ema line opacity individually

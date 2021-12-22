@@ -90,7 +90,7 @@ labelSize = input(size.auto, 'Label Size', options=[size.auto, size.tiny, size.s
 
 deviationLabelSize = input(size.large, 'Deviation Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupDeviationLabels)
 showFifty200DeviationLabel = input(true, 'Show 50/200 Deviation Label', group=groupDeviationLabels, tooltip='The % difference between the 50 and 200 EMA.  To determine if there is enough volatility to trade')
-labelOffsetFifty200Deviation = input(35, 'Offset - 50/200 Deviation', group=groupDeviationLabels)
+labelOffsetFifty200Deviation = input(20, 'Offset - 50/200 Deviation', group=groupDeviationLabels, tooltip="This will be added to labelOffsetStandard")
 
 showDeviationLabels = input(true, 'Show Deviation % Labels', group=groupDeviationLabels, tooltip='Show the percentage away from price as the label.')
 showPriceInDeviationLabel = input(true, 'Show Price in Deviation Labels', group=groupDeviationLabels)
@@ -317,7 +317,7 @@ label.delete(labelConditional5m[1])
 //////////////////////////////////////////////////////////////////
 
 _drawFifty200DeviationLabel() => 
-    x = _getFutureTimeNBarsFromNow(labelOffsetFifty200Deviation)
+    x = _getFutureTimeNBarsFromNow(labelOffsetStandard + labelOffsetFifty200Deviation)xxxxxxxxxxxxxxxxxxxxxxx
     y = showFifty200DeviationLabel ? ema200 : na
     // text = _deviationDisplay(ema50, ema200) + ' (50/200)'
     text = _deviationDisplayPercentOnly(ema50, ema200)
