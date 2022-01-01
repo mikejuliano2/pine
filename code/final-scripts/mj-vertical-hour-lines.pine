@@ -127,17 +127,18 @@ maxTimeframe = input(title='Max timeframe', defval=5, maxval=60, minval=1, group
 numHoursToShow = input(24, 'Number of hours to show', group=groupShared, minval=0, maxval=100)
 
 // LINES
-showLines = input(false, 'Show Lines', group=groupLines)
-lineColor = input(color.new(COLOR_GOLD, 40), 'Line Color', group=groupLines)
+showLines = input(true, 'Show Lines', group=groupLines)
+lineColor = input(#090720, 'Line Color', group=groupLines)
 lineStyle = input(line.style_dashed, 'Line Style', group=groupLines, options=[line.style_solid, line.style_dashed, line.style_dotted])
 lineWidth = input(1, 'Line Width', group=groupLines, options=[1, 2, 3, 4])
 
 // LABELS
 showLabels = input(true, 'Show Labels?', group=groupLabels)
-labelSize = input(size.normal, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large, size.huge], group=groupLabels)
+isDaylightSavings = input(false, 'Is Daylight Savings?', group=groupLabels)
+labelSize = input(size.large, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large, size.huge], group=groupLabels)
 labelColor = input(color.new(#ffb74d, 0), 'Label Color', group=groupLabels)
-labelTextColor = input(COLOR_PINKISH_RED, 'Label Text Color', group=groupLabels)
-labelStyle = input(label.style_label_center, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_center], group=groupLabels)
+labelTextColor = input(#090720, 'Label Text Color', group=groupLabels)
+labelStyle = input(label.style_none, 'Label Style', options=[label.style_none, label.style_label_up, label.style_label_center], group=groupLabels)
 labelLocation = input(yloc.belowbar, 'Label Location', options=[yloc.price, yloc.abovebar, yloc.belowbar], group=groupLabels)
 
 // DATE/TIME LABEL
@@ -167,11 +168,13 @@ _conditionsMet() =>
       and _isAtOrBelowMaxTimeframe()
 
 _drawLabel() => 
+    _hour = isDaylightSavings ? hour : (hour == 0 ? 23 : hour - 1)
+
     barIndex = _conditionsMet() and showLabels ? bar_index : na
     labelId = label.new(
              x=showLabels ? barIndex : na,
              y=high,
-             text=tostring(hour < 4 ? hour + 20 : hour - 4) + ':00',
+             text=tostring(_hour < 4 ? _hour + 20 : _hour - 4) + ':00',
              textcolor=labelTextColor,
              style=labelStyle,
              size=labelSize,
@@ -201,7 +204,10 @@ _plotHourLines() =>
 _plotHourLines()
 _drawLabel()
 
-_getAdjustedHour() => hour < 4 ? hour + 20 : hour - 4
+_getAdjustedHour() => 
+    _hour = isDaylightSavings ? hour : (hour == 0 ? 23 : hour - 1) // adjust for daylight savings.  pine does something weird here
+    _hour := _hour < 4 ? _hour + 20 : _hour - 4
+
 _getAdjustedDay() => 
     adjustedDay = dayofweek == 1 and hour < 4 ? 7
       : hour < 4 ? dayofweek - 1

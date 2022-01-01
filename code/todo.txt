@@ -5,51 +5,26 @@
 //////////////////////////////////////////////////////////////////
 DAD WIFI e7500dc77b
 
-CVD divergence
-weekly open
+lines panel extend all
+
 offset 50/200 deviation label = standard offset + 17
-update default colors for background shading for conditional emas
-13/50 deviation label
-Day HL and Week HL on lines panel
-off switch for date/time thing
+get conditional emas to show on all TFs
+
+CVD divergence
+
+
+
+
+
+
+
+
+
 
 retry vector candles on TL
+
 rename vertical hour lines to "Time Markers"
 make the vertical hour lines visible on seconds charts
-
-get conditional emas to show on all TFs
-optionally set ema line opacity individually
-
 plot TDI divergence on price panel
-
-plot ADR Hi/Low
-RDH/RDL
-
 marker for end of month
-
-add brinks high/low to lines
 camarilla alert condition for level 4 breakout
-
-
-
-IDEA: Entry Condition Builder
-- Toggle a list of conditions from settings
-- For each active setting, draw a label - grey if condition is met, green if not
-- use security to grab all conditions in one script
-- 5 below 13, price below 50, price above pivot, etc.
-- price above/below some adjustable value defined in settings (e.g. the psych high, or local low)
-- alertcondition when all short conditions met
-- alertcondition when all long conditions met
-
-
-ALERTS
-- think carefully about alert management.  Times of day that would be good to get alerts.
-- alert when open interest shifts >= some percentage
-- 15 MFI cross, 60 MFI cross, 240 MFI cross
-- add an alert for MCB divergence on the 15 min
-- on vector candle that has a body some percentage above the average body size
-- on TDI divergence
-
-
-
-
