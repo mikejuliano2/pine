@@ -145,7 +145,7 @@ currentDayColor = input(color.new(COLOR_VOLT, 0), 'Current Day', input.color, gr
 dailyOpenLineStyle = input(line.style_solid, 'Line Style - Daily Open', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 dailyRangeLineStyle = input(line.style_dotted, 'Line Style - Daily HL', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
-lineAsiaOpenActive = input(true, 'Line - Asia Open', group=groupLineSwitches)
+lineAsiaOpenActive = input(false, 'Line - Asia Open', group=groupLineSwitches)
 lineAsiaHLActive = input(false, 'Line - Asia HL', group=groupLineSwitches)
 asiaOpenLineExtend = input(extend.none, 'Extend - Asia Open', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
 asiaColor = input(#00796b, 'Asia', input.color, group=groupColors)

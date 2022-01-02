@@ -5,8 +5,6 @@
 //////////////////////////////////////////////////////////////////
 DAD WIFI e7500dc77b
 
-lines panel extend all
-
 offset 50/200 deviation label = standard offset + 17
 get conditional emas to show on all TFs
 
