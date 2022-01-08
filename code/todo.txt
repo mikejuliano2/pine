@@ -5,6 +5,27 @@
 //////////////////////////////////////////////////////////////////
 DAD WIFI e7500dc77b
 
+separate dHL wHL toggle off separately, extend separately
+change adrH to RDH adrW to RDW
+maxTF for each
+lines panel - choose column for each
+round number when show price
+month Open
+year open
+
+improve Colors
+revisit extend setting for each
+if extend == right, shift the label
+
+
+
+
+lines panel - override line style for all
+lines panel - override line opacity for all
+lines panel - labels only
+
+
+
 offset 50/200 deviation label = standard offset + 17
 get conditional emas to show on all TFs
 
