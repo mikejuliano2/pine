@@ -139,6 +139,7 @@ string TT_LB = "The number of days back to plot the session levels"
 // options
 isFixedToPrice = input(true, 'Lines Fixed to Price?', group=groupOptions)
 extendAll = input(false, 'Extend All', group=groupOptions)
+extendNone = input(false, 'Extend None', group=groupOptions)
 
 // shared
 sessionLevelsLineExtend = input(extend.none, 'Sessions Levels', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
@@ -199,7 +200,7 @@ amrLineStyle = input(line.style_solid, 'Line Style - AMR', options=[line.style_s
 // 50 EMA Hourly
 lineHourlyEmaActive = input(true, '50 EMA Hourly', group=groupSwitches, inline=groupSwitches)
 hourlyEmaExtend = input(extend.none, '50 EMA Hourly', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
-hourlyEmaColor = input(color.new(#e65100, 0), 'Hourly 50 EMA', group=groupColors, inline=inlineColors)
+hourlyEmaColor = input(color.new(#00bcd4, 0), 'Hourly 50 EMA', group=groupColors, inline=inlineColors)
 hourlyEmaLineStyle = input(line.style_dashed, 'Line Style - 50 EMA Hourly', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLineStyle)
 
 // 20 SMA Daily
@@ -250,7 +251,8 @@ lineOffset = input(15, 'Line Offset', group=groupLineStyle, inline=inlinePositio
 lineLength = input(50, 'Line Length', group=groupLineStyle, inline=inlinePositioning)
 labelOffsetOne = input(8, 'Label Offset 1', group=groupLineStyle, inline=inlinePositioning)
 labelOffsetTwo = input(9, 'Label Offset 2', group=groupLineStyle, inline=inlinePositioning)
-lineWidth = input(1, 'Line Width', group=groupLineStyle, options=[1,2,3,4])
+labelOffsetThree = input(9, 'Label Offset 3', group=groupLineStyle, inline=inlinePositioning)
+lineWidth = input(1, 'Line Width', group=groupLineStyle, options=[1,2,3,4], inline=inlinePositioning)
 
 // labels
 allWhiteLabelText = input(false, 'All White Label Text', group=groupLabels)
@@ -268,7 +270,7 @@ dailyOpenTimeRange = input('0000-0015:1234567', 'Daily Open Time', group=groupTi
 
 // ------------------------------------------------------------------------------------------------
 
-_captureSessionLevels(timeRange) => 
+_captureSessionLevels(timeRange) =>
     _inSession = _isInSession(timeRange)
     _inHolding = not _inSession
 
@@ -297,16 +299,16 @@ _captureSessionLevels(timeRange) =>
 
     [_sessionHigh, _sessionLow, _sessionOpen]
 
-_drawLabelledLine(x1, x2, y, _color, _width, _style, _extend, labelText, labelStyle, labelColor, labelTextColor, labelSize, showLabel, labelOffsetInBars, showPrice) => 
+_drawLabelledLine(x1, x2, y, _color, _width, _style, _extend, labelText, labelStyle, labelColor, labelTextColor, labelSize, showLabel, labelOffsetInBars, showPrice) =>
     // x1 and x2 are in time (not bars)
 
     _lineId = line.new(
-         x1, 
-         y, 
-         x2, 
-         y, 
-         xloc.bar_time, 
-         extend=extendAll ? extend.both : _extend
+         x1,
+         y,
+         x2,
+         y,
+         xloc.bar_time,
+         extend=extendAll ? extend.both : extendNone ? extend.none : _extend
          )
 
     line.set_xy1(_lineId, x1, y)
@@ -332,9 +334,9 @@ _drawLabelledLine(x1, x2, y, _color, _width, _style, _extend, labelText, labelSt
     _lineId
 
 /////////////////////////////////////////////////////////
-// 
+//
 // --- PSY LEVELS ---
-// 
+//
 /////////////////////////////////////////////////////////
 
 int chart_gmt = input(group='Day start hour offset', title='Offset hours (For exchanges that have weekend data - set to 3 for Sydney open in DST and set to 2 for Sydney open out of DST. Note: Sydney is in the southern hemisphere which means DST is on during the winter in the the northern hemisphere.) ', defval=3, minval=-12, maxval=14, step=1, tooltip='This allows you to move the daily open/Psy Levels to some desired time like for example the start of Sydney as oposed to exchange midnight. Negative values move line to the right, positive values move line to the left. For exchanges not using UTC+0 simply adjust the offset such that the daily open/psy level calculation start at some desired time. default is set to 3.')
@@ -368,9 +370,9 @@ calcPsyHighLow(gmtoffsetPsy) =>
 [psyHigh, psyLow] = calcPsyHighLow(dly_offset)
 
 /////////////////////////////////////////////////////////
-// 
+//
 // --- ALL TIME HIGH ---
-// 
+//
 /////////////////////////////////////////////////////////
 
 g=bar_index==1
@@ -378,13 +380,13 @@ g=bar_index==1
 ath()=>
     a=0.0
     a:=g ? high : high>a[1] ? high:a[1]
-    
+
 allTimeHigh = security(syminfo.tickerid, 'M', ath(),lookahead=barmerge.lookahead_on)
 
 //////////////////////////////////////////////////////////////////
-// 
+//
 // --- ADR, AWR, AMR, Day High/Low ---
-// 
+//
 //////////////////////////////////////////////////////////////////
 
 _adr(length) =>
@@ -392,7 +394,7 @@ _adr(length) =>
     trueRange = na(high[1])? high-low : max(max(high - low, abs(high - close[1])), abs(low - close[1]))
     // Switched to SMA from RMA because somehow it matches MT4 better
     sma(trueRange[1], length)
-    
+
 _adrHigh(adr) => high - low < adr ? low + adr : close >= open ? low + adr : high
 _adrLow(adr) => high - low < adr ? high - adr : close >= open ? low : high - adr
 _toPips(val) => round( (val/syminfo.mintick)*100)/100
@@ -421,9 +423,9 @@ _20SmaDaily() => security(syminfo.tickerid, 'D', sma(close, 20),lookahead=barmer
 _20SmaWeekly() => security(syminfo.tickerid, 'W', sma(close, 20),lookahead=barmerge.lookahead_on)
 
 ////////////////////////////////////////////////////////
-// 
+//
 // ---- Labelled Lines ---
-// 
+//
 ////////////////////////////////////////////////////////
 
 [__asiaHigh, __asiaLow, asiaOpen] = _captureSessionLevels(asiaOpenTimeRange)
@@ -440,7 +442,7 @@ _drawSessionLines(linesArray) =>
 
      // cleanup
     if initialArraySize > 0
-        for i = 0 to initialArraySize - 1 
+        for i = 0 to initialArraySize - 1
             lineToDelete = array.shift(linesArray)
             line.delete(lineToDelete)
 
@@ -448,7 +450,7 @@ _drawSessionLines(linesArray) =>
 
     x1 = _getTimeNBarsFromNow(_lineOffset)
     x2 = _getTimeNBarsFromNow(_lineOffset + lineLength)
-    
+
     nyHighLowLabelVisible = true
     londonHighLowLabelVisible = true
 
@@ -462,251 +464,252 @@ _drawSessionLines(linesArray) =>
 
     _offsetOne = labelOffsetOne
     _offsetTwo = labelOffsetOne + labelOffsetTwo
+    _offsetThree = labelOffsetOne + labelOffsetTwo + labelOffsetThree
 
     _asianOpenLineId = _drawLabelledLine(
-         x1=x1, 
-         x2=x2, 
-         y=lineAsiaOpenActive ? asiaOpen : na, 
+         x1=x1,
+         x2=x2,
+         y=lineAsiaOpenActive ? asiaOpen : na,
          _color=asiaColor,
-         _width=lineWidth, 
-         _style=asiaOpenLineStyle, 
-         _extend=asiaOpenLineExtend, 
-         labelText='aO', 
-         labelStyle=sessionLabelStyle, 
-         labelColor=_getLabelTextColor(asiaColor, lineAsiaOpenActive), 
-         labelTextColor=_getLabelTextColor(asiaColor, lineAsiaOpenActive), 
-         labelSize=labelSize, 
-         showLabel=labelVisible, 
-         labelOffsetInBars=labelOffsetOne, 
+         _width=lineWidth,
+         _style=asiaOpenLineStyle,
+         _extend=asiaOpenLineExtend,
+         labelText='aO',
+         labelStyle=sessionLabelStyle,
+         labelColor=_getLabelTextColor(asiaColor, lineAsiaOpenActive),
+         labelTextColor=_getLabelTextColor(asiaColor, lineAsiaOpenActive),
+         labelSize=labelSize,
+         showLabel=labelVisible,
+         labelOffsetInBars=_offsetOne,
          showPrice=sessionLabelShowPrice)
-    
+
     _asianHighLineId = _drawLabelledLine(
-         x1=x1, 
-         x2=x2, 
-         y=lineAsiaHLActive ? asiaHigh : na, 
+         x1=x1,
+         x2=x2,
+         y=lineAsiaHLActive ? asiaHigh : na,
          _color=asiaColor,
-         _width=lineWidth, 
-         _style=sessionHighLowLineStyle, 
-         _extend=sessionLevelsLineExtend, 
-         labelText='asH', 
-         labelStyle=sessionLabelStyle, 
-         labelColor=_getLabelTextColor(asiaColor, lineAsiaHLActive), 
-         labelTextColor=_getLabelTextColor(asiaColor, lineAsiaHLActive), 
-         labelSize=labelSize, 
-         showLabel=labelVisible, 
-         labelOffsetInBars=labelOffsetOne, 
+         _width=lineWidth,
+         _style=sessionHighLowLineStyle,
+         _extend=sessionLevelsLineExtend,
+         labelText='asH',
+         labelStyle=sessionLabelStyle,
+         labelColor=_getLabelTextColor(asiaColor, lineAsiaHLActive),
+         labelTextColor=_getLabelTextColor(asiaColor, lineAsiaHLActive),
+         labelSize=labelSize,
+         showLabel=labelVisible,
+         labelOffsetInBars=_offsetThree,
          showPrice=sessionLabelShowPrice)
 
     _asianLowLineId = _drawLabelledLine(
-         x1=x1, 
-         x2=x2, 
-         y=lineAsiaHLActive ? asiaLow : na, 
-         _color=asiaColor, 
-         _width=lineWidth, 
-         _style=sessionHighLowLineStyle, 
-         _extend=sessionLevelsLineExtend, 
-         labelText='asL', 
-         labelStyle=sessionLabelStyle, 
-         labelColor=_getLabelTextColor(asiaColor, lineAsiaHLActive), 
-         labelTextColor=_getLabelTextColor(asiaColor, lineAsiaHLActive), 
-         labelSize=labelSize, 
-         showLabel=labelVisible, 
-         labelOffsetInBars=labelOffsetOne, 
+         x1=x1,
+         x2=x2,
+         y=lineAsiaHLActive ? asiaLow : na,
+         _color=asiaColor,
+         _width=lineWidth,
+         _style=sessionHighLowLineStyle,
+         _extend=sessionLevelsLineExtend,
+         labelText='asL',
+         labelStyle=sessionLabelStyle,
+         labelColor=_getLabelTextColor(asiaColor, lineAsiaHLActive),
+         labelTextColor=_getLabelTextColor(asiaColor, lineAsiaHLActive),
+         labelSize=labelSize,
+         showLabel=labelVisible,
+         labelOffsetInBars=_offsetThree,
          showPrice=sessionLabelShowPrice)
-    
+
     // ---------------
     // New York Lines
     // ---------------
 
     _nyOpenLineId = _drawLabelledLine(
-         x1=x1, 
-         x2=x2, 
-         y=lineNyOpenActive ? nyOpen : na, 
+         x1=x1,
+         x2=x2,
+         y=lineNyOpenActive ? nyOpen : na,
          _color=_getLineColor(nyColor, lineNyOpenActive),
-         _width=lineWidth, 
-         _style=nyOpenLineStyle, 
-         _extend=sessionLevelsLineExtend, 
-         labelText='nyO', 
-         labelStyle=sessionLabelStyle, 
-         labelColor=_getLabelTextColor(nyColor, lineNyOpenActive), 
-         labelTextColor=_getLabelTextColor(nyColor, lineNyOpenActive), 
-         labelSize=labelSize, 
-         showLabel=labelVisible, 
-         labelOffsetInBars=labelOffsetOne, 
+         _width=lineWidth,
+         _style=nyOpenLineStyle,
+         _extend=sessionLevelsLineExtend,
+         labelText='nyO',
+         labelStyle=sessionLabelStyle,
+         labelColor=_getLabelTextColor(nyColor, lineNyOpenActive),
+         labelTextColor=_getLabelTextColor(nyColor, lineNyOpenActive),
+         labelSize=labelSize,
+         showLabel=labelVisible,
+         labelOffsetInBars=_offsetThree,
          showPrice=sessionLabelShowPrice)
 
     _nyHighLineId = _drawLabelledLine(
-         x1=x1, 
-         x2=x2, 
-         y=lineNyHLActive ? nyHigh : na, 
+         x1=x1,
+         x2=x2,
+         y=lineNyHLActive ? nyHigh : na,
          _color=_getLineColor(nyColor, lineNyHLActive),
-         _width=lineWidth, 
+         _width=lineWidth,
          _style=sessionHighLowLineStyle,
-         _extend=sessionLevelsLineExtend, 
-         labelText='nyH', 
-         labelStyle=sessionLabelStyle, 
-         labelColor=_getLabelTextColor(nyColor, lineNyHLActive), 
-         labelTextColor=_getLabelTextColor(nyColor, lineNyHLActive), 
-         labelSize=labelSize, 
-         showLabel=nyHighLowLabelVisible, 
-         labelOffsetInBars=labelOffsetOne, 
+         _extend=sessionLevelsLineExtend,
+         labelText='nyH',
+         labelStyle=sessionLabelStyle,
+         labelColor=_getLabelTextColor(nyColor, lineNyHLActive),
+         labelTextColor=_getLabelTextColor(nyColor, lineNyHLActive),
+         labelSize=labelSize,
+         showLabel=nyHighLowLabelVisible,
+         labelOffsetInBars=_offsetThree,
          showPrice=sessionLabelShowPrice)
 
     _nyLowLineId = _drawLabelledLine(
-         x1=x1, 
-         x2=x2, 
-         y=lineNyHLActive ? nyLow : na, 
+         x1=x1,
+         x2=x2,
+         y=lineNyHLActive ? nyLow : na,
          _color=_getLineColor(nyColor, lineNyHLActive),
-         _width=lineWidth, 
+         _width=lineWidth,
          _style=sessionHighLowLineStyle,
-         _extend=sessionLevelsLineExtend, 
-         labelText='nyL', 
-         labelStyle=sessionLabelStyle, 
+         _extend=sessionLevelsLineExtend,
+         labelText='nyL',
+         labelStyle=sessionLabelStyle,
          labelColor=_getLabelTextColor(nyColor, lineNyHLActive),
          labelTextColor=_getLabelTextColor(nyColor, lineNyHLActive),
-         labelSize=labelSize, 
-         showLabel=nyHighLowLabelVisible, 
-         labelOffsetInBars=labelOffsetOne, 
+         labelSize=labelSize,
+         showLabel=nyHighLowLabelVisible,
+         labelOffsetInBars=_offsetThree,
          showPrice=sessionLabelShowPrice)
-    
+
     // ---------------
     // London Lines
-    // ---------------         
+    // ---------------
 
     _londonOpenLineId = _drawLabelledLine(
-         x1=x1, 
-         x2=x2, 
-         y=lineLondonOpenActive ? londonOpen : na, 
+         x1=x1,
+         x2=x2,
+         y=lineLondonOpenActive ? londonOpen : na,
          _color=_getLineColor(londonColor, lineLondonOpenActive),
-         _width=lineWidth, 
-         _style=londonOpenLineStyle, 
-         _extend=sessionLevelsLineExtend, 
-         labelText='euO', 
-         labelStyle=sessionLabelStyle, 
-         labelColor=_getLabelTextColor(londonColor, lineLondonOpenActive), 
-         labelTextColor=_getLabelTextColor(londonColor, lineLondonOpenActive), 
-         labelSize=labelSize, 
-         showLabel=labelVisible, 
-         labelOffsetInBars=labelOffsetOne, 
+         _width=lineWidth,
+         _style=londonOpenLineStyle,
+         _extend=sessionLevelsLineExtend,
+         labelText='euO',
+         labelStyle=sessionLabelStyle,
+         labelColor=_getLabelTextColor(londonColor, lineLondonOpenActive),
+         labelTextColor=_getLabelTextColor(londonColor, lineLondonOpenActive),
+         labelSize=labelSize,
+         showLabel=labelVisible,
+         labelOffsetInBars=_offsetThree,
          showPrice=sessionLabelShowPrice)
 
     _londonHighLineId = _drawLabelledLine(
-         x1=x1, 
-         x2=x2, 
-         y=lineLondonHLActive ? londonHigh : na, 
+         x1=x1,
+         x2=x2,
+         y=lineLondonHLActive ? londonHigh : na,
          _color=_getLineColor(londonColor, lineLondonOpenActive),
-         _width=lineWidth, 
+         _width=lineWidth,
          _style=sessionHighLowLineStyle,
-         _extend=sessionLevelsLineExtend, 
-         labelText='euH', 
-         labelStyle=sessionLabelStyle, 
+         _extend=sessionLevelsLineExtend,
+         labelText='euH',
+         labelStyle=sessionLabelStyle,
          labelColor=_getLabelTextColor(londonColor, lineLondonHLActive),
          labelTextColor=_getLabelTextColor(londonColor, lineLondonHLActive),
-         labelSize=labelSize, 
-         showLabel=londonHighLowLabelVisible, 
-         labelOffsetInBars=labelOffsetOne, 
+         labelSize=labelSize,
+         showLabel=londonHighLowLabelVisible,
+         labelOffsetInBars=_offsetThree,
          showPrice=sessionLabelShowPrice)
-    
+
     _londonLowLineId = _drawLabelledLine(
-         x1=x1, 
-         x2=x2, 
+         x1=x1,
+         x2=x2,
          y=lineLondonHLActive ? londonLow : na,
          _color=_getLineColor(londonColor, lineLondonOpenActive),
-         _width=lineWidth, 
+         _width=lineWidth,
          _style=sessionHighLowLineStyle,
-         _extend=sessionLevelsLineExtend, 
-         labelText='euL', 
-         labelStyle=sessionLabelStyle, 
+         _extend=sessionLevelsLineExtend,
+         labelText='euL',
+         labelStyle=sessionLabelStyle,
          labelColor=_getLabelTextColor(londonColor, lineLondonHLActive),
          labelTextColor=_getLabelTextColor(londonColor, lineLondonHLActive),
-         labelSize=labelSize, 
-         showLabel=londonHighLowLabelVisible, 
-         labelOffsetInBars=labelOffsetOne, 
+         labelSize=labelSize,
+         showLabel=londonHighLowLabelVisible,
+         labelOffsetInBars=_offsetThree,
          showPrice=sessionLabelShowPrice)
-    
+
     _dailyOpenLineId = _drawLabelledLine(
-         x1=x1, 
-         x2=x2, 
-         y=lineDailyOpenActive ? dailyOpen : na, 
-         _color=_getLineColor(currentDayColor, lineDailyOpenActive), 
-         _width=lineWidth, 
-         _style=dailyOpenLineStyle, 
-         _extend=dailyOpenExtend, 
-         labelText='dO', 
-         labelStyle=sessionLabelStyle, 
+         x1=x1,
+         x2=x2,
+         y=lineDailyOpenActive ? dailyOpen : na,
+         _color=_getLineColor(currentDayColor, lineDailyOpenActive),
+         _width=lineWidth,
+         _style=dailyOpenLineStyle,
+         _extend=dailyOpenExtend,
+         labelText='dO',
+         labelStyle=sessionLabelStyle,
          labelColor=_getLabelTextColor(currentDayColor, lineDailyOpenActive),
          labelTextColor=_getLabelTextColor(currentDayColor, lineDailyOpenActive),
-         labelSize=labelSize, 
-         showLabel=labelVisible, 
-         labelOffsetInBars=labelOffsetOne, 
+         labelSize=labelSize,
+         showLabel=labelVisible,
+         labelOffsetInBars=_offsetOne,
          showPrice=sessionLabelShowPrice)
-    
+
     _dailyHighLineId = _drawLabelledLine(
-         x1=x1, 
-         x2=x2, 
-         y=lineDailyHLActive ? dailyHigh : na, 
-         _color=_getLineColor(currentDayColor, lineDailyHLActive), 
-         _width=lineWidth, 
-         _style=currentDayHLLineStyle, 
-         _extend=currentDayHLExtend, 
-         labelText='dH', 
-         labelStyle=sessionLabelStyle, 
+         x1=x1,
+         x2=x2,
+         y=lineDailyHLActive ? dailyHigh : na,
+         _color=_getLineColor(currentDayColor, lineDailyHLActive),
+         _width=lineWidth,
+         _style=currentDayHLLineStyle,
+         _extend=currentDayHLExtend,
+         labelText='dH',
+         labelStyle=sessionLabelStyle,
          labelColor=_getLabelTextColor(currentDayColor, lineDailyHLActive),
          labelTextColor=_getLabelTextColor(currentDayColor, lineDailyHLActive),
-         labelSize=labelSize, 
-         showLabel=labelVisible, 
-         labelOffsetInBars=labelOffsetOne, 
+         labelSize=labelSize,
+         showLabel=labelVisible,
+         labelOffsetInBars=_offsetOne,
          showPrice=sessionLabelShowPrice)
-    
+
     _dailyLowLineId = _drawLabelledLine(
-         x1=x1, 
-         x2=x2, 
-         y=lineDailyHLActive ? dailyLow : na, 
-         _color=_getLineColor(currentDayColor, lineDailyHLActive), 
-         _width=lineWidth, 
-         _style=currentDayHLLineStyle, 
-         _extend=currentDayHLExtend, 
-         labelText='dL', 
-         labelStyle=sessionLabelStyle, 
+         x1=x1,
+         x2=x2,
+         y=lineDailyHLActive ? dailyLow : na,
+         _color=_getLineColor(currentDayColor, lineDailyHLActive),
+         _width=lineWidth,
+         _style=currentDayHLLineStyle,
+         _extend=currentDayHLExtend,
+         labelText='dL',
+         labelStyle=sessionLabelStyle,
          labelColor=_getLabelTextColor(currentDayColor, lineDailyHLActive),
          labelTextColor=_getLabelTextColor(currentDayColor, lineDailyHLActive),
-         labelSize=labelSize, 
-         showLabel=labelVisible, 
-         labelOffsetInBars=labelOffsetOne, 
+         labelSize=labelSize,
+         showLabel=labelVisible,
+         labelOffsetInBars=_offsetOne,
          showPrice=sessionLabelShowPrice)
-    
+
     _psyHighLineId = _drawLabelledLine(
-         x1=x1, 
-         x2=x2, 
-         y=linePsyLevelsActive ? psyHigh : na, 
-         _color=_getLineColor(psyColor, linePsyLevelsActive), 
-         _width=lineWidth, 
-         _style=psyLineStyle, 
-         _extend=psyLineExtend, 
-         labelText='psyH', 
-         labelStyle=sessionLabelStyle, 
-         labelColor=color.new(psyColor, sessionLabelOpacity), 
-         labelTextColor=_getLabelTextColor(psyColor, linePsyLevelsActive), 
-         labelSize=labelSize, 
-         showLabel=labelVisible, 
-         labelOffsetInBars=labelOffsetOne, 
+         x1=x1,
+         x2=x2,
+         y=linePsyLevelsActive ? psyHigh : na,
+         _color=_getLineColor(psyColor, linePsyLevelsActive),
+         _width=lineWidth,
+         _style=psyLineStyle,
+         _extend=psyLineExtend,
+         labelText='psyH',
+         labelStyle=sessionLabelStyle,
+         labelColor=color.new(psyColor, sessionLabelOpacity),
+         labelTextColor=_getLabelTextColor(psyColor, linePsyLevelsActive),
+         labelSize=labelSize,
+         showLabel=labelVisible,
+         labelOffsetInBars=_offsetThree,
          showPrice=sessionLabelShowPrice)
-    
+
     _psyLowLineId = _drawLabelledLine(
-         x1=x1, 
-         x2=x2, 
-         y=linePsyLevelsActive ? psyLow : na, 
-         _color=_getLineColor(psyColor, linePsyLevelsActive), 
-         _width=lineWidth, 
-         _style=psyLineStyle, 
-         _extend=psyLineExtend, 
-         labelText='psyL', 
-         labelStyle=sessionLabelStyle, 
-         labelColor=color.new(psyColor, sessionLabelOpacity), 
-         labelTextColor=_getLabelTextColor(psyColor, linePsyLevelsActive), 
-         labelSize=labelSize, 
-         showLabel=labelVisible, 
-         labelOffsetInBars=labelOffsetOne, 
+         x1=x1,
+         x2=x2,
+         y=linePsyLevelsActive ? psyLow : na,
+         _color=_getLineColor(psyColor, linePsyLevelsActive),
+         _width=lineWidth,
+         _style=psyLineStyle,
+         _extend=psyLineExtend,
+         labelText='psyL',
+         labelStyle=sessionLabelStyle,
+         labelColor=color.new(psyColor, sessionLabelOpacity),
+         labelTextColor=_getLabelTextColor(psyColor, linePsyLevelsActive),
+         labelSize=labelSize,
+         showLabel=labelVisible,
+         labelOffsetInBars=_offsetThree,
          showPrice=sessionLabelShowPrice)
     
     _athLineId = _drawLabelledLine(
@@ -723,7 +726,7 @@ _drawSessionLines(linesArray) =>
          labelTextColor=_getLabelTextColor(athColor, linePsyLevelsActive), 
          labelSize=labelSize, 
          showLabel=labelVisible, 
-         labelOffsetInBars=labelOffsetOne, 
+         labelOffsetInBars=_offsetThree,
          showPrice=sessionLabelShowPrice)
     
     _yesterdayHighLineId = _drawLabelledLine(
@@ -740,7 +743,7 @@ _drawSessionLines(linesArray) =>
          labelTextColor=_getLabelTextColor(yesterdayColor, lineYesterdayActive), 
          labelSize=labelSize, 
          showLabel=labelVisible, 
-         labelOffsetInBars=_offsetTwo, 
+         labelOffsetInBars=_offsetOne,
          showPrice=sessionLabelShowPrice)
     
     _yesterdayLowLineId = _drawLabelledLine(
@@ -757,7 +760,7 @@ _drawSessionLines(linesArray) =>
          labelTextColor=_getLabelTextColor(yesterdayColor, lineYesterdayActive),
          labelSize=labelSize, 
          showLabel=labelVisible, 
-         labelOffsetInBars=_offsetTwo, 
+         labelOffsetInBars=_offsetOne,
          showPrice=sessionLabelShowPrice)
     
     _currentWeekHighLineId = _drawLabelledLine(
@@ -859,7 +862,7 @@ _drawSessionLines(linesArray) =>
          labelTextColor=_getLabelTextColor(currentDayColor, lineAdrActive), 
          labelSize=labelSize, 
          showLabel=labelVisible, 
-         labelOffsetInBars=_offsetTwo, 
+         labelOffsetInBars=_offsetOne,
          showPrice=sessionLabelShowPrice)
     
     _adrLowLineId = _drawLabelledLine(
@@ -876,7 +879,7 @@ _drawSessionLines(linesArray) =>
          labelTextColor=_getLabelTextColor(currentDayColor, lineAdrActive), 
          labelSize=labelSize, 
          showLabel=labelVisible, 
-         labelOffsetInBars=_offsetTwo, 
+         labelOffsetInBars=_offsetOne,
          showPrice=sessionLabelShowPrice)
     
     _awrHighLineId = _drawLabelledLine(
@@ -893,7 +896,7 @@ _drawSessionLines(linesArray) =>
          labelTextColor=_getLabelTextColor(currentWeekColor, lineAwrActive), 
          labelSize=labelSize, 
          showLabel=labelVisible, 
-         labelOffsetInBars=_offsetTwo, 
+         labelOffsetInBars=_offsetTwo,
          showPrice=sessionLabelShowPrice)
     
     _awrLowLineId = _drawLabelledLine(
@@ -910,7 +913,7 @@ _drawSessionLines(linesArray) =>
          labelTextColor=_getLabelTextColor(currentWeekColor, lineAwrActive), 
          labelSize=labelSize, 
          showLabel=labelVisible, 
-         labelOffsetInBars=_offsetTwo, 
+         labelOffsetInBars=_offsetTwo,
          showPrice=sessionLabelShowPrice)
     
     _amrHighLineId = _drawLabelledLine(
@@ -927,7 +930,7 @@ _drawSessionLines(linesArray) =>
          labelTextColor=_getLabelTextColor(amrColor, lineAmrActive), 
          labelSize=labelSize, 
          showLabel=labelVisible, 
-         labelOffsetInBars=_offsetTwo, 
+         labelOffsetInBars=_offsetThree,
          showPrice=sessionLabelShowPrice)
     
     _amrLowLineId = _drawLabelledLine(
@@ -944,7 +947,7 @@ _drawSessionLines(linesArray) =>
          labelTextColor=_getLabelTextColor(amrColor, lineAmrActive), 
          labelSize=labelSize, 
          showLabel=labelVisible, 
-         labelOffsetInBars=_offsetTwo, 
+         labelOffsetInBars=_offsetThree,
          showPrice=sessionLabelShowPrice)
     
     _hourlyEmaLineId = _drawLabelledLine(
@@ -961,7 +964,7 @@ _drawSessionLines(linesArray) =>
          labelTextColor=_getLabelTextColor(hourlyEmaColor, lineHourlyEmaActive), 
          labelSize=labelSize, 
          showLabel=labelVisible, 
-         labelOffsetInBars=_offsetTwo, 
+         labelOffsetInBars=_offsetThree,
          showPrice=sessionLabelShowPrice)
     
     _dailySmaLineId = _drawLabelledLine(
@@ -978,7 +981,7 @@ _drawSessionLines(linesArray) =>
          labelTextColor=_getLabelTextColor(yesterdayColor, lineDailySmaActive),
          labelSize=labelSize, 
          showLabel=labelVisible, 
-         labelOffsetInBars=_offsetTwo, 
+         labelOffsetInBars=_offsetOne,
          showPrice=sessionLabelShowPrice)
     
     _weeklySmaLineId = _drawLabelledLine(
@@ -995,7 +998,7 @@ _drawSessionLines(linesArray) =>
          labelTextColor=_getLabelTextColor(lastWeekColor, lineWeeklySmaActive),
          labelSize=labelSize, 
          showLabel=labelVisible, 
-         labelOffsetInBars=_offsetTwo, 
+         labelOffsetInBars=_offsetTwo,
          showPrice=sessionLabelShowPrice)
 
     array.push(linesArray, _dailyOpenLineId)
