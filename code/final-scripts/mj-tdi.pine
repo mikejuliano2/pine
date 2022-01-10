@@ -5,6 +5,7 @@ study("MJ - TDI", shorttitle="MJ - TDI", precision=0)
 groupTDI = 'TDI'
 groupDivergence = 'Divergence'
 groupShark = 'Shark Fin'
+groupVolatility = 'Volatility Shading'
 
 COLOR_LIME = #1cd206
 COLOR_VOLT = #affd00
@@ -70,8 +71,7 @@ lbR = divPivotRange
 
 sharkAlertsEnabled = input(true, 'Shark Alerts Enabled')
 sharkPivotRange = input(title="Shark Pivot Range", defval=3, group=groupShark)
-coloredBgWhenOutsideBands = input(true, title='Colored BG when outside bands?', group=groupShark)
-bgColorTransparency = input(94, title='BG color transparency', group=groupShark, minval=0, maxval=100)
+
 sharkHighColor = input(color.new(COLOR_GOLD, 25), 'Shark High Color', group=groupShark)
 sharkLowColor = input(color.new(COLOR_GOLD, 25), 'Shark Low Color', group=groupShark)
 sharkPlotWidth = input(2, 'Shark Plot Width', minval=1, maxval=4)
@@ -285,14 +285,13 @@ alertcondition(hasSharkFin and sharkAlertsEnabled, title="Alert on Shark Fin", m
 // 
 //////////////////////////////////////////////////////
 
-_highlightColor = belowLowerBand ? color.purple : aboveUpperBand ? color.blue : na
+volShadingActive = input(true, title='Is Active', group=groupVolatility)
+volShadingUpColor = input(color.new(color.blue, 92), title='Up', group=groupVolatility, inline=groupVolatility)
+volShadingDownColor = input(color.new(#f06292, 92), title='Down', group=groupVolatility, inline=groupVolatility)
+volShadingDefaultColor = input(color.new(color.black, 92), title='Default', group=groupVolatility, inline=groupVolatility)
 
-bgColor = color.new(
-	  coloredBgWhenOutsideBands ? _highlightColor : na,
-	  bgColorTransparency
-	  )
-
-bgcolor(bgColor)
+volatilityColor = belowLowerBand ? volShadingDownColor : aboveUpperBand ? volShadingUpColor : volShadingDefaultColor
+bgcolor(volShadingActive ? volatilityColor : volShadingDefaultColor)
 
 //////////////////////////////////////////////////////
 // 

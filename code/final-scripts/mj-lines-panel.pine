@@ -152,6 +152,7 @@ currentDayHLExtend = input(extend.right, 'Current Day HL', options=[extend.none,
 currentDayHLLineStyle = input(line.style_dotted, 'Line Style - Daily HL', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
 // daily open
+dailyOpenColor = input(color.new(COLOR_VOLT, 0), 'Daily Open', input.color, group=groupColors, inline=inlineColors)
 lineDailyOpenActive = input(true, 'Daily Open', group=groupSwitches, inline=groupSwitches)
 dailyOpenExtend = input(extend.right, 'Daily Open', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
 dailyOpenLineStyle = input(line.style_solid, 'Line Style - Daily Open', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
@@ -631,14 +632,14 @@ _drawSessionLines(linesArray) =>
          x1=x1,
          x2=x2,
          y=lineDailyOpenActive ? dailyOpen : na,
-         _color=_getLineColor(currentDayColor, lineDailyOpenActive),
+         _color=_getLineColor(dailyOpenColor, lineDailyOpenActive),
          _width=lineWidth,
          _style=dailyOpenLineStyle,
          _extend=dailyOpenExtend,
          labelText='dO',
          labelStyle=sessionLabelStyle,
-         labelColor=_getLabelTextColor(currentDayColor, lineDailyOpenActive),
-         labelTextColor=_getLabelTextColor(currentDayColor, lineDailyOpenActive),
+         labelColor=_getLabelTextColor(dailyOpenColor, lineDailyOpenActive),
+         labelTextColor=_getLabelTextColor(dailyOpenColor, lineDailyOpenActive),
          labelSize=labelSize,
          showLabel=labelVisible,
          labelOffsetInBars=_offsetOne,

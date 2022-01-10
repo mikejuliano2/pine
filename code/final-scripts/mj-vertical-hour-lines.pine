@@ -143,6 +143,8 @@ labelLocation = input(yloc.belowbar, 'Label Location', options=[yloc.price, yloc
 
 // DATE/TIME LABEL
 showDateTimeLabel = input(false, 'Show Date/Time Label', group=groupDateTimeLabel)
+dateTimeLabelFixedColorActive = input(true, 'Fixed Color', group=groupDateTimeLabel, inline='fixedColor')
+dateTimeLabelFixedColor = input(color.new(color.white, 0), 'Color', group=groupDateTimeLabel, inline='fixedColor')
 dateTimeLabelSize = input(size.normal, 'Date/Time Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large, size.huge], group=groupDateTimeLabel)
 dateTimeLabelMarginMultiple = input(0.4, 'Date/Time Label Margin Multiple', 
  group=groupDateTimeLabel, minval=-2, maxval=2, step=0.05, 
@@ -244,9 +246,11 @@ _getDateTimeDisplay() =>
     timeframe.isintraday ? _display : na
 
 
-_getColorByDay() => 
-    adjustedDay = _getAdjustedDay() 
-    if adjustedDay == 1
+_getColorByDay() =>
+    adjustedDay = _getAdjustedDay()
+    if dateTimeLabelFixedColorActive
+        dateTimeLabelFixedColor
+    else if adjustedDay == 1
         color.white
     else if adjustedDay == 2
         color.red
