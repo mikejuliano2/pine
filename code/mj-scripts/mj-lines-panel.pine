@@ -174,6 +174,12 @@ lineMonthOpenActive = input(true, 'Month Open', group=groupSwitches, inline=grou
 monthOpenExtend = input(extend.right, 'Month Open', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
 monthOpenLineStyle = input(line.style_solid, 'Line Style - Month Open', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
+// year open
+currentYearColor = input(color.new(#db3333, 0), 'Current Year', input.color, group=groupColors, inline=inlineColors)
+lineYearOpenActive = input(true, 'Month Open', group=groupSwitches, inline=groupSwitches)
+yearOpenExtend = input(extend.right, 'Year Open', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
+yearOpenLineStyle = input(line.style_solid, 'Line Style - Year Open', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+
 // yesterday
 lineYesterdayActive = input(true, 'Yesterday HL', group=groupSwitches, inline=groupSwitches)
 yesterdayColor = input(color.new(#090720, 0), 'Yesterday', group=groupColors, inline=inlineColors)
@@ -254,7 +260,7 @@ athColor = input(color.new(COLOR_GOLD, 10), 'ATH', input.color, group=groupColor
 athLineStyle = input(line.style_dashed, 'Line Style - ATH', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
 // line style
-lineOffset = input(15, 'Line Offset', group=groupLineStyle, inline=inlinePositioning)
+lineOffset = input(5, 'Line Offset', group=groupLineStyle, inline=inlinePositioning)
 lineLength = input(10, 'Line Length', group=groupLineStyle, inline=inlinePositioning)
 labelOffsetOne = input(8, 'Label Offset 1', group=groupLineStyle, inline=inlinePositioning)
 labelOffsetTwo = input(9, 'Label Offset 2', group=groupLineStyle, inline=inlinePositioning)
@@ -422,6 +428,7 @@ amr = security(syminfo.tickerid, "M", _adr(1),  lookahead=barmerge.lookahead_on)
 amrHigh = security(syminfo.tickerid, "M", _adrHigh(amr), lookahead=barmerge.lookahead_on)
 amrLow  = security(syminfo.tickerid, "M", _adrLow(amr), lookahead=barmerge.lookahead_on)
 
+[yearHigh, yearLow, yearOpen] = security(syminfo.tickerid, '12M', [high, low, open], lookahead=true)
 [monthHigh, monthLow, monthOpen] = security(syminfo.tickerid, 'M', [high, low, open], lookahead=true)
 [weekHigh, weekLow, weekOpen] = security(syminfo.tickerid, 'W', [high, low, open], lookahead=true)
 [dailyHigh, dailyLow, dailyOpen] = security(syminfo.tickerid, 'D', [high, low, open], lookahead=true)
@@ -839,6 +846,23 @@ _drawSessionLines(linesArray) =>
          labelStyle=sessionLabelStyle,
          labelColor=currentMonthColor,
          labelTextColor=_getLabelTextColor(currentMonthColor, lineMonthOpenActive),
+         labelSize=labelSize,
+         showLabel=labelVisible,
+         labelOffsetInBars=_offsetTwo,
+         showPrice=showPriceInLabel)
+    
+    _currentYearOpenLineId = _drawLabelledLine(
+         x1=x1,
+         x2=x2,
+         y=lineYearOpenActive ? yearOpen : na,
+         _color=_getLineColor(currentYearColor, lineYearOpenActive),
+         _width=lineWidth,
+         _style=yearOpenLineStyle,
+         _extend=yearOpenExtend,
+         labelText='yO',
+         labelStyle=sessionLabelStyle,
+         labelColor=currentYearColor,
+         labelTextColor=_getLabelTextColor(currentYearColor, lineYearOpenActive),
          labelSize=labelSize,
          showLabel=labelVisible,
          labelOffsetInBars=_offsetTwo,
