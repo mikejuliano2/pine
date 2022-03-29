@@ -44,14 +44,13 @@ overlayLineWidth = input(2, 'Line Width', group=groupOverlay, options=[1,2,3,4])
 
 // COLORS
 
-overrideOpacityHighVol = input(50, 'Override Opacity High Volume', group=groupColors, minval=0, maxval=100, step=1)
-overrideOpacityLowVol = input(50, 'Override Opacity Low Volume', group=groupColors, minval=0, maxval=100, step=1)
+overrideOpacity = input(50, 'Override Opacity', group=groupColors, minval=0, maxval=100, step=1)
 climaxVolBullColor = input(color.green, 'Climax Bull Color', group=groupColors)
 climaxVolBearColor = input(#b22833, 'Climax Bear Color', group=groupColors)
 aboveAvgVolBullColor = input(#2962ff, 'Above Average Volume Bull Color', group=groupColors)
 aboveAvgVolBearColor = input(#793be4, 'Above Average Volume Bear Color', group=groupColors)
-standardVolBullColor = input(#090720, 'Standard Volume Bull Color', group=groupColors)
-standardVolBearColor = input(#090720, 'Standard Volume Bear Color', group=groupColors)
+standardVolBullColor = input(#141d38, 'Standard Volume Bull Color', group=groupColors)
+standardVolBearColor = input(#141d38, 'Standard Volume Bear Color', group=groupColors)
 
 // SYMBOL
 
@@ -133,10 +132,8 @@ barColor = _getBarColorByVolWeight(volWeight, _open, _close)
 volumeBarColor = barColor == standardVolBullColor ? standardVolBearColor : barColor
 
 // APPLY OVERRIDE OPACITY
-if volWeight > 0 and overrideOpacityHighVol > 0
-    barColor := color.new(barColor, overrideOpacityHighVol)
-else if volWeight == 0 and overrideOpacityLowVol > 0
-    barColor := color.new(barColor, overrideOpacityLowVol)
+if overrideOpacity > 0
+    barColor := color.new(barColor, overrideOpacity)
 
 //////////////////////////////////////////////////
 // 
