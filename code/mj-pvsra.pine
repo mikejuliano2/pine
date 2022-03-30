@@ -44,7 +44,8 @@ overlayLineWidth = input(2, 'Line Width', group=groupOverlay, options=[1,2,3,4])
 
 // COLORS
 
-overrideOpacity = input(50, 'Override Opacity', group=groupColors, minval=0, maxval=100, step=1)
+selectedTemplate = input(0, 'Template', options=[0,1,2,3], group=groupColors, tooltip="use color picker below if 0")
+overrideOpacity = input(0, 'Override Opacity', group=groupColors, minval=0, maxval=100, step=1)
 climaxVolBullColor = input(color.green, 'Climax Bull Color', group=groupColors)
 climaxVolBearColor = input(#b22833, 'Climax Bear Color', group=groupColors)
 aboveAvgVolBullColor = input(#2962ff, 'Above Average Volume Bull Color', group=groupColors)
@@ -69,8 +70,42 @@ volPeriodLength = input(10, 'Volume Period Length', tooltip='Used in the PVSRA c
 
 //////////////////////////////////////////////////
 // 
-// === FUNCTIONS ===
+// === APPLY COLOR TEMPLATE ===
 // 
+//////////////////////////////////////////////////
+
+// nice dark blue: #010839
+
+if selectedTemplate == 1
+    climaxVolBullColor := color.new(#4caf50, 50)
+    climaxVolBearColor := color.new(#b22833, 50)
+    aboveAvgVolBullColor := color.new(#2962ff, 50)
+    aboveAvgVolBearColor := color.new(#793be4, 50)
+    standardVolBullColor := color.new(#090720, 40)
+    standardVolBearColor := color.new(#090720, 40)
+    overrideOpacity := 50
+else if selectedTemplate == 2
+    // climaxVolBullColor := color.new(#1d8634, 50)
+    climaxVolBullColor := color.new(#16864f, 50)
+    climaxVolBearColor := color.new(#b12a35, 50)
+    aboveAvgVolBullColor := color.new(#2962ff, 50)
+    aboveAvgVolBearColor := color.new(#793be4, 50)
+    standardVolBullColor := color.new(#363e57, 50)
+    standardVolBearColor := color.new(#363e57, 50)
+    overrideOpacity := 1
+else if selectedTemplate == 3
+    climaxVolBullColor := color.new(#056656, 50)
+    climaxVolBearColor := color.new(#542422, 50)
+    aboveAvgVolBullColor := color.new(#1848cc, 50)
+    aboveAvgVolBearColor := color.new(#3e31c4, 50)
+    standardVolBullColor := color.new(#363e57, 50)
+    standardVolBearColor := color.new(#363e57, 50)
+    overrideOpacity := 1
+
+//////////////////////////////////////////////////
+//
+// === FUNCTIONS ===
+//
 //////////////////////////////////////////////////
 
 _print(_text) => var _label = label.new(bar_index, na, _text, xloc.bar_index, yloc.price, color(na), label.style_none, color.gray, size.large, text.align_left), label.set_xy(_label, bar_index, highest(10)[1]), label.set_text(_label, _text)
@@ -179,3 +214,56 @@ plot(
 alertcondition(volWeight == 2, title="Alert on Green or Red Candle", message="{{ticker}} Green or Red Candle on the {{interval}}")
 alertcondition(volWeight > 0, title="Alert on Vector Candle", message="{{ticker}} Vector Candle on the {{interval}}")
 
+
+
+// template 1
+// green: #4caf50 50
+// red: #b22833 50
+// blue: #2962ff 50
+// purple: #793be4 50
+// up: #090720 40
+// down: #090720 40
+
+// template 2
+// green: #1d8634
+// red: #7a2c2c
+// blue: #2962ff
+// purple: #793be4
+// up: #363e57
+// down: #363e57
+
+// template 3
+// green: #056656
+// red: #542422
+// blue: #1848cc
+// purple: #3e31c4
+// up: #363e57
+// down: #363e57
+
+// template
+// green: #
+// red: #
+// blue: #
+// purple: #
+// up: #
+// down: #
+
+// template
+// green: #
+// red: #
+// blue: #
+// purple: #
+// up: #
+// down: #
+
+// template
+// green: #
+// red: #
+// blue: #
+// purple: #
+// up: #
+// down: #
+
+
+
+// template 2
