@@ -114,165 +114,183 @@ new_bar(res) => change(time(res)) != 0
 // dependencies: dateUtils, plotUtils
 // -----------------------
 
-groupSwitches = 'Switches'
-groupOffset = 'Offset'
-groupPlotSwitches = 'Plot Switches'
-groupColors = 'Colors'
-groupTimeRanges = 'Time Ranges'
-groupLineStyle = 'Line Style'
-groupLabels = 'Labels'
-groupDailyOpenPlot='Daily Open Plot'
-groupMarkers='Markers'
-groupOptions='Options'
-groupExtend = 'Extend'
+groupLinesAndLabels = '--- Lines and Labels ---'
+groupOptions='--- Options ---'
+groupColors = '--- Colors ---'
+groupSwitches = '--- Switches ---'
+groupExtend = '--- Extend ---'
+groupLineStyle = '--- Line Style ---'
+groupTimeRanges = '--- Time Ranges ---'
 
 inlinePositioning = 'positioning'
 inlineExtend = 'extend'
 inlineColors = 'colors'
 
-// ----------------------------------------------------------------------------------
 // tooltips
-
 string TT_LB = "The number of days back to plot the session levels"
 
 
-// options
-isFixedToPrice = input(true, 'Lines Fixed to Price?', group=groupOptions)
-extendAll = input(false, 'Extend All', group=groupOptions)
-extendNone = input(false, 'Extend None', group=groupOptions)
+// ---------------------------------------------------------------------------------------------------------------------
+// LINE POSITIONING ----------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 
-// shared
-sessionLevelsLineExtend = input(extend.none, 'Sessions Levels', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
-sessionHighLowLineStyle = input(line.style_solid, 'Line Style - Session HL', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+lineOffset = input(24, 'Line Offset', group=groupLinesAndLabels, inline=inlinePositioning)
+lineLength = input(0, 'Line Length', group=groupLinesAndLabels, inline=inlinePositioning)
+labelOffsetOne = input(5, 'Label Offset 1', group=groupLinesAndLabels, inline=inlinePositioning)
+labelOffsetTwo = input(9, 'Label Offset 2', group=groupLinesAndLabels, inline=inlinePositioning)
+labelOffsetThree = input(9, 'Label Offset 3', group=groupLinesAndLabels, inline=inlinePositioning)
+lineWidth = input(1, 'Line Width', group=groupLinesAndLabels, options=[1,2,3,4], inline=inlinePositioning)
+sessionLabelStyle = input(label.style_none, 'Session Label Style', group=groupLinesAndLabels, inline=inlinePositioning, options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
+sessionLabelOpacity = input(70, 'Label Opacity', group=groupLinesAndLabels, inline=inlinePositioning, minval=0, maxval=100)
+sessionLabelSize = input(size.normal, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupLinesAndLabels, inline=inlinePositioning)
+
+// ---------------------------------------------------------------------------------------------------------------------
+// OPTIONS ----------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+
+isFixedToPrice = input(false, 'Lines Fixed to Price?', group=groupOptions, inline=groupOptions)
+extendAll = input(false, 'Extend All', group=groupOptions, inline=groupOptions)
+extendNone = input(false, 'Extend None', group=groupOptions, inline=groupOptions)
+allWhiteLabelText = input(false, 'All White Label Text', group=groupOptions, inline=groupOptions)
+showPriceInLabel = input(false, 'Show Price in Label?', group=groupOptions, inline=groupOptions)
+
+// ---------------------------------------------------------------------------------------------------------------------
+// DAY, WEEK, MONTH, YEAR ----------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 
 // current day HL
-currentDayColor = input(color.new(#090720, 0), 'Current Day', input.color, group=groupColors, inline=inlineColors)
-lineDailyHLActive = input(true, 'Current Day HL', group=groupSwitches, inline=groupSwitches)
-currentDayHLExtend = input(extend.right, 'Current Day HL', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
-currentDayHLLineStyle = input(line.style_dotted, 'Line Style - Daily HL', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+currentDayColor = input(color.new(#090720, 0), 'dH, dL', input.color, group=groupColors, inline=inlineColors)
+lineDailyHLActive = input(true, 'dH, dL', group=groupSwitches, inline=groupSwitches)
+currentDayHLExtend = input(extend.right, 'dH, dL', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+currentDayHLLineStyle = input(line.style_dotted, 'dH, dL', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
 // daily open
-dailyOpenColor = input(color.new(COLOR_VOLT, 0), 'Daily Open', input.color, group=groupColors, inline=inlineColors)
-lineDailyOpenActive = input(true, 'Daily Open', group=groupSwitches, inline=groupSwitches)
-dailyOpenExtend = input(extend.right, 'Daily Open', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
-dailyOpenLineStyle = input(line.style_solid, 'Line Style - Daily Open', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+dailyOpenColor = input(color.new(COLOR_VOLT, 0), 'dO', input.color, group=groupColors, inline=inlineColors)
+lineDailyOpenActive = input(true, 'dO', group=groupSwitches, inline=groupSwitches)
+dailyOpenExtend = input(extend.right, 'dO', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+dailyOpenLineStyle = input(line.style_solid, 'dO', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
 // current week HL
-currentWeekColor = input(color.new(#787b86, 0), 'Current Week', input.color, group=groupColors, inline=inlineColors)
-lineCurrentWeekHLActive = input(true, 'Current Week HL', group=groupSwitches, inline=groupSwitches)
-currentWeekHLExtend = input(extend.right, 'Current Week HL', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
-currentWeekHLLineStyle = input(line.style_dotted, 'Line Style - Current Week HL', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+currentWeekColor = input(color.new(#00bcd4, 0), 'wO, wH, wL', input.color, group=groupColors, inline=inlineColors)
+lineCurrentWeekHLActive = input(true, 'wH, wL', group=groupSwitches, inline=groupSwitches)
+currentWeekHLExtend = input(extend.right, 'wH, wL', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+currentWeekHLLineStyle = input(line.style_dotted, 'wH, wL', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
 // week open
-lineWeekOpenActive = input(true, 'Week Open', group=groupSwitches, inline=groupSwitches)
-weekOpenExtend = input(extend.right, 'Week Open', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
-weekOpenLineStyle = input(line.style_solid, 'Line Style - Week Open', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+lineWeekOpenActive = input(true, 'wO', group=groupSwitches, inline=groupSwitches)
+weekOpenExtend = input(extend.right, 'wO', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+weekOpenLineStyle = input(line.style_solid, 'wO', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
 // month open
-currentMonthColor = input(color.new(#c945ff, 0), 'Current Month', input.color, group=groupColors, inline=inlineColors)
-lineMonthOpenActive = input(true, 'Month Open', group=groupSwitches, inline=groupSwitches)
-monthOpenExtend = input(extend.right, 'Month Open', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
-monthOpenLineStyle = input(line.style_solid, 'Line Style - Month Open', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+currentMonthColor = input(color.new(#d612f8, 0), 'mO, mH, mL', input.color, group=groupColors, inline=inlineColors)
+lineMonthOpenActive = input(true, 'mO', group=groupSwitches, inline=groupSwitches)
+monthOpenExtend = input(extend.right, 'mO', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+monthOpenLineStyle = input(line.style_solid, 'mO', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
 // year open
-currentYearColor = input(color.new(#db3333, 0), 'Current Year', input.color, group=groupColors, inline=inlineColors)
-lineYearOpenActive = input(true, 'Month Open', group=groupSwitches, inline=groupSwitches)
-yearOpenExtend = input(extend.right, 'Year Open', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
-yearOpenLineStyle = input(line.style_solid, 'Line Style - Year Open', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+currentYearColor = input(color.new(#db3333, 0), 'yO, yH, yL', input.color, group=groupColors, inline=inlineColors)
+lineYearOpenActive = input(true, 'yO', group=groupSwitches, inline=groupSwitches)
+yearOpenExtend = input(extend.right, 'yO', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+yearOpenLineStyle = input(line.style_solid, 'yO', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
 // yesterday
-lineYesterdayActive = input(true, 'Yesterday HL', group=groupSwitches, inline=groupSwitches)
-yesterdayColor = input(color.new(#090720, 0), 'Yesterday', group=groupColors, inline=inlineColors)
-yesterdayExtend = input(extend.none, 'Yesterday', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
-yesterdayLineStyle = input(line.style_dotted, 'Line Style - Yesterday', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+lineYesterdayActive = input(true, 'pdH, pdL', group=groupSwitches, inline=groupSwitches)
+yesterdayColor = input(color.new(#787b86, 0), 'pd', group=groupColors, inline=inlineColors)
+yesterdayExtend = input(extend.none, 'pd', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+yesterdayLineStyle = input(line.style_dotted, 'pd', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
 // last week
-lastWeekColor = input(color.new(#787b86, 50), 'Last Week', group=groupColors, inline=inlineColors)
-lineLastWeekActive = input(true, 'Last Week HL', group=groupSwitches, inline=groupSwitches)
-lastWeekExtend = input(extend.none, 'Last Week', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
-lastWeekLineStyle = input(line.style_dotted, 'Line Style - Last Week', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+lastWeekColor = input(color.new(#787b86, 20), 'pwH, pwL', group=groupColors, inline=inlineColors)
+lineLastWeekActive = input(true, 'pw', group=groupSwitches, inline=groupSwitches)
+lastWeekExtend = input(extend.none, 'pw', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+lastWeekLineStyle = input(line.style_dotted, 'pw', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+
+// ---------------------------------------------------------------------------------------------------------------------
+// VOLATILITY ----------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 
 // ADR
-// adrColor = input(color.new(color.blue, 0), 'ADR', group=groupColors, inline=inlineColors)
-lineAdrActive = input(true, 'ADR HL', group=groupSwitches, inline=groupSwitches)
-adrExtend = input(extend.right, 'ADR', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
-adrLineStyle = input(line.style_solid, 'Line Style - ADR', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLineStyle)
+// adrColor = input(color.new(color.blue, 0), 'RDH, RDL', group=groupColors, inline=inlineColors)
+lineAdrActive = input(true, 'RDH, RDL', group=groupSwitches, inline=groupSwitches)
+adrExtend = input(extend.right, 'ADR', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+adrLineStyle = input(line.style_solid, 'ADR', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLineStyle, inline=groupLineStyle)
 
 // AWR
 lineAwrActive = input(false, 'AWR HL', group=groupSwitches, inline=groupSwitches)
-awrExtend = input(extend.right, 'AWR', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
+awrExtend = input(extend.right, 'AWR', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
 // awrColor = input(color.new(color.green, 0), 'AWR', group=groupColors, inline=inlineColors)
-awrLineStyle = input(line.style_solid, 'Line Style - AWR', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLineStyle)
+awrLineStyle = input(line.style_solid, 'AWR', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLineStyle, inline=groupLineStyle)
 
 // AMR
 lineAmrActive = input(false, 'AMR HL', group=groupSwitches, inline=groupSwitches)
-amrExtend = input(extend.right, 'AMR', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
+amrExtend = input(extend.right, 'AMR', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
 amrColor = input(color.new(#ab47bc, 30), 'AMR', group=groupColors, inline=inlineColors)
-amrLineStyle = input(line.style_solid, 'Line Style - AMR', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLineStyle)
+amrLineStyle = input(line.style_solid, 'AMR', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLineStyle, inline=groupLineStyle)
 
-// 50 EMA Hourly
-lineHourlyEmaActive = input(true, '50 EMA Hourly', group=groupSwitches, inline=groupSwitches)
-hourlyEmaExtend = input(extend.none, '50 EMA Hourly', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
-hourlyEmaColor = input(color.new(#00bcd4, 0), 'Hourly 50 EMA', group=groupColors, inline=inlineColors)
-hourlyEmaLineStyle = input(line.style_dashed, 'Line Style - 50 EMA Hourly', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLineStyle)
+// ---------------------------------------------------------------------------------------------------------------------
+// MOVING AVERAGES -----------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 
-// 20 SMA Daily
-// dailySmaColor = input(color.new(color.blue, 0), 'Daily 20 SMA', group=groupColors, inline=inlineColors)
-lineDailySmaActive = input(true, '20 SMA Daily', group=groupSwitches, inline=groupSwitches)
-dailySmaExtend = input(extend.none, '20 SMA Daily', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
-dailySmaLineStyle = input(line.style_dashed, 'Line Style - 20 SMA Daily', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLineStyle)
+// 50h
+lineHourlyEmaActive = input(true, '50h', group=groupSwitches, inline=groupSwitches)
+hourlyEmaExtend = input(extend.none, '50h', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+hourlyEmaColor = input(color.new(#1592e6, 0), '50h', group=groupColors, inline=inlineColors)
+hourlyEmaLineStyle = input(line.style_dashed, '50h', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLineStyle, inline=groupLineStyle)
 
-// 20 SMA Weekly
-// weeklySmaColor = input(color.new(color.green, 0), 'Weekly 20 SMA', group=groupColors, inline=inlineColors)
-lineWeeklySmaActive = input(true, '20 SMA Weekly', group=groupSwitches, inline=groupSwitches)
-weeklySmaExtend = input(extend.none, '20 SMA Weekly', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
-weeklySmaLineStyle = input(line.style_dashed, 'Line Style - 20 SMA Weekly', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLineStyle)
+// 20d
+// dailySmaColor = input(color.new(color.blue, 0), '20d', group=groupColors, inline=inlineColors)
+lineDailySmaActive = input(true, '20d', group=groupSwitches, inline=groupSwitches)
+dailySmaExtend = input(extend.none, '20d', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+dailySmaLineStyle = input(line.style_dashed, '20d', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLineStyle, inline=groupLineStyle)
+
+// 20w
+// weeklySmaColor = input(color.new(color.green, 0), '20w', group=groupColors, inline=inlineColors)
+lineWeeklySmaActive = input(true, '20w', group=groupSwitches, inline=groupSwitches)
+weeklySmaExtend = input(extend.none, '20w', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+weeklySmaLineStyle = input(line.style_dashed, '20w', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLineStyle, inline=groupLineStyle)
+
+// ---------------------------------------------------------------------------------------------------------------------
+// KEY LEVELS-----------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+
+// PSY
+linePsyLevelsActive = input(true, 'Psy', group=groupSwitches, inline=groupSwitches)
+psyLineExtend = input(extend.right, 'Psy', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+psyColor = input(color.new(COLOR_GOLD, 20), 'Psy', input.color, group=groupColors, inline=inlineColors)
+psyLineStyle = input(line.style_solid, 'Psy', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+
+// ATH
+lineAthActive = input(true, 'ATH', group=groupSwitches, inline=groupSwitches)
+athLineExtend = input(extend.both, 'ATH', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+athColor = input(color.new(COLOR_GOLD, 10), 'ATH', input.color, group=groupColors, inline=inlineColors)
+athLineStyle = input(line.style_dashed, 'ATH', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+
+// ---------------------------------------------------------------------------------------------------------------------
+// SESSION LEVELS ------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+
+// shared
+sessionLevelsLineExtend = input(extend.none, 'Sessions Levels', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+sessionHighLowLineStyle = input(line.style_solid, 'Session HL', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
 // asia
 lineAsiaOpenActive = input(false, 'Asia Open', group=groupSwitches, inline=groupSwitches)
 lineAsiaHLActive = input(false, 'Asia HL', group=groupSwitches, inline=groupSwitches)
-asiaOpenLineExtend = input(extend.none, 'Asia Open', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
+asiaOpenLineExtend = input(extend.none, 'Asia Open', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
 asiaColor = input(#00796b, 'Asia', input.color, group=groupColors, inline=inlineColors)
-asiaOpenLineStyle = input(line.style_solid, 'Line Style - Asia Open', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+asiaOpenLineStyle = input(line.style_solid, 'Asia Open', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
 // london
 lineLondonOpenActive = input(false, 'London Open', group=groupSwitches, inline=groupSwitches)
 lineLondonHLActive = input(false, 'London HL', group=groupSwitches, inline=groupSwitches)
 londonColor = input(COLOR_MAGENTA_WEAK, 'London', input.color, group=groupColors, inline=inlineColors)
-londonOpenLineStyle = input(line.style_solid, 'Line Style - London Open', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+londonOpenLineStyle = input(line.style_solid, 'London Open', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
 // new york
 lineNyHLActive = input(false, 'NY HL', group=groupSwitches, inline=groupSwitches)
 lineNyOpenActive = input(false, 'NY Open', group=groupSwitches, inline=groupSwitches)
 nyColor = input(#880e4f, 'New York', input.color, group=groupColors, inline=inlineColors)
-nyOpenLineStyle = input(line.style_solid, 'Line Style - NY Open', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
-
-// psy
-linePsyLevelsActive = input(true, 'Psy Levels', group=groupSwitches, inline=groupSwitches)
-psyLineExtend = input(extend.right, 'Psy Levels', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
-psyColor = input(color.new(COLOR_GOLD, 20), 'Psy Levels', input.color, group=groupColors, inline=inlineColors)
-psyLineStyle = input(line.style_solid, 'Line Style - Psy Levels', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
-
-// ATH
-lineAthActive = input(true, 'ATH', group=groupSwitches, inline=groupSwitches)
-athLineExtend = input(extend.both, 'ATH', options=[extend.none, extend.left, extend.right, extend.both], group=groupExtend)
-athColor = input(color.new(COLOR_GOLD, 10), 'ATH', input.color, group=groupColors, inline=inlineColors)
-athLineStyle = input(line.style_dashed, 'Line Style - ATH', group=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
-
-// line style
-lineOffset = input(5, 'Line Offset', group=groupLineStyle, inline=inlinePositioning)
-lineLength = input(10, 'Line Length', group=groupLineStyle, inline=inlinePositioning)
-labelOffsetOne = input(8, 'Label Offset 1', group=groupLineStyle, inline=inlinePositioning)
-labelOffsetTwo = input(9, 'Label Offset 2', group=groupLineStyle, inline=inlinePositioning)
-labelOffsetThree = input(9, 'Label Offset 3', group=groupLineStyle, inline=inlinePositioning)
-lineWidth = input(1, 'Line Width', group=groupLineStyle, options=[1,2,3,4], inline=inlinePositioning)
-
-// labels
-allWhiteLabelText = input(true, 'All White Label Text', group=groupLabels)
-sessionLabelStyle = input(label.style_none, 'Session Label Style', group=groupLabels, options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
-sessionLabelOpacity = input(70, 'Label Opacity', group=groupLabels, minval=0, maxval=100)
-sessionLabelSize = input(size.normal, 'Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large], group=groupLabels)
-showPriceInLabel = input(false, 'Show Price in Label?', group=groupOptions)
+nyOpenLineStyle = input(line.style_solid, 'NY Open', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
 // time ranges
 asiaOpenTimeRange = input('2100-2045:1234567', 'Asia Open', group=groupTimeRanges, type=input.session) // use this for the Asia Open only

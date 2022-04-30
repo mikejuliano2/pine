@@ -44,7 +44,7 @@ overlayLineWidth = input(2, 'Line Width', group=groupOverlay, options=[1,2,3,4])
 
 // COLORS
 
-selectedTemplate = input(0, 'Template', options=[0,1,2,3], group=groupColors, tooltip="use color picker below if 0")
+selectedTemplate = input(2, 'Template', options=[0,1,2,3], group=groupColors, tooltip="use color picker below if 0")
 overrideOpacity = input(0, 'Override Opacity', group=groupColors, minval=0, maxval=100, step=1)
 climaxVolBullColor = input(color.green, 'Climax Bull Color', group=groupColors)
 climaxVolBearColor = input(#b22833, 'Climax Bear Color', group=groupColors)
@@ -87,7 +87,7 @@ if selectedTemplate == 1
 else if selectedTemplate == 2
     // climaxVolBullColor := color.new(#1d8634, 50)
     climaxVolBullColor := color.new(#16864f, 50)
-    climaxVolBearColor := color.new(#b12a35, 50)
+    climaxVolBearColor := color.new(#8a294a, 50)
     aboveAvgVolBullColor := color.new(#2962ff, 50)
     aboveAvgVolBearColor := color.new(#793be4, 50)
     standardVolBullColor := color.new(#363e57, 50)
