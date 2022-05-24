@@ -3,13 +3,14 @@ study("MJ - ATR", overlay=true)
 
 //Plot ATR for placing stop loss
 
-length = input(14, title="ATR Period", minval=1)
+length = input(5, title="ATR Period", minval=1)
 smoothing = input(title="Smoothing", defval="RMA", options=["RMA", "SMA", "EMA", "WMA"])
 
 groupMultipliers = 'Multipliers'
-multiplierOne = input(1, '1', minval=.01, maxval=100, step=0.1, inline=groupMultipliers, group=groupMultipliers)
-multiplierTwo = input(1.5, '2', minval=.01, maxval=100, step=0.1, inline=groupMultipliers, group=groupMultipliers)
-multiplierThree = input(2, '3', minval=.01, maxval=100, step=0.1, inline=groupMultipliers, group=groupMultipliers)
+
+multiplierOne = 1
+multiplierTwo = input(2, '2', minval=.01, maxval=100, step=0.1, inline=groupMultipliers, group=groupMultipliers)
+multiplierThree = input(3, '3', minval=.01, maxval=100, step=0.1, inline=groupMultipliers, group=groupMultipliers)
 
 tblPos = input(
   title="Position on Chart",
@@ -51,6 +52,44 @@ highValThree = high + atrThree
 lowValOne = low - atrOne
 lowValTwo = low - atrTwo
 lowValThree = low - atrThree
+
+
+// /////////////////////////////////////////////////////////
+//
+// --- High Volatility ---
+//
+// /////////////////////////////////////////////////////////
+
+groupVolatility = 'Volatility'
+plotHighVolatilityMarkers = input(true, 'Show Markers', inline=groupVolatility, group=groupVolatility)
+percentInput = input(50, 'Length', minval=2, maxval=100, step=1, inline=groupVolatility, group=groupVolatility)
+highVolColor = input(color.new(#f7525f, 50), 'High', inline=groupVolatility, group=groupVolatility)
+lowVolColor = input(color.new(#787b86, 50), 'Low', inline=groupVolatility, group=groupVolatility)
+volMarkerPosition = input(location.bottom, 'Position', options=[location.top, location.bottom], inline=groupVolatility, group=groupVolatility)
+
+currentAtrPercentage = (catr / close) * 100
+averageAtrPercentage = sma(currentAtrPercentage, percentInput)
+volatilityAverage = sma(catr, percentInput)
+isHighVolatility = currentAtrPercentage > averageAtrPercentage
+
+plotshape(
+  plotHighVolatilityMarkers and not isHighVolatility,
+  title="Volatility Low",
+  style=shape.circle,
+  location=volMarkerPosition,
+  size=size.tiny,
+  color=lowVolColor
+  )
+
+plotshape(
+  plotHighVolatilityMarkers and isHighVolatility,
+  title="Volatility High",
+  style=shape.circle,
+  location=volMarkerPosition,
+  size=size.tiny,
+  color=highVolColor
+  )
+
 
 // /////////////////////////////////////////////////////////
 //
@@ -134,7 +173,7 @@ table.cell(
   row=1,
   column=1,
   text=_formatValue(atrOne),
-  text_color=cellTextColor,
+  text_color=isHighVolatility ? color.new(highVolColor, 0) : cellTextColor,
   text_halign=text.align_right,
   text_valign=text.align_center
   )
@@ -257,9 +296,9 @@ _getTimeNBarsFromNow(numBars) => numBars > 0 ? _getFutureTimeNBarsFromNow(numBar
 
 groupLabels = 'Labels'
 labelsActive = input(true, 'Active', inline=groupLabels, group=groupLabels)
-labelTextColor = input(color.new(#ffcc80, 20), 'Color', inline=groupLabels)
-labelOffset = input(7, 'Offset', inline=groupLabels)
-labelSize = input(size.large, 'Size', options=[size.auto, size.tiny, size.small, size.normal, size.large, size.huge], group=groupLabels, inline=groupLabels)
+labelTextColor = input(color.new(#787b86, 20), 'Color', inline=groupLabels)
+labelOffset = input(60, 'Offset', inline=groupLabels)
+labelSize = input(size.normal, 'Size', options=[size.auto, size.tiny, size.small, size.normal, size.large, size.huge], group=groupLabels, inline=groupLabels)
 
 _drawLabels(multiplier, highVal, lowVal) =>
     labelTime = _getTimeNBarsFromNow(labelOffset)

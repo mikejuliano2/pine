@@ -134,11 +134,11 @@ string TT_LB = "The number of days back to plot the session levels"
 // LINE POSITIONING ----------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 
-lineOffset = input(24, 'Line Offset', group=groupLinesAndLabels, inline=inlinePositioning)
+lineOffset = input(8, 'Line Offset', group=groupLinesAndLabels, inline=inlinePositioning)
 lineLength = input(0, 'Line Length', group=groupLinesAndLabels, inline=inlinePositioning)
 labelOffsetOne = input(5, 'Label Offset 1', group=groupLinesAndLabels, inline=inlinePositioning)
-labelOffsetTwo = input(9, 'Label Offset 2', group=groupLinesAndLabels, inline=inlinePositioning)
-labelOffsetThree = input(9, 'Label Offset 3', group=groupLinesAndLabels, inline=inlinePositioning)
+labelOffsetTwo = input(5, 'Label Offset 2', group=groupLinesAndLabels, inline=inlinePositioning)
+labelOffsetThree = input(5, 'Label Offset 3', group=groupLinesAndLabels, inline=inlinePositioning)
 lineWidth = input(1, 'Line Width', group=groupLinesAndLabels, options=[1,2,3,4], inline=inlinePositioning)
 sessionLabelStyle = input(label.style_none, 'Session Label Style', group=groupLinesAndLabels, inline=inlinePositioning, options=[label.style_none, label.style_label_up, label.style_label_upper_right, label.style_label_right, label.style_label_lower_right, label.style_label_down, label.style_label_lower_left, label.style_label_left, label.style_label_upper_left, label.style_label_center, label.style_triangleup, label.style_triangledown, label.style_arrowup, label.style_arrowdown, label.style_xcross, label.style_cross, label.style_flag, label.style_circle])
 sessionLabelOpacity = input(70, 'Label Opacity', group=groupLinesAndLabels, inline=inlinePositioning, minval=0, maxval=100)
@@ -158,52 +158,81 @@ showPriceInLabel = input(false, 'Show Price in Label?', group=groupOptions, inli
 // DAY, WEEK, MONTH, YEAR ----------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 
-// current day HL
-currentDayColor = input(color.new(#090720, 0), 'dH, dL', input.color, group=groupColors, inline=inlineColors)
-lineDailyHLActive = input(true, 'dH, dL', group=groupSwitches, inline=groupSwitches)
-currentDayHLExtend = input(extend.right, 'dH, dL', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
-currentDayHLLineStyle = input(line.style_dotted, 'dH, dL', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+// -------------------------
+// --- DAY ---
+// -------------------------
 
-// daily open
+// dO
 dailyOpenColor = input(color.new(COLOR_VOLT, 0), 'dO', input.color, group=groupColors, inline=inlineColors)
 lineDailyOpenActive = input(true, 'dO', group=groupSwitches, inline=groupSwitches)
 dailyOpenExtend = input(extend.right, 'dO', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
 dailyOpenLineStyle = input(line.style_solid, 'dO', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
-// current week HL
-currentWeekColor = input(color.new(#00bcd4, 0), 'wO, wH, wL', input.color, group=groupColors, inline=inlineColors)
-lineCurrentWeekHLActive = input(true, 'wH, wL', group=groupSwitches, inline=groupSwitches)
-currentWeekHLExtend = input(extend.right, 'wH, wL', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
-currentWeekHLLineStyle = input(line.style_dotted, 'wH, wL', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+// dH, dL
+currentDayColor = input(color.new(#090720, 0), 'dH, dL', input.color, group=groupColors, inline=inlineColors)
+lineDailyHLActive = input(true, 'dH, dL', group=groupSwitches, inline=groupSwitches)
+currentDayHLExtend = input(extend.right, 'dH, dL', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+currentDayHLLineStyle = input(line.style_dotted, 'dH, dL', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
-// week open
-lineWeekOpenActive = input(true, 'wO', group=groupSwitches, inline=groupSwitches)
-weekOpenExtend = input(extend.right, 'wO', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
-weekOpenLineStyle = input(line.style_solid, 'wO', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
-
-// month open
-currentMonthColor = input(color.new(#d612f8, 0), 'mO, mH, mL', input.color, group=groupColors, inline=inlineColors)
-lineMonthOpenActive = input(true, 'mO', group=groupSwitches, inline=groupSwitches)
-monthOpenExtend = input(extend.right, 'mO', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
-monthOpenLineStyle = input(line.style_solid, 'mO', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
-
-// year open
-currentYearColor = input(color.new(#db3333, 0), 'yO, yH, yL', input.color, group=groupColors, inline=inlineColors)
-lineYearOpenActive = input(true, 'yO', group=groupSwitches, inline=groupSwitches)
-yearOpenExtend = input(extend.right, 'yO', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
-yearOpenLineStyle = input(line.style_solid, 'yO', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
-
-// yesterday
+// pdH, pdL
 lineYesterdayActive = input(true, 'pdH, pdL', group=groupSwitches, inline=groupSwitches)
 yesterdayColor = input(color.new(#787b86, 0), 'pd', group=groupColors, inline=inlineColors)
 yesterdayExtend = input(extend.none, 'pd', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
 yesterdayLineStyle = input(line.style_dotted, 'pd', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
 
-// last week
-lastWeekColor = input(color.new(#787b86, 20), 'pwH, pwL', group=groupColors, inline=inlineColors)
+// -------------------------
+// --- WEEK ---
+// -------------------------
+
+// wO
+currentWeekColor = input(color.new(#00bcd4, 0), 'wO, wH, wL', input.color, group=groupColors, inline=inlineColors)
+lineWeekOpenActive = input(true, 'wO', group=groupSwitches, inline=groupSwitches)
+weekOpenExtend = input(extend.right, 'wO', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+weekOpenLineStyle = input(line.style_solid, 'wO', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+
+// wH, wL
+lineCurrentWeekHLActive = input(true, 'wH, wL', group=groupSwitches, inline=groupSwitches)
+currentWeekHLExtend = input(extend.none, 'wH, wL', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+currentWeekHLLineStyle = input(line.style_dotted, 'wH, wL', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+
+// pwH, pwL
+lastWeekColor = input(color.new(color.green, 0), 'pwH, pwL', group=groupColors, inline=inlineColors)
 lineLastWeekActive = input(true, 'pw', group=groupSwitches, inline=groupSwitches)
 lastWeekExtend = input(extend.none, 'pw', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
 lastWeekLineStyle = input(line.style_dotted, 'pw', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+
+
+// -------------------------
+// --- MONTH ---
+// -------------------------
+
+// mO
+currentMonthColor = input(color.new(#d612f8, 0), 'mO, mH, mL', input.color, group=groupColors, inline=inlineColors)
+lineMonthOpenActive = input(true, 'mO', group=groupSwitches, inline=groupSwitches)
+monthOpenExtend = input(extend.right, 'mO', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+monthOpenLineStyle = input(line.style_solid, 'mO', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+
+// mH, mL
+lineCurrentMonthHLActive = input(true, 'mH, mL', group=groupSwitches, inline=groupSwitches)
+currentMonthHLExtend = input(extend.none, 'mH, mL', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+currentMonthHLLineStyle = input(line.style_dotted, 'mH, mL', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+
+// pmH, pmL
+lastMonthColor = input(color.new(#d855ef, 0), 'pmH, pmL', group=groupColors, inline=inlineColors)
+lineLastMonthActive = input(true, 'pm', group=groupSwitches, inline=groupSwitches)
+lastMonthExtend = input(extend.none, 'pm', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+lastMonthLineStyle = input(line.style_dotted, 'pm', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+
+// -------------------------
+// --- YEAR ---
+// -------------------------
+
+// yO
+currentYearColor = input(color.new(#db3333, 0), 'yO, yH, yL', input.color, group=groupColors, inline=inlineColors)
+lineYearOpenActive = input(true, 'yO', group=groupSwitches, inline=groupSwitches)
+yearOpenExtend = input(extend.right, 'yO', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
+yearOpenLineStyle = input(line.style_solid, 'yO', group=groupLineStyle, inline=groupLineStyle, options=[line.style_solid, line.style_dashed, line.style_dotted])
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // VOLATILITY ----------------------------------------------------------------------------------------------------------
@@ -234,17 +263,17 @@ amrLineStyle = input(line.style_solid, 'AMR', options=[line.style_solid, line.st
 // 50h
 lineHourlyEmaActive = input(true, '50h', group=groupSwitches, inline=groupSwitches)
 hourlyEmaExtend = input(extend.none, '50h', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
-hourlyEmaColor = input(color.new(#1592e6, 0), '50h', group=groupColors, inline=inlineColors)
+color50h = input(color.new(#e65100, 0), '50h', group=groupColors, inline=inlineColors)
 hourlyEmaLineStyle = input(line.style_dashed, '50h', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLineStyle, inline=groupLineStyle)
 
 // 20d
-// dailySmaColor = input(color.new(color.blue, 0), '20d', group=groupColors, inline=inlineColors)
+color20d = input(color.new(#1592e6, 0), '20d', group=groupColors, inline=inlineColors)
 lineDailySmaActive = input(true, '20d', group=groupSwitches, inline=groupSwitches)
 dailySmaExtend = input(extend.none, '20d', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
 dailySmaLineStyle = input(line.style_dashed, '20d', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLineStyle, inline=groupLineStyle)
 
 // 20w
-// weeklySmaColor = input(color.new(color.green, 0), '20w', group=groupColors, inline=inlineColors)
+color20w = input(color.new(color.green, 0), '20w', group=groupColors, inline=inlineColors)
 lineWeeklySmaActive = input(true, '20w', group=groupSwitches, inline=groupSwitches)
 weeklySmaExtend = input(extend.none, '20w', options=[extend.none, extend.left, extend.right, extend.both], inline=groupExtend, group=groupExtend)
 weeklySmaLineStyle = input(line.style_dashed, '20w', options=[line.style_solid, line.style_dashed, line.style_dotted], group=groupLineStyle, inline=groupLineStyle)
@@ -455,6 +484,8 @@ yesterdayHigh = security(syminfo.tickerid, 'D', high[1], lookahead=true)
 yesterdayLow = security(syminfo.tickerid, 'D', low[1], lookahead=true)
 lastWeekHigh = security(syminfo.tickerid, 'W', high[1], lookahead=true)
 lastWeekLow = security(syminfo.tickerid, 'W', low[1], lookahead=true)
+lastMonthHigh = security(syminfo.tickerid, 'M', high[1], lookahead=true)
+lastMonthLow = security(syminfo.tickerid, 'M', low[1], lookahead=true)
 
 _50EmaHourly() => security(syminfo.tickerid, '60', ema(close, 50),lookahead=barmerge.lookahead_on)
 _20SmaDaily() => security(syminfo.tickerid, 'D', sma(close, 20),lookahead=barmerge.lookahead_on)
@@ -835,6 +866,40 @@ _drawSessionLines(linesArray) =>
          labelOffsetInBars=_offsetTwo, 
          showPrice=showPriceInLabel)
     
+    _currentMonthLowLineId = _drawLabelledLine(
+         x1=x1, 
+         x2=x2, 
+         y=lineCurrentMonthHLActive ? monthLow : na, 
+         _color=_getLineColor(currentMonthColor, lineCurrentMonthHLActive), 
+         _width=lineWidth, 
+         _style=currentMonthHLLineStyle, 
+         _extend=currentMonthHLExtend, 
+         labelText='mL',
+         labelStyle=sessionLabelStyle, 
+         labelColor=currentMonthColor, 
+         labelTextColor=_getLabelTextColor(currentMonthColor, lineCurrentMonthHLActive), 
+         labelSize=labelSize, 
+         showLabel=labelVisible, 
+         labelOffsetInBars=_offsetThree,
+         showPrice=showPriceInLabel)
+
+    _currentMonthHighLineId = _drawLabelledLine(
+         x1=x1,
+         x2=x2,
+         y=lineCurrentMonthHLActive ? monthHigh : na,
+         _color=_getLineColor(currentMonthColor, lineCurrentMonthHLActive),
+         _width=lineWidth,
+         _style=currentMonthHLLineStyle,
+         _extend=currentMonthHLExtend,
+         labelText='mH',
+         labelStyle=sessionLabelStyle,
+         labelColor=currentMonthColor,
+         labelTextColor=_getLabelTextColor(currentMonthColor, lineCurrentMonthHLActive),
+         labelSize=labelSize,
+         showLabel=labelVisible,
+         labelOffsetInBars=_offsetThree,
+         showPrice=showPriceInLabel)
+    
     _currentWeekOpenLineId = _drawLabelledLine(
          x1=x1, 
          x2=x2, 
@@ -849,7 +914,7 @@ _drawSessionLines(linesArray) =>
          labelTextColor=_getLabelTextColor(currentWeekColor, lineWeekOpenActive), 
          labelSize=labelSize, 
          showLabel=labelVisible, 
-         labelOffsetInBars=_offsetTwo, 
+         labelOffsetInBars=_offsetTwo,
          showPrice=showPriceInLabel)
 
     _currentMonthOpenLineId = _drawLabelledLine(
@@ -866,7 +931,7 @@ _drawSessionLines(linesArray) =>
          labelTextColor=_getLabelTextColor(currentMonthColor, lineMonthOpenActive),
          labelSize=labelSize,
          showLabel=labelVisible,
-         labelOffsetInBars=_offsetTwo,
+         labelOffsetInBars=_offsetThree,
          showPrice=showPriceInLabel)
     
     _currentYearOpenLineId = _drawLabelledLine(
@@ -883,7 +948,7 @@ _drawSessionLines(linesArray) =>
          labelTextColor=_getLabelTextColor(currentYearColor, lineYearOpenActive),
          labelSize=labelSize,
          showLabel=labelVisible,
-         labelOffsetInBars=_offsetTwo,
+         labelOffsetInBars=_offsetThree,
          showPrice=showPriceInLabel)
          
     _lastWeekHighLineId = _drawLabelledLine(
@@ -918,6 +983,40 @@ _drawSessionLines(linesArray) =>
          labelSize=labelSize, 
          showLabel=labelVisible, 
          labelOffsetInBars=_offsetTwo, 
+         showPrice=showPriceInLabel)
+         
+    _lastMonthHighLineId = _drawLabelledLine(
+         x1=x1, 
+         x2=x2, 
+         y=lineLastMonthActive ? lastMonthHigh : na, 
+         _color=_getLineColor(lastMonthColor, lineLastMonthActive), 
+         _width=lineWidth, 
+         _style=lastMonthLineStyle, 
+         _extend=lastMonthExtend, 
+         labelText='pmH', 
+         labelStyle=sessionLabelStyle, 
+         labelColor=lastMonthColor, 
+         labelTextColor=_getLabelTextColor(lastMonthColor, lineLastMonthActive), 
+         labelSize=labelSize, 
+         showLabel=labelVisible, 
+         labelOffsetInBars=_offsetThree,
+         showPrice=showPriceInLabel)
+         
+    _lastMonthLowLineId = _drawLabelledLine(
+         x1=x1, 
+         x2=x2, 
+         y=lineLastMonthActive ? lastMonthLow : na, 
+         _color=_getLineColor(lastMonthColor, lineLastMonthActive), 
+         _width=lineWidth, 
+         _style=lastMonthLineStyle, 
+         _extend=lastMonthExtend, 
+         labelText='pmL',
+         labelStyle=sessionLabelStyle, 
+         labelColor=lastMonthColor, 
+         labelTextColor=_getLabelTextColor(lastMonthColor, lineLastMonthActive), 
+         labelSize=labelSize, 
+         showLabel=labelVisible, 
+         labelOffsetInBars=_offsetThree,
          showPrice=showPriceInLabel)
     
     _adrHighLineId = _drawLabelledLine(
@@ -1026,14 +1125,14 @@ _drawSessionLines(linesArray) =>
          x1=x1, 
          x2=x2, 
          y=lineHourlyEmaActive ? _50EmaHourly() : na, 
-         _color=_getLineColor(hourlyEmaColor, lineHourlyEmaActive), 
+         _color=_getLineColor(color50h, lineHourlyEmaActive), 
          _width=lineWidth, 
          _style=hourlyEmaLineStyle, 
          _extend=hourlyEmaExtend, 
          labelText='50h', 
          labelStyle=sessionLabelStyle, 
-         labelColor=hourlyEmaColor, 
-         labelTextColor=_getLabelTextColor(hourlyEmaColor, lineHourlyEmaActive), 
+         labelColor=color50h, 
+         labelTextColor=_getLabelTextColor(color50h, lineHourlyEmaActive), 
          labelSize=labelSize, 
          showLabel=labelVisible, 
          labelOffsetInBars=_offsetThree,
@@ -1043,14 +1142,14 @@ _drawSessionLines(linesArray) =>
          x1=x1, 
          x2=x2, 
          y=lineDailySmaActive ? _20SmaDaily() : na, 
-         _color=_getLineColor(yesterdayColor, lineDailySmaActive),
+         _color=_getLineColor(color20d, lineDailySmaActive),
          _width=lineWidth, 
          _style=dailySmaLineStyle, 
          _extend=dailySmaExtend, 
          labelText='20d', 
          labelStyle=sessionLabelStyle, 
-         labelColor=yesterdayColor,
-         labelTextColor=_getLabelTextColor(yesterdayColor, lineDailySmaActive),
+         labelColor=color20d,
+         labelTextColor=_getLabelTextColor(color20d, lineDailySmaActive),
          labelSize=labelSize, 
          showLabel=labelVisible, 
          labelOffsetInBars=_offsetOne,
@@ -1060,14 +1159,14 @@ _drawSessionLines(linesArray) =>
          x1=x1, 
          x2=x2, 
          y=lineWeeklySmaActive ? _20SmaWeekly() : na, 
-         _color=_getLineColor(lastWeekColor, lineWeeklySmaActive),
+         _color=_getLineColor(color20w, lineWeeklySmaActive),
          _width=lineWidth, 
          _style=weeklySmaLineStyle, 
          _extend=weeklySmaExtend, 
          labelText='20w', 
          labelStyle=sessionLabelStyle, 
-         labelColor=lastWeekColor,
-         labelTextColor=_getLabelTextColor(lastWeekColor, lineWeeklySmaActive),
+         labelColor=color20w,
+         labelTextColor=_getLabelTextColor(color20w, lineWeeklySmaActive),
          labelSize=labelSize, 
          showLabel=labelVisible, 
          labelOffsetInBars=_offsetTwo,
@@ -1091,6 +1190,10 @@ _drawSessionLines(linesArray) =>
     array.push(linesArray, _yesterdayLowLineId)
     array.push(linesArray, _lastWeekHighLineId)
     array.push(linesArray, _lastWeekLowLineId)
+    array.push(linesArray, _lastMonthLowLineId)
+    array.push(linesArray, _lastMonthHighLineId)
+    array.push(linesArray, _currentMonthLowLineId)
+    array.push(linesArray, _currentMonthHighLineId)
     array.push(linesArray, _adrHighLineId)
     array.push(linesArray, _adrLowLineId)
     array.push(linesArray, _awrHighLineId)
@@ -1106,4 +1209,3 @@ _drawSessionLines(linesArray) =>
 
 var line[] _lines = array.new_line(0)
 _drawSessionLines(_lines)
-
