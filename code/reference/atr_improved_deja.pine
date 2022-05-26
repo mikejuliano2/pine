@@ -1,0 +1,38 @@
+// This source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
+// © OasisTrading
+
+//@version=4
+study(title="Average True Range - Improved", shorttitle="ATR Improved", overlay=false, resolution="")
+
+length = input(title="Length", defval=5, minval=1)
+smoothing = input(title="Smoothing", defval="RMA", options=["RMA", "SMA", "EMA", "WMA"])
+
+ma_function(source, length) =>
+    if smoothing == "RMA"
+        rma(source, length)
+    else
+        if smoothing == "SMA"
+            sma(source, length)
+        else
+            if smoothing == "EMA"
+                ema(source, length)
+            else
+                wma(source, length)
+
+atrvalue = (ma_function(tr(true), length))
+
+percent = (atrvalue / close) * 100
+
+//percentvalue = input(0.33, title= "Percent Value")
+percentinput = input(50, title="Persent SMA")
+percentvalue = sma(percent,percentinput)
+volatilityAverage = sma(atrvalue, percentinput)
+
+plot(percent, title= "ATR: Percent", style=plot.style_line, linewidth=2, color=#000000, transp=0, display=display.none)
+plot(percentvalue, title = "ATR Average: Percent", style=plot.style_circles, linewidth= 1, color=color.blue, transp=0, display=display.none)
+
+plot(ma_function(tr(true), length), title = "ATR", style=plot.style_area, linewidth= 4, color=#991515, transp=50)
+plot(volatilityAverage, title = "ATR Average", style=plot.style_circles, linewidth= 1, color=#2196F3, transp=0)
+
+plotshape(percent < percentvalue, title="Volatility Low", style=shape.circle, location=location.top, size=size.tiny, color=color.green, transp=50)
+plotshape(percent > percentvalue, title="Volatility High", style=shape.circle, location=location.top, size=size.tiny, color=color.red, transp=50)
