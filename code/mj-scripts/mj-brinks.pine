@@ -63,7 +63,7 @@ _isInSession(timeRange) =>
 _isFirstOrLastFiveMinOfAnyHour() => 
     _isInSession('2355-0005') or _isInSession('0055-0105') or _isInSession('0155-0205') or _isInSession('0255-0305') or _isInSession('0355-0405') or _isInSession('0455-0505') or _isInSession('0555-0605') or _isInSession('0655-0705') or _isInSession('0755-0805') or _isInSession('0855-0905') or _isInSession('0955-1005') or _isInSession('1055-1105') or _isInSession('1155-1205') or _isInSession('1255-1305') or _isInSession('1355-1405') or _isInSession('1455-1505') or _isInSession('1555-1605') or _isInSession('1655-1705') or _isInSession('1755-1805') or _isInSession('1855-1905') or _isInSession('1955-2005') or _isInSession('2055-2105') or _isInSession('2155-2205') or _isInSession('2255-2305')    
 
-_isLastBarForCurrentTimeframeAtResolution(Resolution) =>
+_monthColorBarForCurrentTimeframeAtResolution(Resolution) =>
     t = time(Resolution, session.regular) // e.g. "1440" = Daily Resolution
     not na(t[1]) and na(t) or t[1] < t
 

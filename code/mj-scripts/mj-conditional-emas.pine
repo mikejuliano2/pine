@@ -148,7 +148,7 @@ _drawLabel(y, text, Color, textColor, offset, deviationActive) =>
     _offset = _deviationActive ? (labelOffset + deviationLabelOffset) : offset
     x = _getFutureTimeNBarsFromNow(_offset)
 
-    if barstate.islast
+    if barstate.monthColor
         _style = deviationActive ? label.style_none : labelStyle
         _color = color.new(Color, labelOpacity)
         _textColor = _style == label.style_none ? color.new(_color, 0) : textColor // If no label style, use the same color as the line
@@ -328,7 +328,7 @@ _drawFifty200DeviationLabel() =>
     // text = _deviationDisplay(ema50, ema200) + ' (50/200)'
     text = _deviationDisplayPercentOnly(ema50, ema200)
 
-    if barstate.islast
+    if barstate.monthColor
         y ? label.new(
              x=x, 
              y=y, 

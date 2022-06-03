@@ -246,7 +246,7 @@ if mCandlesActive
 
     // draw the body and wicks for the current candle
 
-    if barstate.islast
+    if barstate.monthColor
         if isNewPeriod
             bodyBox := na
             topWickLine := na

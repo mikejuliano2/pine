@@ -30,22 +30,24 @@ groupMonth = '--- Month ---'
 
 // main
 plotMonthRangeActive = input(true, 'Month HL', inline=inlineMonthMain)
-monthColor = input(color.new(#793be4, 0), 'Month Color', group=groupMonth, inline=inlineMonthMain)
+monthColor = input(color.new(#311b92, 0), 'Month Color', group=groupMonth, inline=inlineMonthMain)
 
 // HL
-monthRangePlotLineWidth = input(4, 'HL Line W', options=[1,2,3,4], group=groupMonth, inline=inlineMonthHL)
-monthRangePlotStyle = input(plot.style_stepline, 'HL Style', options=[plot.style_circles, plot.style_cross, plot.style_stepline], group=groupMonth, inline=inlineMonthHL)
+monthRangePlotLineWidth = input(2, 'HL Line W', options=[1,2,3,4], group=groupMonth, inline=inlineMonthHL)
+monthRangePlotStyle = input(plot.style_linebr, 'HL Style', options=[plot.style_circles, plot.style_cross, plot.style_linebr, plot.style_stepline], group=groupMonth, inline=inlineMonthHL)
 
 // mid
-monthMidPlotLineWidth = input(3, 'Mid Line W', options=[1,2,3,4], group=groupMonth, inline=inlineMonthMid)
-monthMidPlotStyle = input(plot.style_stepline, 'Mid Style', options=[plot.style_circles, plot.style_cross, plot.style_stepline], group=groupMonth, inline=inlineMonthMid)
+monthMidPlotLineWidth = input(1, 'Mid Line W', options=[1,2,3,4], group=groupMonth, inline=inlineMonthMid)
+monthMidPlotStyle = input(plot.style_linebr, 'Mid Style', options=[plot.style_circles, plot.style_cross, plot.style_linebr, plot.style_stepline], group=groupMonth, inline=inlineMonthMid)
 monthMidOpacity = input(0, 'Opacity', step=1, minval=0, maxval=100, group=groupMonth, inline=inlineMonthMid)
 
 [monthHigh, monthLow, monthOpen] = security(syminfo.tickerid, 'M', [high, low, open], lookahead=true)
 monthMid = (monthHigh + monthLow) / 2
 
+isFirstBarOfMonth = monthHigh != monthHigh[1]
+
 monthRangeHighPlot = plot(
-  plotMonthRangeActive and isWithinLookBack ? monthHigh : na,
+  plotMonthRangeActive and isWithinLookBack and not isFirstBarOfMonth ? monthHigh : na,
   "Month High",
   plotMonthRangeActive ? monthColor : na,
   monthRangePlotLineWidth,
@@ -53,7 +55,7 @@ monthRangeHighPlot = plot(
   )
 
 monthRangeLowPlot = plot(
-  plotMonthRangeActive and isWithinLookBack ? monthLow : na,
+  plotMonthRangeActive and isWithinLookBack and not isFirstBarOfMonth ? monthLow : na,
   "Month Low",
   plotMonthRangeActive ? monthColor : na,
   monthRangePlotLineWidth,
@@ -61,9 +63,9 @@ monthRangeLowPlot = plot(
   )
 
 monthMidPlot = plot(
-  plotMonthRangeActive and isWithinLookBack ? monthMid : na,
+  plotMonthRangeActive and isWithinLookBack and not isFirstBarOfMonth ? monthMid : na,
   "Month Mid",
-  plotMonthRangeActive ? color.new(monthColor, 50) : na,
+  plotMonthRangeActive ? color.new(monthColor, monthMidOpacity) : na,
   monthMidPlotLineWidth,
   monthMidPlotStyle
   )
@@ -80,23 +82,25 @@ inlineWeekMid = 'weekMid'
 inlineWeekHL = 'weekHL'
 
 // main
-plotWeekRangeActive = input(true, 'Week HL', group=groupWeek, inline=inlineWeekMain)
-weekColor = input(color.new(#089981, 50), 'Week Color', group=groupWeek, inline=inlineWeekMain)
+plotWeekRangeActive = input(true, 'Week', group=groupWeek, inline=inlineWeekMain)
+weekColor = input(color.new(#089981, 10), 'Week Color', group=groupWeek, inline=inlineWeekMain)
 
 // HL
-weekRangePlotLineWidth = input(4, 'HL Line W', options=[1,2,3,4], group=groupWeek, inline=inlineWeekHL)
-weekRangePlotStyle = input(plot.style_stepline, 'HL Style', options=[plot.style_circles, plot.style_cross, plot.style_stepline], group=groupWeek, inline=inlineWeekHL)
+weekRangePlotLineWidth = input(2, 'HL Line W', options=[1,2,3,4], group=groupWeek, inline=inlineWeekHL)
+weekRangePlotStyle = input(plot.style_linebr, 'HL Style', options=[plot.style_circles, plot.style_cross, plot.style_linebr, plot.style_stepline], group=groupWeek, inline=inlineWeekHL)
 
 // mid
-weekMidPlotLineWidth = input(2, 'Mid Line W', options=[1,2,3,4], group=groupWeek, inline=inlineWeekMid)
-weekMidPlotStyle = input(plot.style_stepline, 'Mid Style', options=[plot.style_circles, plot.style_cross, plot.style_stepline], group=groupWeek, inline=inlineWeekMid)
-weekMidOpacity = input(50, 'Week Mid Line Opacity', step=1, minval=0, maxval=100, group=groupWeek, inline=inlineWeekMid)
+weekMidPlotLineWidth = input(1, 'Mid Line W', options=[1,2,3,4], group=groupWeek, inline=inlineWeekMid)
+weekMidPlotStyle = input(plot.style_linebr, 'Mid Style', options=[plot.style_circles, plot.style_cross, plot.style_linebr, plot.style_stepline], group=groupWeek, inline=inlineWeekMid)
+weekMidOpacity = input(10, 'Week Mid Line Opacity', step=1, minval=0, maxval=100, group=groupWeek, inline=inlineWeekMid)
 
 [weekHigh, weekLow, weekOpen] = security(syminfo.tickerid, 'W', [high, low, open], lookahead=true)
 weekMid = (weekHigh + weekLow) / 2
 
+isFirstBarOfWeek = weekHigh != weekHigh[1]
+
 weekRangeHighPlot = plot(
-  plotWeekRangeActive and isWithinLookBack ? weekHigh : na,
+  plotWeekRangeActive and isWithinLookBack and not isFirstBarOfWeek ? weekHigh : na,
   "Week High",
   plotWeekRangeActive ? weekColor : na,
   weekRangePlotLineWidth,
@@ -104,7 +108,7 @@ weekRangeHighPlot = plot(
   )
 
 weekRangeLowPlot = plot(
-  plotWeekRangeActive and isWithinLookBack ? weekLow : na,
+  plotWeekRangeActive and isWithinLookBack and not isFirstBarOfWeek ? weekLow : na,
   "Week Low",
   plotWeekRangeActive ? weekColor : na,
   weekRangePlotLineWidth,
@@ -112,7 +116,7 @@ weekRangeLowPlot = plot(
   )
 
 weekMidPlot = plot(
-  plotWeekRangeActive and isWithinLookBack ? weekMid : na,
+  plotWeekRangeActive and isWithinLookBack and not isFirstBarOfWeek ? weekMid : na,
   "Week Mid",
   plotWeekRangeActive ? color.new(weekColor, weekMidOpacity) : na,
   weekMidPlotLineWidth,
