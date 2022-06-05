@@ -99,7 +99,7 @@ plotshape(
 
 var resultsTable = table.new(
   position=tablePosition,
-  columns=4,
+  columns=2,
   rows=4,
   bgcolor=cellBgColor,
   border_width=1,
@@ -132,28 +132,8 @@ table.cell(
   text_valign=text.align_center
   )
 
-table.cell(
-  resultsTable,
-  row=0,
-  column=2,
-  text='H',
-  text_color=cellTextColor,
-  text_halign=text.align_left,
-  text_valign=text.align_center
-  )
-
-table.cell(
-  resultsTable,
-  row=0,
-  column=3,
-  text='L',
-  text_color=cellTextColor,
-  text_halign=text.align_left,
-  text_valign=text.align_center
-  )
-
 _formatValue(value) =>
-    formatString = close > 10000 ? '######' : close > 1000 ? '######.0' : '######.00'
+    formatString = close > 10000 ? '######' : close > 1000 ? '######.0' : close > 10 ? '######.00' : close > 1 ? '######.000' : '######.0000'
     tostring(value, formatString)
 
 // --- Row One ---
@@ -178,26 +158,6 @@ table.cell(
   text_valign=text.align_center
   )
 
-table.cell(
-  resultsTable,
-  row=1,
-  column=2,
-  text=_formatValue(highValOne),
-  text_color=cellTextColor,
-  text_halign=text.align_left,
-  text_valign=text.align_center
-  )
-
-table.cell(
-  resultsTable,
-  row=1,
-  column=3,
-  text=_formatValue(lowValOne),
-  text_color=cellTextColor,
-  text_halign=text.align_right,
-  text_valign=text.align_center
-  )
-
 // --- Row Two ---
 
 table.cell(
@@ -215,26 +175,6 @@ table.cell(
   row=2,
   column=1,
   text=_formatValue(atrTwo),
-  text_color=cellTextColor,
-  text_halign=text.align_right,
-  text_valign=text.align_center
-  )
-
-table.cell(
-  resultsTable,
-  row=2,
-  column=2,
-  text=_formatValue(highValTwo),
-  text_color=cellTextColor,
-  text_halign=text.align_left,
-  text_valign=text.align_center
-  )
-
-table.cell(
-  resultsTable,
-  row=2,
-  column=3,
-  text=_formatValue(lowValTwo),
   text_color=cellTextColor,
   text_halign=text.align_right,
   text_valign=text.align_center
@@ -262,27 +202,6 @@ table.cell(
   text_valign=text.align_center
   )
 
-table.cell(
-  resultsTable,
-  row=3,
-  column=2,
-  text=_formatValue(highValThree),
-  text_color=cellTextColor,
-  text_halign=text.align_left,
-  text_valign=text.align_center
-  )
-
-table.cell(
-  resultsTable,
-  row=3,
-  column=3,
-  text=_formatValue(lowValThree),
-  text_color=cellTextColor,
-  text_halign=text.align_right,
-  text_valign=text.align_center
-  )
-
-
 
 // /////////////////////////////////////////////////////////
 //
@@ -297,7 +216,7 @@ _getTimeNBarsFromNow(numBars) => numBars > 0 ? _getFutureTimeNBarsFromNow(numBar
 groupLabels = 'Labels'
 labelsActive = input(true, 'Active', inline=groupLabels, group=groupLabels)
 labelTextColor = input(color.new(#787b86, 20), 'Color', inline=groupLabels)
-labelOffset = input(60, 'Offset', inline=groupLabels)
+labelOffset = input(40, 'Offset', inline=groupLabels)
 labelSize = input(size.normal, 'Size', options=[size.auto, size.tiny, size.small, size.normal, size.large, size.huge], group=groupLabels, inline=groupLabels)
 
 _drawLabels(multiplier, highVal, lowVal) =>

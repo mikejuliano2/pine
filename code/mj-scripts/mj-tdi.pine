@@ -25,7 +25,7 @@ bandsColor = input(color.new(#2962ff, 40), 'Bands Color', group=groupTDI)
 marketBaseColor = input(color.new(#ffb74d, 50), 'Market Base Color', group=groupTDI)
 marketSignalColor = input(color.new(#ff5252, 20), 'Market Signal Color', group=groupTDI)
 rsiColor = input(color.new(#006064, 0), 'RSI Color', group=groupTDI)
-hLineColor = input(color.new(#5d606b, 0), "Horizontal Line Color", group=groupTDI)
+hLineColor = input(color.new(#9598a1, 60), "Horizontal Line Color", group=groupTDI)
 trendFillOpacity = input(70, 'Trend Fill Opacity', minval=0, maxval=100, group=groupTDI)
 
 bandsLineWidth = input(2, 'Bands Line Width', options=[1,2,3,4], group=groupTDI)
@@ -59,9 +59,8 @@ divergenceLineWidth = input(2, 'Divergence Line Width', options=[1,2,3,4], group
 divergenceLineTransparency = input(20, 'Divergence Line Opacity', maxval=100, minval=0, group=groupDivergence)
 rangeUpper = input(title="Max of Lookback Range", defval=60, group=groupDivergence)
 rangeLower = input(title="Min of Lookback Range", defval=5, group=groupDivergence)
-divPivotRange = input(title="Divergence Pivot Range", defval=7, group=groupDivergence)
-lbL = divPivotRange
-lbR = divPivotRange
+lbL = input(title="Divergence Lookback Left", defval=7, group=groupDivergence)
+lbR = input(title="Divergence Lookback Right", defval=1, group=groupDivergence)
 // lbR = input(title="Pivot Lookback Right", defval=5)
 // lbL = input(title="Pivot Lookback Left", defval=5)
 
@@ -77,9 +76,9 @@ sharkLowColor = input(color.new(COLOR_GOLD, 25), 'Shark Low Color', group=groupS
 sharkPlotWidth = input(2, 'Shark Plot Width', minval=1, maxval=4)
 
 //////////////////////////////////////////////////////
-// 
+//
 // --- CALCULATIONS ---
-// 
+//
 //////////////////////////////////////////////////////
 
 rsiOfClose = rsi(close, rsiPeriod)
@@ -96,30 +95,31 @@ marketSignal = sma(rsiOfClose, marketSignalMaLength) // Moving Average of RSI 7 
 
 
 //////////////////////////////////////////////////////
-// 
+//
 // --- PLOT ---
-// 
+//
 //////////////////////////////////////////////////////
 
-bandUpperPlot = plot(upperBand, "Upper Band", color=bandsColor, linewidth=bandsLineWidth)              
-bandLowerPlot = plot(lowerBand, "Lower Band", color=bandsColor, linewidth=bandsLineWidth)              
+bandUpperPlot = plot(upperBand, "Upper Band", color=bandsColor, linewidth=bandsLineWidth)
+bandLowerPlot = plot(lowerBand, "Lower Band", color=bandsColor, linewidth=bandsLineWidth)
 marketBasePlot = plot(marketBase, "Market Base", color=marketBaseColor, linewidth=marketBaseLineWidth)
 rsiLine = plot(_rsi, "RSI", color=rsiColor, linewidth=rsiLineWidth)
-marketSignalLine = plot(marketSignal, "Market Signal", color=marketSignalColor, linewidth=marketSignalLineWidth)  
+marketSignalLine = plot(marketSignal, "Market Signal", color=marketSignalColor, linewidth=marketSignalLineWidth)
 
 trendFillColor = _rsi > marketSignal ? rsiColor : marketSignalColor
 // trendFillColor = _rsi > marketSignal ? bullColor : bearColor
 fill(rsiLine, marketSignalLine, color.new(trendFillColor, trendFillOpacity))
 
-oversoldLine = hline(30, color=hLineColor, linewidth=1, linestyle=hline.style_dotted, title='Oversold Line')
-middleLine = hline(50, color=hLineColor, linewidth=1, linestyle=hline.style_dotted, title='Middle Line')
-overboughtLine = hline(70, color=hLineColor, linewidth=1, linestyle=hline.style_dotted, title='Overbought Line')
+oversoldLine = hline(30, color=hLineColor, linewidth=1, linestyle=hline.style_solid, title='Oversold Line')
+middleLine = hline(50, color=hLineColor, linewidth=1, linestyle=hline.style_solid, title='Middle Line')
+overboughtLine = hline(70, color=hLineColor, linewidth=1, linestyle=hline.style_solid, title='Overbought Line')
+// fill(overboughtLine, oversoldLine, color=color.blue, title="RSI Background Fill")
 
 
 //////////////////////////////////////////////////////
-// 
+//
 // --- CALCULATIONS ---
-// 
+//
 //////////////////////////////////////////////////////
 
 _print(_text) => var _label = label.new(bar_index, na, _text, xloc.bar_index, yloc.price, color(na), label.style_none, color.gray, size.large, text.align_left), label.set_xy(_label, bar_index, highest(10)[1]), label.set_text(_label, _text)
@@ -158,9 +158,9 @@ hasHiddenBearishDiv = plotHiddenBear and priceHadLowerHigh and rsiHadHigherHigh 
 
 
 //////////////////////////////////////////////////////
-// 
+//
 // --- PLOT DIVERGENCE ---
-// 
+//
 //////////////////////////////////////////////////////
 
 //-----------------------
@@ -256,9 +256,9 @@ plotshape(
 	 )
 
 //////////////////////////////////////////////////////
-// 
+//
 // --- SHARK FIN ---
-// 
+//
 //////////////////////////////////////////////////////
 
 belowLowerBand = _rsi < lowerBand
@@ -280,9 +280,9 @@ hasSharkFin = hasHighSharkFin or hasLowSharkFin
 alertcondition(hasSharkFin and sharkAlertsEnabled, title="Alert on Shark Fin", message="{{ticker}} Shark Fin on the {{interval}}")
 
 //////////////////////////////////////////////////////
-// 
+//
 // --- VOLATILITY BACKGROUND COLOR ---
-// 
+//
 //////////////////////////////////////////////////////
 
 volShadingActive = input(true, title='Is Active', group=groupVolatility)
@@ -294,14 +294,14 @@ volatilityColor = belowLowerBand ? volShadingDownColor : aboveUpperBand ? volSha
 bgcolor(volShadingActive ? volatilityColor : volShadingDefaultColor)
 
 //////////////////////////////////////////////////////
-// 
+//
 // --- LONG/SHORT SIGNALS ---
-// 
+//
 //////////////////////////////////////////////////////
 
 // longConditionMet = crossover(_rsi, marketSignal) and _rsi > marketBase and _rsi > 50
 
-signalShapesActive = input(true, 'Signal Shapes Active', group=groupTDI)
+signalShapesActive = input(false, 'Signal Shapes Active', group=groupTDI)
 
 longConditionMet = crossover(_rsi, marketSignal) and _rsi > marketBase and _rsi > 50 and signalShapesActive
 shortConditionMet = crossunder(_rsi, marketSignal) and _rsi < marketBase and _rsi < 50 and signalShapesActive
@@ -314,3 +314,4 @@ alertcondition(shortConditionMet, title='Short Signal', message='{{ticker}} TDI 
 
 // best_setup = crossover(mab, mid) 
 // alertcondition(best_setup, title="RSI Crosses Market Base", message="{{ticker}} RSI crossed market base on the {{interval}}")
+
