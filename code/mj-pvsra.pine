@@ -1,6 +1,6 @@
-//@version=4
+//@version=5
 
-study("MJ - PVSRA", overlay=true, precision=0, scale=scale.none)
+indicator("MJ - PVSRA", overlay=true, precision=0, scale=scale.none)
 
 //////////////////////////////////////////////////
 // 
@@ -34,18 +34,10 @@ groupColors = 'Colors'
 groupSymbol = 'Symbol'
 groupCalc = 'Calculation'
 
-// VOLUME OVERLAY
-
-overlayEnabled = input(false, 'Enabled', group=groupOverlay)
-overlayScreenPercentage = input(5, 'Screen %', minval=1, maxval=100, group=groupOverlay)
-overlayOpacity = input(20, 'Opacity', minval=0, maxval=100, group=groupOverlay)
-overlayStyle = input(plot.style_columns, 'Plot Style', group=groupOverlay, options=[plot.style_columns, plot.style_histogram])
-overlayLineWidth = input(2, 'Line Width', group=groupOverlay, options=[1,2,3,4])
-
 // COLORS
 
-selectedTemplate = input(2, 'Template', options=[0,1,2,3], group=groupColors, tooltip="use color picker below if 0")
-overrideOpacity = input(0, 'Override Opacity', group=groupColors, minval=0, maxval=100, step=1)
+selectedTemplate = input.int(4, 'Template', minval=0, maxval=4, step=1, group=groupColors, tooltip="use color picker below if 0")
+overrideOpacity = input.int(0, 'Override Opacity', group=groupColors, minval=0, maxval=100, step=1)
 climaxVolBullColor = input(color.green, 'Climax Bull Color', group=groupColors)
 climaxVolBearColor = input(#b22833, 'Climax Bear Color', group=groupColors)
 aboveAvgVolBullColor = input(#2962ff, 'Above Average Volume Bull Color', group=groupColors)
@@ -53,20 +45,9 @@ aboveAvgVolBearColor = input(#793be4, 'Above Average Volume Bear Color', group=g
 standardVolBullColor = input(#141d38, 'Standard Volume Bull Color', group=groupColors)
 standardVolBearColor = input(#141d38, 'Standard Volume Bear Color', group=groupColors)
 
-// SYMBOL
-
-overrideSymbol = input(false, 'Override chart symbol?', group=groupSymbol)
-
-pvsraSymbol = input(
-  defval="INDEX:BTCUSD", 
-  title="Symbol to use for volume candles", 
-  group=groupSymbol, 
-  type=input.symbol, 
-  tooltip="You can use INDEX:BTCUSD or you can combine multiple feeds, for example '(BINANCE:BTCUSDT+COINBASE:BTCUSD)'. Note that adding too many will slow things down.")
-
 // CALCULATION
 
-volPeriodLength = input(10, 'Volume Period Length', tooltip='Used in the PVSRA calculation in 2 places', group=groupCalc, minval=1, maxval=20)
+volPeriodLength = input.int(10, 'Volume Period Length', tooltip='Used in the PVSRA calculation in 2 places', group=groupCalc, minval=1, maxval=20)
 
 //////////////////////////////////////////////////
 // 
@@ -101,6 +82,14 @@ else if selectedTemplate == 3
     standardVolBullColor := color.new(#363e57, 50)
     standardVolBearColor := color.new(#363e57, 50)
     overrideOpacity := 1
+else if selectedTemplate == 4
+    climaxVolBullColor := color.new(#1848cc, 50)
+    climaxVolBearColor := color.new(#b22833, 50)
+    aboveAvgVolBullColor := color.new(#5b9cf6, 50)
+    aboveAvgVolBearColor := color.new(#b1617c, 50)
+    standardVolBullColor := color.new(#363e57, 50)
+    standardVolBearColor := color.new(#363e57, 50)
+    overrideOpacity := 1
 
 //////////////////////////////////////////////////
 //
@@ -108,13 +97,13 @@ else if selectedTemplate == 3
 //
 //////////////////////////////////////////////////
 
-_print(_text) => var _label = label.new(bar_index, na, _text, xloc.bar_index, yloc.price, color(na), label.style_none, color.gray, size.large, text.align_left), label.set_xy(_label, bar_index, highest(10)[1]), label.set_text(_label, _text)
-_printNum(_num) => _print(tostring(_num))
+_print(_text) => var _label = label.new(bar_index, na, _text, xloc.bar_index, yloc.price, color(na), label.style_none, color.gray, size.large, text.align_left), label.set_xy(_label, bar_index, ta.highest(10)[1]), label.set_text(_label, _text)
+_printNum(_num) => _print(str.tostring(_num))
 
 _getFutureTimeNBarsFromNow(numBars) => time + ( ( time - time[1] ) * numBars )
 
-_pvsraSecurity(sresolution, sseries) => security(
-      overrideSymbol ? pvsraSymbol : syminfo.tickerid,
+_pvsraSecurity(sresolution, sseries) => request.security(
+      syminfo.tickerid,
       sresolution,
       sseries[barstate.isrealtime ? 1 : 0], 
       barmerge.gaps_off,
@@ -137,9 +126,9 @@ _getBarColorByVolWeight(volWeight, _open, _close) =>
 
 _getVolumeWeight(_open, _spread, _close, _vol) => 
     // The math below matches MT4 PVSRA indicator source
-    avgVol = sma(_vol, volPeriodLength) // average volume from last 10 candles
+    avgVol = ta.sma(_vol, volPeriodLength) // average volume from last 10 candles
     volWeightedPriceSpread = _vol * _spread // climax volume on the current candle
-    highestVolWeightedPriceSpread = highest(volWeightedPriceSpread, volPeriodLength) // highest climax volume of the last 10 candles
+    highestVolWeightedPriceSpread = ta.highest(volWeightedPriceSpread, volPeriodLength) // highest climax volume of the last 10 candles
 
     isClimaxVolume = _vol >= (avgVol * 2) or volWeightedPriceSpread >= highestVolWeightedPriceSpread
     isAboveAvgVolume = _vol >= avgVol * 1.5 and not isClimaxVolume
@@ -155,11 +144,11 @@ _getPvsraColor(_open, _spread, _close, _vol) =>
 // 
 //////////////////////////////////////////////////
 
-_vol = overrideSymbol ? _pvsraSecurity("", volume) : volume
-_high = overrideSymbol ? _pvsraSecurity("", high) : high
-_low = overrideSymbol ? _pvsraSecurity("", low) : low
-_open = overrideSymbol ? _pvsraSecurity("", open) : open
-_close = overrideSymbol ? _pvsraSecurity("", close) : close
+_vol = volume
+_high = high
+_low = low
+_open = open
+_close = close
 _spread = _high - _low
 
 volWeight = _getVolumeWeight(_open, _spread, _close, _vol)
@@ -178,32 +167,6 @@ if overrideOpacity > 0
 
 barcolor(barColor) 
 
-//////////////////////////////////////////////////
-// 
-// === VOLUME OVERLAY ===
-// 
-//////////////////////////////////////////////////
-
-// to scale the volume overlay
-// we get the max volume of the last 100 candles
-// then multiple the volume to plot be the scale percentage defined in inputs
-
-maxVolOfLastNCandles = max(_vol, 100)
-scaledVolume = _vol * overlayScreenPercentage / 100
-
-// plot the max vol (transparent)
-plot(
-     overlayEnabled ? maxVolOfLastNCandles : na, 
-     color=color.new(color.blue, 100)
-     )
-
-// plot the volume overlay
-plot(
-  series=overlayEnabled ? scaledVolume : na, 
-  style=overlayStyle, 
-  color=color.new(volumeBarColor, overlayOpacity), 
-  linewidth=overlayLineWidth
-  )
 
 //////////////////////////////////////////////////
 // 
