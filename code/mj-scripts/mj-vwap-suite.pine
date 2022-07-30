@@ -13,9 +13,9 @@ hideonDWM = input(false, title="Hide VWAP 1D / Above", group=groupShared, inline
 showBands = input(true, title="Show Bands", group=groupShared, inline=inlineSharedToggles)
 // TrackCloses = input(false, title="Track Dates", group=groupShared, inline=inlineSharedToggles)
 
-stdevMult = input(1.0, title="B1", group=groupShared, inline=inlineDev)
-stdevMult2 = input(1.5, title="B2", group=groupShared, inline=inlineDev)
-stdevMult3 = input(2.0, title="B3", group=groupShared, inline=inlineDev)
+stdevMult = input(1.0, title="B1", group=groupShared, inline=inlineDev, step=0.5)
+stdevMult2 = input(1.5, title="B2", group=groupShared, inline=inlineDev, step=0.5)
+stdevMult3 = input(2.0, title="B3", group=groupShared, inline=inlineDev, step=0.5)
 
 VwapStyle = input.string("line", options = ["circles","line","cross"],title = "VWAP", group=groupShared, inline=inlineSharedStyles)
 //CloseStyle = input.string("circles", options = ["circles","line","cross"],title = "Close", group=groupShared, inline=inlineSharedStyles)
