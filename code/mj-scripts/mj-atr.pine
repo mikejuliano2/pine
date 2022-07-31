@@ -249,3 +249,60 @@ _drawLabels(multiplier, highVal, lowVal) =>
 _drawLabels(multiplierOne, highValOne, lowValOne)
 _drawLabels(multiplierTwo, highValTwo, lowValTwo)
 _drawLabels(multiplierThree, highValThree, lowValThree)
+
+
+
+//////////////////////////////////////////////////////////////////
+// 
+// ==== PRINT CURRENT DATE/TIME ==== 
+// 
+//////////////////////////////////////////////////////////////////
+groupDateTimeLabel = 'Date/Time Label'
+showDateTimeLabel = input(true, 'Show Date/Time Label', group=groupDateTimeLabel)
+dateTimeLabelColor = input(color.new(color.white, 0), 'Color', group=groupDateTimeLabel, inline='fixedColor')
+dateTimeLabelSize = input(size.normal, 'Date/Time Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large, size.huge], group=groupDateTimeLabel)
+dateTimeLabelMarginMultiple = input(0.4, 'Date/Time Label Margin Multiple', 
+ group=groupDateTimeLabel, minval=-2, maxval=2, step=0.05, 
+ tooltip='Use this to adjust the vertical positioning of the date/time label.  Positive values will place it above price. Negative values will place it below price.')
+dateTimeLabelOffset = input(50, 'Date/Time Label Offset (in bars)', group=groupDateTimeLabel)
+dateTimeLabelOpacity = input(30, 'Opacity', minval=0, maxval=100)
+
+
+_print(_text, _color) => 
+    var _label = label.new(bar_index, na, _text, xloc.bar_index, yloc.price, color(na), label.style_none, color.new(_color, dateTimeLabelOpacity), dateTimeLabelSize, text.align_left)
+    label.set_xy(_label, bar_index + dateTimeLabelOffset, _getLabelHeight())
+    label.set_text(_label, _text)
+    label.set_textcolor(_label, _color)
+
+
+_getAdjustedTimeDisplay() => tostring(_getAdjustedHour()) + ':' + _getMinute()
+// _debugDisplay() => 'D' + tostring(dayofweek) + ' h' + tostring(hour) + ' m' + tostring(minute) + ' | '
+
+_getDateTimeDisplay() => 
+    _display = _dateDisplay() + _getDayOfWeekLabel() + ' - ' + _getAdjustedTimeDisplay()
+    timeframe.isintraday ? _display : na
+
+_getDayOfWeekLabel() =>
+    adjustedHour = _getAdjustedHour()
+    adjustedDay = _getAdjustedDay()
+
+    if adjustedDay == 1
+        'Sun'
+    else if adjustedDay == 2
+        'Mon'
+    else if adjustedDay == 3
+        'Tues'
+    else if adjustedDay == 4
+        'Wed'
+    else if adjustedDay == 5
+        'Thur'
+    else if adjustedDay == 6
+        'Fri'
+    else
+        'Sat'
+
+
+_print(
+     showDateTimeLabel ? _getDateTimeDisplay() : na, 
+     showDateTimeLabel ? dateTimeLabelColor : na
+     )

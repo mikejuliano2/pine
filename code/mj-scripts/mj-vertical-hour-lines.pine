@@ -219,6 +219,34 @@ _getMinute() => minute < 10 ? '0' + tostring(minute) : tostring(minute)
 
 _dateDisplay() => '(' + tostring(month) + '/' + tostring(dayofmonth) + ') '
 
+
+
+_getLabelHeight() => 
+    vm = abs(sma(high - low, 50))
+    y = dateTimeLabelMarginMultiple > 0 ? high + vm : low - vm
+
+
+//////////////////////////////////////////////////////////////////
+// 
+// ==== PRINT CURRENT DATE/TIME ==== 
+// 
+//////////////////////////////////////////////////////////////////
+
+
+_print(_text, _color) => 
+    var _label = label.new(bar_index, na, _text, xloc.bar_index, yloc.price, color(na), label.style_none, color.new(_color, dateTimeLabelOpacity), dateTimeLabelSize, text.align_left)
+    label.set_xy(_label, bar_index + dateTimeLabelOffset, _getLabelHeight())
+    label.set_text(_label, _text)
+    label.set_textcolor(_label, _color)
+
+
+_getAdjustedTimeDisplay() => tostring(_getAdjustedHour()) + ':' + _getMinute()
+// _debugDisplay() => 'D' + tostring(dayofweek) + ' h' + tostring(hour) + ' m' + tostring(minute) + ' | '
+
+_getDateTimeDisplay() =>
+    _display = _dateDisplay() + _getDayOfWeekLabel() + ' - ' + _getAdjustedTimeDisplay()
+    timeframe.isintraday ? _display : na
+
 _getDayOfWeekLabel() =>
     adjustedHour = _getAdjustedHour()
     adjustedDay = _getAdjustedDay()
@@ -237,13 +265,6 @@ _getDayOfWeekLabel() =>
         'Fri'
     else
         'Sat'
-
-_getAdjustedTimeDisplay() => tostring(_getAdjustedHour()) + ':' + _getMinute()
-// _debugDisplay() => 'D' + tostring(dayofweek) + ' h' + tostring(hour) + ' m' + tostring(minute) + ' | '
-
-_getDateTimeDisplay() => 
-    _display = _dateDisplay() + _getDayOfWeekLabel() + ' - ' + _getAdjustedTimeDisplay()
-    timeframe.isintraday ? _display : na
 
 
 _getColorByDay() =>
@@ -265,24 +286,6 @@ _getColorByDay() =>
     else
         color.purple
 
-
-
-_getLabelHeight() => 
-    vm = abs(sma(high - low, 50))
-    y = dateTimeLabelMarginMultiple > 0 ? high + vm : low - vm
-
-
-//////////////////////////////////////////////////////////////////
-// 
-// ==== PRINT CURRENT DATE/TIME ==== 
-// 
-//////////////////////////////////////////////////////////////////
-
-_print(_text, _color) => 
-    var _label = label.new(bar_index, na, _text, xloc.bar_index, yloc.price, color(na), label.style_none, color.new(_color, dateTimeLabelOpacity), dateTimeLabelSize, text.align_left)
-    label.set_xy(_label, bar_index + dateTimeLabelOffset, _getLabelHeight())
-    label.set_text(_label, _text)
-    label.set_textcolor(_label, _color)
 
 
 _print(
