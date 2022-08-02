@@ -50,9 +50,9 @@ standardVolBearColor = input(#141d38, 'Standard Volume Bear Color', group=groupC
 volPeriodLength = input.int(10, 'Volume Period Length', tooltip='Used in the PVSRA calculation in 2 places', group=groupCalc, minval=1, maxval=20)
 
 //////////////////////////////////////////////////
-// 
+//
 // === APPLY COLOR TEMPLATE ===
-// 
+//
 //////////////////////////////////////////////////
 
 // nice dark blue: #010839
@@ -90,6 +90,22 @@ else if selectedTemplate == 4
     standardVolBullColor := color.new(#363e57, 50)
     standardVolBearColor := color.new(#363e57, 50)
     overrideOpacity := 1
+else if selectedTemplate == 5
+    climaxVolBullColor := color.new(color.green, 50)
+    climaxVolBearColor := color.new(#b22833, 50)
+    aboveAvgVolBullColor := color.new(color.blue, 50)
+    aboveAvgVolBearColor := color.new(#793be4, 50)
+    standardVolBullColor := color.new(#9598a1, 50)
+    standardVolBearColor := color.new(#787b86, 50)
+    overrideOpacity := 1
+
+// PVSRA ORIGINAL LIGHT
+// green: color.green
+// red: #b22833
+// blue: color.blue
+// purple: #793be4
+// up: #9598a1
+// down: #787b86
 
 //////////////////////////////////////////////////
 //
@@ -105,26 +121,26 @@ _getFutureTimeNBarsFromNow(numBars) => time + ( ( time - time[1] ) * numBars )
 _pvsraSecurity(sresolution, sseries) => request.security(
       syminfo.tickerid,
       sresolution,
-      sseries[barstate.isrealtime ? 1 : 0], 
+      sseries[barstate.isrealtime ? 1 : 0],
       barmerge.gaps_off,
       barmerge.lookahead_off)
 
 
-_getBarColorByVolWeight(volWeight, _open, _close) => 
+_getBarColorByVolWeight(volWeight, _open, _close) =>
     if _close > _open
-        volWeight == 1 
-          ? climaxVolBullColor 
-          : volWeight == 2 
-              ? aboveAvgVolBullColor 
+        volWeight == 1
+          ? climaxVolBullColor
+          : volWeight == 2
+              ? aboveAvgVolBullColor
               : standardVolBullColor
     else
-        volWeight == 1 
-          ? climaxVolBearColor 
-          : volWeight == 2 
-              ? aboveAvgVolBearColor 
+        volWeight == 1
+          ? climaxVolBearColor
+          : volWeight == 2
+              ? aboveAvgVolBearColor
               : standardVolBearColor
 
-_getVolumeWeight(_open, _spread, _close, _vol) => 
+_getVolumeWeight(_open, _spread, _close, _vol) =>
     // The math below matches MT4 PVSRA indicator source
     avgVol = ta.sma(_vol, volPeriodLength) // average volume from last 10 candles
     volWeightedPriceSpread = _vol * _spread // climax volume on the current candle
@@ -134,14 +150,14 @@ _getVolumeWeight(_open, _spread, _close, _vol) =>
     isAboveAvgVolume = _vol >= avgVol * 1.5 and not isClimaxVolume
     volWeight = isClimaxVolume ? 1 : isAboveAvgVolume ? 2 : 0
 
-_getPvsraColor(_open, _spread, _close, _vol) => 
+_getPvsraColor(_open, _spread, _close, _vol) =>
     volWeight = _getVolumeWeight(_open, _spread, _close, _vol)
     _getBarColorByVolWeight(volWeight, _open, _close)
 
 //////////////////////////////////////////////////
-// 
+//
 // === CALCULATIONS ===
-// 
+//
 //////////////////////////////////////////////////
 
 _vol = volume
@@ -160,18 +176,18 @@ if overrideOpacity > 0
     barColor := color.new(barColor, overrideOpacity)
 
 //////////////////////////////////////////////////
-// 
+//
 // === PLOT ===
-// 
+//
 //////////////////////////////////////////////////
 
-barcolor(barColor) 
+barcolor(chart.is_standard ? barColor : na)
 
 
 //////////////////////////////////////////////////
-// 
+//
 // === ALERTS ===
-// 
+//
 //////////////////////////////////////////////////
 
 alertcondition(volWeight == 2, title="Alert on Green or Red Candle", message="{{ticker}} Green or Red Candle on the {{interval}}")

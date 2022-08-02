@@ -61,9 +61,9 @@ lowValThree = low - atrThree
 // /////////////////////////////////////////////////////////
 
 groupVolatility = 'Volatility'
-plotHighVolatilityMarkers = input(true, 'Show Markers', inline=groupVolatility, group=groupVolatility)
+plotHighVolatilityMarkers = input(false, 'Show Markers', inline=groupVolatility, group=groupVolatility)
 percentInput = input(50, 'Length', minval=2, maxval=100, step=1, inline=groupVolatility, group=groupVolatility)
-highVolColor = input(color.new(#f7525f, 50), 'High', inline=groupVolatility, group=groupVolatility)
+highVolColor = input(color.new(color.white, 50), 'High', inline=groupVolatility, group=groupVolatility)
 lowVolColor = input(color.new(#787b86, 50), 'Low', inline=groupVolatility, group=groupVolatility)
 volMarkerPosition = input(location.bottom, 'Position', options=[location.top, location.bottom], inline=groupVolatility, group=groupVolatility)
 
@@ -91,6 +91,55 @@ plotshape(
   )
 
 
+//////////////////////////////////////////////////////////////////
+//
+// ==== PRINT CURRENT DATE/TIME ====
+//
+//////////////////////////////////////////////////////////////////
+
+groupDateTimeLabel = 'Date/Time Label'
+
+isDaylightSavings = input(false, 'Is Daylight Savings?', group=groupDateTimeLabel)
+
+_dateDisplay() => '(' + tostring(month) + '/' + tostring(dayofmonth) + ') '
+
+_getMinute() => minute < 10 ? '0' + tostring(minute) : tostring(minute)
+
+_getAdjustedHour() =>
+    _hour = isDaylightSavings ? hour : (hour == 0 ? 23 : hour - 1) // adjust for daylight savings.  pine does something weird here
+    _hour := _hour < 4 ? _hour + 20 : _hour - 4
+
+_getAdjustedTimeDisplay() => tostring(_getAdjustedHour()) + ':' + _getMinute()
+// _debugDisplay() => 'D' + tostring(dayofweek) + ' h' + tostring(hour) + ' m' + tostring(minute) + ' | '
+
+_getAdjustedDay() =>
+    adjustedDay = dayofweek == 1 and hour < 4 ? 7
+      : hour < 4 ? dayofweek - 1
+      : dayofweek
+
+_getDayOfWeekLabel() =>
+    adjustedHour = _getAdjustedHour()
+    adjustedDay = _getAdjustedDay()
+
+    if adjustedDay == 1
+        'Sun'
+    else if adjustedDay == 2
+        'Mon'
+    else if adjustedDay == 3
+        'Tues'
+    else if adjustedDay == 4
+        'Wed'
+    else if adjustedDay == 5
+        'Thur'
+    else if adjustedDay == 6
+        'Fri'
+    else
+        'Sat'
+
+_getDateTimeDisplay() =>
+    _display = _dateDisplay() + _getDayOfWeekLabel() + ' - ' + _getAdjustedTimeDisplay()
+    timeframe.isintraday ? _display : na
+
 // /////////////////////////////////////////////////////////
 //
 // --- Table ---
@@ -99,7 +148,7 @@ plotshape(
 
 var resultsTable = table.new(
   position=tablePosition,
-  columns=2,
+  columns=3,
   rows=4,
   bgcolor=cellBgColor,
   border_width=1,
@@ -132,6 +181,16 @@ table.cell(
   text_valign=text.align_center
   )
 
+table.cell(
+  resultsTable,
+  row=0,
+  column=2,
+  text='Date',
+  text_color=cellTextColor,
+  text_halign=text.align_left,
+  text_valign=text.align_center
+  )
+
 _formatValue(value) =>
     formatString = close > 10000 ? '######' : close > 1000 ? '######.0' : close > 10 ? '######.00' : close > 1 ? '######.000' : '######.0000'
     tostring(value, formatString)
@@ -158,6 +217,16 @@ table.cell(
   text_valign=text.align_center
   )
 
+table.cell(
+  resultsTable,
+  row=1,
+  column=2,
+  text=_dateDisplay(),
+  text_color=cellTextColor,
+  text_halign=text.align_left,
+  text_valign=text.align_center
+  )
+
 // --- Row Two ---
 
 table.cell(
@@ -177,6 +246,16 @@ table.cell(
   text=_formatValue(atrTwo),
   text_color=cellTextColor,
   text_halign=text.align_right,
+  text_valign=text.align_center
+  )
+
+table.cell(
+  resultsTable,
+  row=2,
+  column=2,
+  text=_getDayOfWeekLabel(),
+  text_color=cellTextColor,
+  text_halign=text.align_left,
   text_valign=text.align_center
   )
 
@@ -202,6 +281,15 @@ table.cell(
   text_valign=text.align_center
   )
 
+table.cell(
+  resultsTable,
+  row=3,
+  column=2,
+  text=_getAdjustedTimeDisplay(),
+  text_color=cellTextColor,
+  text_halign=text.align_left,
+  text_valign=text.align_center
+  )
 
 // /////////////////////////////////////////////////////////
 //
@@ -252,57 +340,4 @@ _drawLabels(multiplierThree, highValThree, lowValThree)
 
 
 
-//////////////////////////////////////////////////////////////////
-// 
-// ==== PRINT CURRENT DATE/TIME ==== 
-// 
-//////////////////////////////////////////////////////////////////
-groupDateTimeLabel = 'Date/Time Label'
-showDateTimeLabel = input(true, 'Show Date/Time Label', group=groupDateTimeLabel)
-dateTimeLabelColor = input(color.new(color.white, 0), 'Color', group=groupDateTimeLabel, inline='fixedColor')
-dateTimeLabelSize = input(size.normal, 'Date/Time Label Size', options=[size.auto, size.tiny, size.small, size.normal, size.large, size.huge], group=groupDateTimeLabel)
-dateTimeLabelMarginMultiple = input(0.4, 'Date/Time Label Margin Multiple', 
- group=groupDateTimeLabel, minval=-2, maxval=2, step=0.05, 
- tooltip='Use this to adjust the vertical positioning of the date/time label.  Positive values will place it above price. Negative values will place it below price.')
-dateTimeLabelOffset = input(50, 'Date/Time Label Offset (in bars)', group=groupDateTimeLabel)
-dateTimeLabelOpacity = input(30, 'Opacity', minval=0, maxval=100)
 
-
-_print(_text, _color) => 
-    var _label = label.new(bar_index, na, _text, xloc.bar_index, yloc.price, color(na), label.style_none, color.new(_color, dateTimeLabelOpacity), dateTimeLabelSize, text.align_left)
-    label.set_xy(_label, bar_index + dateTimeLabelOffset, _getLabelHeight())
-    label.set_text(_label, _text)
-    label.set_textcolor(_label, _color)
-
-
-_getAdjustedTimeDisplay() => tostring(_getAdjustedHour()) + ':' + _getMinute()
-// _debugDisplay() => 'D' + tostring(dayofweek) + ' h' + tostring(hour) + ' m' + tostring(minute) + ' | '
-
-_getDateTimeDisplay() => 
-    _display = _dateDisplay() + _getDayOfWeekLabel() + ' - ' + _getAdjustedTimeDisplay()
-    timeframe.isintraday ? _display : na
-
-_getDayOfWeekLabel() =>
-    adjustedHour = _getAdjustedHour()
-    adjustedDay = _getAdjustedDay()
-
-    if adjustedDay == 1
-        'Sun'
-    else if adjustedDay == 2
-        'Mon'
-    else if adjustedDay == 3
-        'Tues'
-    else if adjustedDay == 4
-        'Wed'
-    else if adjustedDay == 5
-        'Thur'
-    else if adjustedDay == 6
-        'Fri'
-    else
-        'Sat'
-
-
-_print(
-     showDateTimeLabel ? _getDateTimeDisplay() : na, 
-     showDateTimeLabel ? dateTimeLabelColor : na
-     )
