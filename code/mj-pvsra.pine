@@ -36,7 +36,7 @@ groupCalc = 'Calculation'
 
 // COLORS
 
-selectedTemplate = input.int(4, 'Template', minval=0, maxval=4, step=1, group=groupColors, tooltip="use color picker below if 0")
+selectedTemplate = input.int(4, 'Template', minval=0, maxval=5, step=1, group=groupColors, tooltip="use color picker below if 0")
 overrideOpacity = input.int(0, 'Override Opacity', group=groupColors, minval=0, maxval=100, step=1)
 climaxVolBullColor = input(color.green, 'Climax Bull Color', group=groupColors)
 climaxVolBearColor = input(#b22833, 'Climax Bear Color', group=groupColors)
