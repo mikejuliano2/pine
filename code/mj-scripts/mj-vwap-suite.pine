@@ -13,9 +13,9 @@ hideonDWM = input(false, title="Hide VWAP 1D / Above", group=groupShared, inline
 showBands = input(true, title="Show Bands", group=groupShared, inline=inlineSharedToggles)
 // TrackCloses = input(false, title="Track Dates", group=groupShared, inline=inlineSharedToggles)
 
-stdevMult = input(1.0, title="B1", group=groupShared, inline=inlineDev, step=0.5)
-stdevMult2 = input(1.5, title="B2", group=groupShared, inline=inlineDev, step=0.5)
-stdevMult3 = input(2.0, title="B3", group=groupShared, inline=inlineDev, step=0.5)
+stdevMult = input(1.0, title="B1", group=groupShared, inline=inlineDev, step=0.1)
+stdevMult2 = input(1.5, title="B2", group=groupShared, inline=inlineDev, step=0.1)
+stdevMult3 = input(2.0, title="B3", group=groupShared, inline=inlineDev, step=0.1)
 
 VwapStyle = input.string("line", options = ["circles","line","cross"],title = "VWAP", group=groupShared, inline=inlineSharedStyles)
 //CloseStyle = input.string("circles", options = ["circles","line","cross"],title = "Close", group=groupShared, inline=inlineSharedStyles)
@@ -26,7 +26,7 @@ plotStylePpoc = input.string("cross", options = ["circles","line","cross"],title
 LabelSize = input.string("small", options = ["small","medium","large"],title = "Label Size", group=groupShared, inline=inlineSharedStyles)
 labelOffset = input.int(0, title="Label Offset", group=groupShared, inline=inlineSharedStyles)
 
-_getLineStyle(_style) => (_style == "line") ? plot.style_line : (_style == "circles") ? plot.style_circles : (_style == "cross") ? plot.style_cross : na 
+_getLineStyle(_style) => (_style == "line") ? plot.style_line : (_style == "circles") ? plot.style_circles : (_style == "cross") ? plot.style_cross : na
 
 VwapStyleHolder = _getLineStyle(VwapStyle)
 //CloseStyleHolder = _getLineStyle(CloseStyle)
@@ -54,7 +54,7 @@ inlineMain1 = 'main1'
 inlineFine1 = 'fine1'
 
 var anchorS1 = input.string(defval = "D", title="VWAP 1 Anchor", options=["None","D", "W", "M", "3M", "6M", "12M"], group=groupV1, inline=inlineMain1)
-var anchorOneDefined = anchorS1 != "None" 
+var anchorOneDefined = anchorS1 != "None"
 
 _oneOffset = input(5, title="Offset", group=groupV1, inline=inlineMain1)
 oneTextColor = input.color(color.new(#ffcc80, 40), title="Text", group=groupV1, inline=inlineMain1)
@@ -140,7 +140,7 @@ inlineFine3 = 'fine3'
 
 var anchorS3 = input.string(defval = "M", title="VWAP 3 Anchor", options=["None","D", "W", "M", "3M", "6M", "12M"], group=groupV3, inline=inlineMain3)
 var anchorThreeDefined = anchorS3 != "None"
- 
+
 _threeOffset = input(5, title="Offset", group=groupV3, inline=inlineMain3)
 threeTextColor = input.color(color.new(#7b1fa2, 0), title="Text", group=groupV3, inline=inlineMain3)
 threeVwapColor = input.color(color.new(#7b1fa2, 0), title = "VWAP/Close",group=groupV3, inline=inlineMain3)
@@ -327,6 +327,11 @@ if anchorOneDefined
             setLabelPrice(L1V1S3,upBand3S1,oneOffset)
             setLabelPrice(L2V1S3,lowBand3S1,oneOffset)
 
+onePpocPlot = plot(onePPOC, title="One PPOC", color=onePpocColor, offset=0,style=ppocPlotStyle)
+onePvahPlot = plot(onePVAH, title="One PVAH", color=onePvaEdgeColor, offset=0,style=pvaPlotStyleHolder)
+onePvalPlot = plot(onePVAL, title="One PVAL", color=onePvaEdgeColor, offset=0,style=pvaPlotStyleHolder)
+fill(onePvalPlot, onePvahPlot, onePvaFillActive ? onePvaFillColor : na, title='One PVA Fill')
+
 plot(showOneVwap ? vwapValueS1 : na, title="VWAP 1", color=oneVwapColor, offset=0, style = VwapStyleHolder)
 
 oneDvahPlot = plot(showOneBand1 ? oneDVAH : na, title="One DVAH", color=oneBandColor, offset=0, style=BandStyleHolder)
@@ -337,11 +342,6 @@ plot(showOneBand2 ? upBand2S1 : na, title="One +1.5", color=oneBandColor, offset
 plot(showOneBand2 ? lowBand2S1 : na, title="One -1.5", color=oneBandColor, offset=0, style =BandStyleHolder)
 plot(showOneBand3 ? upBand3S1 : na, title="One +2", color=oneBandColor, offset=0, style =BandStyleHolder)
 plot(showOneBand3 ? lowBand3S1 : na, title="One -2", color=oneBandColor, offset=0, style =BandStyleHolder)
-
-onePpocPlot = plot(onePPOC, title="One PPOC", color=onePpocColor, offset=0,style=ppocPlotStyle)
-onePvahPlot = plot(onePVAH, title="One PVAH", color=onePvaEdgeColor, offset=0,style=pvaPlotStyleHolder)
-onePvalPlot = plot(onePVAL, title="One PVAL", color=onePvaEdgeColor, offset=0,style=pvaPlotStyleHolder)
-fill(onePvalPlot, onePvahPlot, onePvaFillActive ? onePvaFillColor : na, title='One PVA Fill')
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -411,6 +411,11 @@ if anchorTwoDefined
             setLabelPrice(L1V2S3,upBand3S2,twoOffset)
             setLabelPrice(L2V2S3,lowBand3S2,twoOffset)
 
+twoPpocPlot = plot(twoPPOC, title="Two PPOC", color=twoPpocColor, offset=0,style=ppocPlotStyle)
+twoPvahPlot = plot(twoPVAH, title="Two PVAH", color=twoPvaEdgeColor, offset=0, style=pvaPlotStyleHolder)
+twoPvalPlot = plot(twoPVAL, title="Two PVAL", color=twoPvaEdgeColor, offset=0, style=pvaPlotStyleHolder)
+fill(twoPvalPlot, twoPvahPlot, twoPvaFillActive ? twoPvaFillColor : na, title='Two PVA Fill')
+
 plot(showTwoVwap ? vwapValueS2 : na, title="VWAP 2", color=twoVwapColor, offset=0, style = VwapStyleHolder)
 
 twoDvahPlot = plot(showTwoBand1 ? twoDVAH : na, title="Two DVAH", color=twoBandColor, offset=0, style =BandStyleHolder)
@@ -421,11 +426,6 @@ plot(showTwoBand2 ? upBand2S2 : na, title="Two +1.5", color=twoBandColor, offset
 plot(showTwoBand2 ? lowBand2S2 : na, title="Two -1.5", color=twoBandColor, offset=0, style =BandStyleHolder)
 plot(showTwoBand3 ? upBand3S2 : na, title="Two +2", color=twoBandColor, offset=0, style =BandStyleHolder)
 plot(showTwoBand3 ? lowBand3S2 : na, title="Two -2", color=twoBandColor, offset=0, style =BandStyleHolder)
-
-twoPpocPlot = plot(twoPPOC, title="Two PPOC", color=twoPpocColor, offset=0,style=ppocPlotStyle)
-twoPvahPlot = plot(twoPVAH, title="Two PVAH", color=twoPvaEdgeColor, offset=0, style=pvaPlotStyleHolder)
-twoPvalPlot = plot(twoPVAL, title="Two PVAL", color=twoPvaEdgeColor, offset=0, style=pvaPlotStyleHolder)
-fill(twoPvalPlot, twoPvahPlot, twoPvaFillActive ? twoPvaFillColor : na, title='Two PVA Fill')
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -495,6 +495,11 @@ if anchorThreeDefined
             setLabelPrice(L1V3S3,upBand3S3,threeOffset)
             setLabelPrice(L2V3S3,lowBand3S3,threeOffset)
 
+//threePpocPlot = plot(threePPOC, title="Three PPOC", color=threePpocColor, offset=0,style=ppocPlotStyle)
+threePvahPlot = plot(threePVAH, title="Three PVAH", color=threePvaEdgeColor, offset=0, style=pvaPlotStyleHolder)
+threePvalPlot = plot(threePVAL, title="Three PVAL", color=threePvaEdgeColor, offset=0, style=pvaPlotStyleHolder)
+fill(threePvalPlot, threePvahPlot, threePvaFillActive ? threePvaFillColor : na, title='Three PVA Fill')
+
 plot(showThreeVwap ? vwapValueS3 : na, title="VWAP 3", color=threeVwapColor, offset=0, style = VwapStyleHolder)
 
 threeDvahPlot = plot(showThreeBand1 ? threeDVAH : na, title="Three DVAH", color=threeBandColor, offset=0, style =BandStyleHolder)
@@ -505,8 +510,3 @@ plot(showThreeBand2 ? upBand2S3 : na, title="Three +1.5", color=threeBandColor, 
 plot(showThreeBand2 ? lowBand2S3 : na, title="Three -1.5", color=threeBandColor, offset=0, style =BandStyleHolder)
 plot(showThreeBand3 ? upBand3S3 : na, title="Three +2", color=threeBandColor, offset=0, style =BandStyleHolder)
 plot(showThreeBand3 ? lowBand3S3 : na, title="Three -2", color=threeBandColor, offset=0, style =BandStyleHolder)
-
-//threePpocPlot = plot(threePPOC, title="Three PPOC", color=threePpocColor, offset=0,style=ppocPlotStyle)
-threePvahPlot = plot(threePVAH, title="Three PVAH", color=threePvaEdgeColor, offset=0, style=pvaPlotStyleHolder)
-threePvalPlot = plot(threePVAL, title="Three PVAL", color=threePvaEdgeColor, offset=0, style=pvaPlotStyleHolder)
-fill(threePvalPlot, threePvahPlot, threePvaFillActive ? threePvaFillColor : na, title='Three PVA Fill')
