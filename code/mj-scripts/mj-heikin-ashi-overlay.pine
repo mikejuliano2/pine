@@ -1,0 +1,68 @@
+//@version=5
+indicator("MJ - Heikin Ashi Overlay", overlay=true, scale=scale.none)
+
+inlineMain = 'main'
+inlineOverride = 'override'
+inlineColors = 'colors'
+groupMarkers = '----- Markers -----'
+groupBg = '----- Background Color -----'
+groupShared = '----- Shared -----'
+
+barsActive = input(false, 'Bars', inline=inlineMain, group=groupShared)
+_upColor = input.color(color.new(#1848cc, 0), title="Up", inline=inlineMain, group=groupShared)
+_downColor = input.color(color.new(#0a1f55, 0), title="Down", inline=inlineMain, group=groupShared)
+
+markersActive = input(true, 'Active', group=groupMarkers, inline=inlineMain)
+markerChangeOnly = input(true, 'Only on change', group=groupMarkers, inline=inlineMain)
+markerOpacity = input.int(50, 'Opacity', group=groupMarkers, maxval=100, minval=0, inline=inlineMain)
+markerPosition = input.string(location.bottom, 'Position', options=[location.top, location.bottom, location.abovebar, location.belowbar, location.absolute], group=groupMarkers, inline=inlineMain)
+markerShape = input.string(shape.square, 'Shape', options=[shape.circle, shape.cross, shape.diamond, shape.labelup, shape.labeldown, shape.square, shape.triangledown, shape.triangleup, shape.xcross], group=groupMarkers, inline=inlineMain)
+
+markerColorOverridesActive = input(false, 'Overrides', group=groupMarkers, inline=inlineOverride)
+markerOverrideUpColor = input.color(color.new(color.white, 70), title="Up", group=groupMarkers, inline=inlineOverride)
+markerOverrideDownColor = input.color(color.new(color.red, 70), title="Down", group=groupMarkers, inline=inlineOverride)
+
+// BG COLOR
+bgActive = input(false, 'Active', group=groupBg, inline=inlineMain)
+bgChangeOnly = input(true, 'Only on change', group=groupBg, inline=inlineMain)
+bgOpacity = input.int(90, 'Opacity', group=groupBg, maxval=100, minval=0, inline=inlineMain)
+bgOerridesActive = input(true, 'Override', group=groupBg, inline=inlineOverride)
+bgOverrideUpColor = input.color(color.new(color.white, 90), title="Up", group=groupBg, inline=inlineOverride)
+bgOverrideDownColor = input.color(color.new(color.red, 90), title="Down", group=groupBg, inline=inlineOverride)
+
+_heikinAshiIsUp() =>
+    handle = ticker.heikinashi(syminfo.tickerid)
+    [haOpen, haClose] = request.security(handle, timeframe.period, [open, close])
+    haClose > haOpen
+
+directionIsUp = _heikinAshiIsUp()
+didChange = directionIsUp != directionIsUp[1]
+
+_heikinAshiColor(colorUp, colorDown) => directionIsUp ? colorUp : colorDown
+
+
+barColor = _heikinAshiColor(_upColor, _downColor)
+barcolor(barsActive ? barColor : na)
+
+
+_markerColor() =>
+  markerColorOverridesActive
+   ? _heikinAshiColor(markerOverrideUpColor, markerOverrideDownColor)
+   : color.new(barColor, markerOpacity)
+
+plotshape(
+  markersActive and (markerChangeOnly ? didChange : true),
+  title="HA",
+  style=markerShape,
+  location=markerPosition,
+  size=size.tiny,
+  color=markersActive  ? _markerColor() : na
+  )
+
+_bgColor() =>
+  bgOerridesActive
+   ? _heikinAshiColor(bgOverrideUpColor, bgOverrideDownColor)
+   : color.new(barColor, bgOpacity)
+
+bgColorActive = bgActive ? (bgChangeOnly ? didChange : true) : false
+bgcolor(bgColorActive ? _bgColor() : na)
